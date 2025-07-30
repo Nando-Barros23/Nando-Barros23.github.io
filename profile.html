@@ -69,7 +69,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -84,7 +83,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const storage = firebase.storage();
         const usersCollection = db.collection('users');
 
         const userArea = document.getElementById('user-area');
@@ -101,10 +99,10 @@
                     renderHeader();
                     renderProfilePage();
                 } else {
-                    window.location.href = 'index.html'; // Se não tem perfil, volta pra home
+                    window.location.href = 'index.html';
                 }
             } else {
-                window.location.href = 'index.html'; // Se não está logado, volta pra home
+                window.location.href = 'index.html';
             }
         });
 
@@ -143,8 +141,8 @@
                         <input type="text" id="username" value="${currentUserProfile.username}" required>
                     </div>
                     <div class="form-grupo">
-                        <label for="photo">Alterar Foto de Perfil</label>
-                        <input type="file" id="photo" accept="image/*">
+                        <label for="photoURL">URL da Foto de Perfil</label>
+                        <input type="url" id="photoURL" value="${currentUserProfile.photoURL}" required>
                     </div>
                     <button type="submit" class="btn-primario" id="save-profile-btn">Salvar Alterações</button>
                 </form>
@@ -166,17 +164,9 @@
             btn.textContent = 'Salvando...';
 
             const newUsername = document.getElementById('username').value;
-            const newPhotoFile = document.getElementById('photo').files[0];
-            let newPhotoURL = currentUserProfile.photoURL;
+            const newPhotoURL = document.getElementById('photoURL').value;
 
             try {
-                if (newPhotoFile) {
-                    const filePath = `profile-pictures/${currentUser.uid}/${newPhotoFile.name}`;
-                    const storageRef = storage.ref(filePath);
-                    const uploadTask = await storageRef.put(newPhotoFile);
-                    newPhotoURL = await uploadTask.ref.getDownloadURL();
-                }
-
                 const updatedProfile = {
                     username: newUsername,
                     photoURL: newPhotoURL
@@ -184,7 +174,7 @@
 
                 await usersCollection.doc(currentUser.uid).update(updatedProfile);
                 alert('Perfil atualizado com sucesso!');
-                location.reload(); // Recarrega a página para ver as mudanças
+                location.reload();
 
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
