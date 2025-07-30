@@ -4,22 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados & Calangos - Mural</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Estilos com a paleta de cores "Dados & Calangos" */
+        /* Estilos com a paleta de cores "Dados & Calangos" - TEMA CLARO */
         :root {
-            --cor-fundo: #221A29;
-            --cor-fundo-card: #2d2336; /* Um tom pouco mais claro que o fundo */
+            --cor-fundo: #F7F7F7;
+            --cor-fundo-card: #FFFFFF;
             --cor-primaria: #D06E41;
-            --cor-texto: #F7F7F7;
-            --cor-texto-secundario: #DFE0DF;
+            --cor-texto: #221A29;
+            --cor-texto-secundario: #5c5561;
             --cor-alerta: #FFDBA7;
-            --sombra: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --cor-borda: #DFE0DF;
+            --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+            /* Definindo as fontes */
+            --fonte-titulo: 'MedievalSharp', cursive;
+            --fonte-corpo: 'Roboto', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: var(--fonte-corpo);
             background-color: var(--cor-fundo);
             color: var(--cor-texto);
             line-height: 1.6;
@@ -38,36 +48,26 @@
         @media (min-width: 992px) { .container { grid-template-columns: 2fr 1fr; } }
 
         /* Cabeçalho */
-        header {
-            text-align: center;
-            padding: 2rem 1rem;
-        }
-        header .logo {
-            max-width: 150px;
-            margin-bottom: 1rem;
-        }
+        header { text-align: center; padding: 2rem 1rem; }
+        header .logo { max-width: 150px; margin-bottom: 1rem; }
         header h1 {
-            color: var(--cor-primaria);
-            font-size: 2.8rem;
-            font-weight: bold;
-        }
-        
-        h2 {
-            color: var(--cor-primaria);
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--cor-primaria);
-            padding-bottom: 0.5rem;
+            font-family: var(--fonte-titulo);
+            color: var(--cor-texto);
+            font-size: 4rem;
         }
 
-        /* Mural de Aventuras */
-        #mural-aventuras {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+        h2, h3 {
+            font-family: var(--fonte-titulo);
+            color: var(--cor-primaria);
         }
+        h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+
+        /* Mural de Aventuras */
+        #mural-aventuras { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
 
         .card-aventura {
             background-color: var(--cor-fundo-card);
+            border: 1px solid var(--cor-borda);
             border-radius: 8px;
             box-shadow: var(--sombra);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -76,73 +76,45 @@
             overflow: hidden;
         }
 
-        .card-aventura:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(208, 110, 65, 0.15);
-        }
-        
-        .card-imagem {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-
-        .card-conteudo {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .card-conteudo h3 { color: var(--cor-primaria); margin-bottom: 0.5rem; }
+        .card-aventura:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
+        .card-imagem { width: 100%; height: 180px; object-fit: cover; }
+        .card-conteudo { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
         .card-conteudo p { color: var(--cor-texto-secundario); margin-bottom: 1rem; }
         .card-conteudo .descricao { flex-grow: 1; }
-        .card-conteudo strong { color: var(--cor-texto); }
+        .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
 
         .card-gatilho {
             font-style: italic;
-            color: var(--cor-alerta);
-            background-color: rgba(255, 219, 167, 0.1);
+            color: #8c6d3f;
+            background-color: var(--cor-alerta);
             padding: 0.5rem;
             border-radius: 4px;
             font-size: 0.9rem;
         }
-        
-        #mensagem-vazio {
-            color: var(--cor-texto-secundario);
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 2rem;
-            background: var(--cor-fundo-card);
-            border-radius: 8px;
-        }
+
+        #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
 
         /* Painel do Mestre */
-        .painel-mestre {
-            background-color: var(--cor-fundo-card);
-            padding: 2rem;
-            border-radius: 8px;
-            position: sticky;
-            top: 2rem;
-        }
-
+        .painel-mestre { background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
         .form-grupo { margin-bottom: 1rem; }
-        .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto-secundario); }
+        .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto-secundario); font-weight: 700; }
         .form-grupo input, .form-grupo textarea {
             width: 100%;
             padding: 0.8rem;
             background-color: var(--cor-fundo);
-            border: 1px solid var(--cor-primaria);
+            border: 1px solid var(--cor-borda);
             border-radius: 4px;
             color: var(--cor-texto);
             font-size: 1rem;
+            font-family: var(--fonte-corpo);
         }
         .form-grupo textarea { resize: vertical; min-height: 100px; }
-        
+        .form-grupo input:focus, .form-grupo textarea:focus { border-color: var(--cor-primaria); outline: none; }
+
         /* Botões */
-        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; }
-        .btn-primario { background-color: var(--cor-primaria); color: var(--cor-fundo); width: 100%; margin-top: 1rem; }
-        .btn-primario:hover { background-color: var(--cor-alerta); color: var(--cor-fundo); }
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
+        .btn-primario { background-color: var(--cor-primaria); color: #fff; width: 100%; margin-top: 1rem; }
+        .btn-primario:hover { background-color: #b85b30; }
         .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-end; margin-top: 1rem; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
 
@@ -160,7 +132,7 @@
             <h2>Chamados de Aventura</h2>
             <div id="mural-aventuras"></div>
         </main>
-        
+
         <aside>
             <div class="painel-mestre">
                 <h2>Painel do Mestre</h2>
@@ -197,7 +169,7 @@
             aventuras.forEach((aventura, index) => {
                 const card = document.createElement('div');
                 card.className = 'card-aventura';
-                
+
                 const imagemHtml = aventura.imagem ? `<img src="${aventura.imagem}" alt="Imagem da aventura" class="card-imagem">` : '';
                 const gatilhoHtml = aventura.gatilho ? `<p class="card-gatilho">⚠️ <strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
 
@@ -215,7 +187,7 @@
                         <button class="btn-deletar" onclick="deletarAventura(${index})">Deletar</button>
                     </div>
                 `;
-                
+
                 muralAventuras.appendChild(card);
             });
         };
