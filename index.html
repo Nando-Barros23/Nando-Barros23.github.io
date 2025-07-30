@@ -95,7 +95,15 @@
             font-size: 0.9rem;
         }
         
-        #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background: #FFF; border-radius: 8px; border: 1px solid var(--cor-borda); }
+        #mensagem-vazio { 
+            color: var(--cor-texto-secundario); 
+            grid-column: 1 / -1; 
+            text-align: center; 
+            padding: 2rem; 
+            background-color: var(--cor-fundo-card); /* CORRIGIDO AQUI */
+            border-radius: 8px; 
+            border: 1px solid var(--cor-borda); 
+        }
 
         /* Painel do Mestre */
         .painel-mestre { background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
