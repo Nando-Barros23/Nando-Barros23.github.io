@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural de Aventuras</title>
+    <style>
+        /* Estilos Globais e Reset */
+        :root {
+            --cor-fundo: #1a1a1a;
+            --cor-fundo-card: #2c2c2c;
+            --cor-primaria: #00aaff;
+            --cor-texto: #e0e0e0;
+            --cor-texto-secundario: #a0a0a0;
+            --cor-borda: #444;
+            --sombra: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            line-height: 1.6;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Cabeçalho e Títulos */
+        header h1 {
+            text-align: center;
+            color: var(--cor-primaria);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: var(--cor-primaria);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--cor-borda);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Mural de Aventuras */
+        #mural-aventuras {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card-aventura {
+            background-color: var(--cor-fundo-card);
+            border: 1px solid var(--cor-borda);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--sombra);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-aventura:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 170, 255, 0.1);
+        }
+
+        .card-aventura h3 {
+            color: var(--cor-primaria);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-aventura p {
+            color: var(--cor-texto-secundario);
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        
+        .card-aventura strong {
+            color: var(--cor-texto);
+        }
+        
+        #mensagem-vazio {
+            color: var(--cor-texto-secundario);
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            background: var(--cor-fundo-card);
+            border-radius: 8px;
+        }
+
+        /* Painel do Mestre (Formulário) */
+        .painel-mestre {
+            background-color: var(--cor-fundo-card);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--cor-borda);
+            position: sticky;
+            top: 2rem;
+        }
+
+        .form-grupo {
+            margin-bottom: 1rem;
+        }
+
+        .form-grupo label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--cor-texto-secundario);
+        }
+
+        .form-grupo input,
+        .form-grupo textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--cor-fundo);
+            border: 1px solid var(--cor-borda);
+            border-radius: 4px;
+            color: var(--cor-texto);
+            font-size: 1rem;
+        }
+
+        .form-grupo textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* Botões */
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primario {
+            background-color: var(--cor-primaria);
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primario:hover {
+            background-color: #0088cc;
+        }
+        
+        .btn-deletar {
+            background-color: #ff4d4d;
+            color: #fff;
+            align-self: flex-end;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .btn-deletar:hover {
+            background-color: #cc0000;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mural de Aventuras</h1>
+    </header>
+
+    <div class="container">
+        <main>
+            <h2>Chamados de Aventura</h2>
+            <div id="mural-aventuras">
+                </div>
+        </main>
+        
+        <aside>
+            <div class="painel-mestre">
+                <h2>Painel do Mestre</h2>
+                <form id="form-aventura">
+                    <div class="form-grupo">
+                        <label for="titulo">Título da Aventura</label>
+                        <input type="text" id="titulo" required>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="mestre">Nome do Mestre</label>
+                        <input type="text" id="mestre" required>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="sistema">Sistema de RPG</label>
+                        <input type="text" id="sistema" required>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="descricao">Descrição</label>
+                        <textarea id="descricao" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primario">Publicar Aventura</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Seleciona os elementos do HTML que vamos manipular
+        const formAventura = document.getElementById('form-aventura');
+        const muralAventuras = document.getElementById('mural-aventuras');
+
+        // Função para buscar as aventuras salvas no navegador
+        const getAventuras = () => {
+            // Se houver 'aventuras' salvas, converte de volta para objeto, senão, retorna um array vazio
+            return JSON.parse(localStorage.getItem('aventuras')) || [];
+        };
+
+        // Função para salvar as aventuras no navegador
+        const salvarAventuras = (aventuras) => {
+            // Converte o array de objetos para uma string JSON e salva
+            localStorage.setItem('aventuras', JSON.stringify(aventuras));
+        };
+
+        // Função para renderizar (mostrar) as aventuras na tela
+        const renderizarAventuras = () => {
+            // Limpa o mural antes de adicionar as novas aventuras
+            muralAventuras.innerHTML = '';
+
+            const aventuras = getAventuras();
+
+            // Se não houver aventuras, mostra uma mensagem
+            if (aventuras.length === 0) {
+                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda. Seja o primeiro!</p>';
+                return;
+            }
+
+            // Para cada aventura no array, cria um card HTML
+            aventuras.forEach((aventura, index) => {
+                const card = document.createElement('div');
+                card.className = 'card-aventura';
+                
+                card.innerHTML = `
+                    <h3>${aventura.titulo}</h3>
+                    <p>
+                        <strong>Mestre:</strong> ${aventura.mestre}<br>
+                        <strong>Sistema:</strong> ${aventura.sistema}
+                    </p>
+                    <p>${aventura.descricao}</p>
+                    <button class="btn-deletar" onclick="deletarAventura(${index})">Deletar</button>
+                `;
+                
+                muralAventuras.appendChild(card);
+            });
+        };
+
+        // Função para deletar uma aventura
+        const deletarAventura = (index) => {
+            if (confirm('Tem certeza que deseja deletar esta aventura?')) {
+                const aventuras = getAventuras();
+                // Remove a aventura do array pelo seu índice
+                aventuras.splice(index, 1);
+                salvarAventuras(aventuras);
+                renderizarAventuras();
+            }
+        };
+
+        // Adiciona um "ouvinte" para o evento de submissão do formulário
+        formAventura.addEventListener('submit', (event) => {
+            // Previne que a página recarregue ao enviar o formulário
+            event.preventDefault();
+
+            // Pega os valores dos campos do formulário
+            const novaAventura = {
+                titulo: document.getElementById('titulo').value,
+                mestre: document.getElementById('mestre').value,
+                sistema: document.getElementById('sistema').value,
+                descricao: document.getElementById('descricao').value,
+            };
+
+            const aventuras = getAventuras();
+            // Adiciona a nova aventura no início do array
+            aventuras.unshift(novaAventura);
+            salvarAventuras(aventuras);
+
+            // Limpa os campos do formulário
+            formAventura.reset();
+
+            // Re-renderiza a lista de aventuras na tela
+            renderizarAventuras();
+        });
+
+        // Renderiza as aventuras salvas assim que a página carrega
+        document.addEventListener('DOMContentLoaded', renderizarAventuras);
+
+    </script>
+</body>
+</html>
