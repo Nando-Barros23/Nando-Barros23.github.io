@@ -104,9 +104,9 @@
                     <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
                     <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required disabled></div>
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
-                    <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="number" id="nivel" min="1" required></div>
+                    <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="text" id="nivel" required></div>
                     <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (cole o link da imagem aqui)"></div>
-                    <div class="form-grupo"><label for="gatilho">Alertas de Gatilho (Opcional)</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência"></div>
+                    <div class="form-grupo"><label for="gatilho">Alertas de Gatilho</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência" required></div>
                     <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
                     <button type="submit" class="btn-primario" id="btn-publicar">Publicar Aventura</button>
                 </form>
@@ -159,7 +159,7 @@
                     const newProfile = {
                         email: user.email,
                         username: user.displayName || 'Novo Calango',
-                        photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', // Avatar padrão
+                        photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png',
                         role: 'player',
                         masterRequest: false
                     };
@@ -207,7 +207,7 @@
                 <form id="email-form">
                     <div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div>
                     <div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div>
-                    <button type="submit" class="btn btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button>
+                    <button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button>
                 </form>
                 <button id="google-login-btn" class="btn">Entrar com Google</button>
             `;
