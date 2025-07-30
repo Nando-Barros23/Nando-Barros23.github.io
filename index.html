@@ -3,25 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mural de Aventuras</title>
+    <title>Dados & Calangos - Mural</title>
     <style>
-        /* Estilos Globais e Reset */
+        /* Estilos com a paleta de cores "Dados & Calangos" */
         :root {
-            --cor-fundo: #1a1a1a;
-            --cor-fundo-card: #2c2c2c;
-            --cor-primaria: #00aaff;
-            --cor-texto: #e0e0e0;
-            --cor-texto-secundario: #a0a0a0;
-            --cor-borda: #444;
-            --cor-alerta: #ffcc00;
-            --sombra: 0 4px 8px rgba(0, 0, 0, 0.2);
+            --cor-fundo: #221A29;
+            --cor-fundo-card: #2d2336; /* Um tom pouco mais claro que o fundo */
+            --cor-primaria: #D06E41;
+            --cor-texto: #F7F7F7;
+            --cor-texto-secundario: #DFE0DF;
+            --cor-alerta: #FFDBA7;
+            --sombra: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -40,24 +35,27 @@
             gap: 2rem;
         }
 
-        @media (min-width: 992px) {
-            .container {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
+        @media (min-width: 992px) { .container { grid-template-columns: 2fr 1fr; } }
 
-        /* Cabeçalho e Títulos */
-        header h1 {
+        /* Cabeçalho */
+        header {
             text-align: center;
+            padding: 2rem 1rem;
+        }
+        header .logo {
+            max-width: 150px;
+            margin-bottom: 1rem;
+        }
+        header h1 {
             color: var(--cor-primaria);
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            font-weight: bold;
         }
         
         h2 {
             color: var(--cor-primaria);
             margin-bottom: 1rem;
-            border-bottom: 2px solid var(--cor-borda);
+            border-bottom: 2px solid var(--cor-primaria);
             padding-bottom: 0.5rem;
         }
 
@@ -70,25 +68,23 @@
 
         .card-aventura {
             background-color: var(--cor-fundo-card);
-            border: 1px solid var(--cor-borda);
             border-radius: 8px;
             box-shadow: var(--sombra);
             transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Garante que a imagem não saia do card */
+            overflow: hidden;
         }
 
         .card-aventura:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 170, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(208, 110, 65, 0.15);
         }
         
         .card-imagem {
             width: 100%;
             height: 180px;
-            object-fit: cover; /* Faz a imagem cobrir o espaço sem distorcer */
-            border-bottom: 1px solid var(--cor-borda);
+            object-fit: cover;
         }
 
         .card-conteudo {
@@ -98,27 +94,17 @@
             flex-grow: 1;
         }
 
-        .card-conteudo h3 {
-            color: var(--cor-primaria);
-            margin-bottom: 0.5rem;
-        }
-
-        .card-conteudo p {
-            color: var(--cor-texto-secundario);
-            margin-bottom: 1rem;
-        }
-        
-        .card-conteudo .descricao {
-             flex-grow: 1;
-        }
-        
-        .card-conteudo strong {
-            color: var(--cor-texto);
-        }
+        .card-conteudo h3 { color: var(--cor-primaria); margin-bottom: 0.5rem; }
+        .card-conteudo p { color: var(--cor-texto-secundario); margin-bottom: 1rem; }
+        .card-conteudo .descricao { flex-grow: 1; }
+        .card-conteudo strong { color: var(--cor-texto); }
 
         .card-gatilho {
             font-style: italic;
             color: var(--cor-alerta);
+            background-color: rgba(255, 219, 167, 0.1);
+            padding: 0.5rem;
+            border-radius: 4px;
             font-size: 0.9rem;
         }
         
@@ -131,123 +117,61 @@
             border-radius: 8px;
         }
 
-        /* Painel do Mestre (Formulário) */
+        /* Painel do Mestre */
         .painel-mestre {
             background-color: var(--cor-fundo-card);
             padding: 2rem;
             border-radius: 8px;
-            border: 1px solid var(--cor-borda);
             position: sticky;
             top: 2rem;
         }
 
-        .form-grupo {
-            margin-bottom: 1rem;
-        }
-
-        .form-grupo label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--cor-texto-secundario);
-        }
-
-        .form-grupo input,
-        .form-grupo textarea {
+        .form-grupo { margin-bottom: 1rem; }
+        .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto-secundario); }
+        .form-grupo input, .form-grupo textarea {
             width: 100%;
             padding: 0.8rem;
             background-color: var(--cor-fundo);
-            border: 1px solid var(--cor-borda);
+            border: 1px solid var(--cor-primaria);
             border-radius: 4px;
             color: var(--cor-texto);
             font-size: 1rem;
         }
-
-        .form-grupo textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
+        .form-grupo textarea { resize: vertical; min-height: 100px; }
         
         /* Botões */
-        button {
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        
-        .btn-primario {
-            background-color: var(--cor-primaria);
-            color: #fff;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .btn-primario:hover {
-            background-color: #0088cc;
-        }
-        
-        .btn-deletar {
-            background-color: #ff4d4d;
-            color: #fff;
-            align-self: flex-end;
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-        }
-        
-        .btn-deletar:hover {
-            background-color: #cc0000;
-        }
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; }
+        .btn-primario { background-color: var(--cor-primaria); color: var(--cor-fundo); width: 100%; margin-top: 1rem; }
+        .btn-primario:hover { background-color: var(--cor-alerta); color: var(--cor-fundo); }
+        .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-end; margin-top: 1rem; padding: 0.5rem 1rem; }
+        .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
 
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Mural de Aventuras</h1>
+        <img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo">
+        <h1>Dados & Calangos</h1>
     </header>
 
     <div class="container">
         <main>
             <h2>Chamados de Aventura</h2>
-            <div id="mural-aventuras">
-                </div>
+            <div id="mural-aventuras"></div>
         </main>
         
         <aside>
             <div class="painel-mestre">
                 <h2>Painel do Mestre</h2>
                 <form id="form-aventura">
-                    <div class="form-grupo">
-                        <label for="titulo">Título da Aventura</label>
-                        <input type="text" id="titulo" required>
-                    </div>
-                    <div class="form-grupo">
-                        <label for="mestre">Nome do Mestre</label>
-                        <input type="text" id="mestre" required>
-                    </div>
-                    <div class="form-grupo">
-                        <label for="sistema">Sistema de RPG</label>
-                        <input type="text" id="sistema" required>
-                    </div>
-                    <div class="form-grupo">
-                        <label for="nivel">Nível Recomendado</label>
-                        <input type="number" id="nivel" min="1" required>
-                    </div>
-                     <div class="form-grupo">
-                        <label for="imagem">URL da Imagem</label>
-                        <input type="url" id="imagem" placeholder="https://exemplo.com/imagem.png">
-                    </div>
-                     <div class="form-grupo">
-                        <label for="gatilho">Alertas de Gatilho (Opcional)</label>
-                        <input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência Gráfica">
-                    </div>
-                    <div class="form-grupo">
-                        <label for="descricao">Descrição</label>
-                        <textarea id="descricao" required></textarea>
-                    </div>
+                    <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
+                    <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required></div>
+                    <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
+                    <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="number" id="nivel" min="1" required></div>
+                    <div class="form-grupo"><label for="imagem">URL da Imagem da Aventura</label><input type="url" id="imagem" placeholder="https://... (link da imagem)"></div>
+                    <div class="form-grupo"><label for="gatilho">Alertas de Gatilho (Opcional)</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência"></div>
+                    <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
                     <button type="submit" class="btn-primario">Publicar Aventura</button>
                 </form>
             </div>
@@ -258,13 +182,8 @@
         const formAventura = document.getElementById('form-aventura');
         const muralAventuras = document.getElementById('mural-aventuras');
 
-        const getAventuras = () => {
-            return JSON.parse(localStorage.getItem('aventuras')) || [];
-        };
-
-        const salvarAventuras = (aventuras) => {
-            localStorage.setItem('aventuras', JSON.stringify(aventuras));
-        };
+        const getAventuras = () => JSON.parse(localStorage.getItem('aventuras_calangos')) || [];
+        const salvarAventuras = (aventuras) => localStorage.setItem('aventuras_calangos', JSON.stringify(aventuras));
 
         const renderizarAventuras = () => {
             muralAventuras.innerHTML = '';
@@ -279,10 +198,7 @@
                 const card = document.createElement('div');
                 card.className = 'card-aventura';
                 
-                // Adiciona a imagem apenas se a URL for fornecida
-                const imagemHtml = aventura.imagem ? `<img src="${aventura.imagem}" alt="Imagem da aventura ${aventura.titulo}" class="card-imagem">` : '';
-
-                // Adiciona o alerta de gatilho apenas se for fornecido
+                const imagemHtml = aventura.imagem ? `<img src="${aventura.imagem}" alt="Imagem da aventura" class="card-imagem">` : '';
                 const gatilhoHtml = aventura.gatilho ? `<p class="card-gatilho">⚠️ <strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
 
                 card.innerHTML = `
@@ -304,7 +220,7 @@
             });
         };
 
-        const deletarAventura = (index) => {
+        window.deletarAventura = (index) => {
             if (confirm('Tem certeza que deseja deletar esta aventura?')) {
                 const aventuras = getAventuras();
                 aventuras.splice(index, 1);
@@ -315,7 +231,6 @@
 
         formAventura.addEventListener('submit', (event) => {
             event.preventDefault();
-
             const novaAventura = {
                 titulo: document.getElementById('titulo').value,
                 mestre: document.getElementById('mestre').value,
@@ -325,7 +240,6 @@
                 gatilho: document.getElementById('gatilho').value,
                 descricao: document.getElementById('descricao').value,
             };
-
             const aventuras = getAventuras();
             aventuras.unshift(novaAventura);
             salvarAventuras(aventuras);
