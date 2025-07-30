@@ -13,6 +13,7 @@
             --cor-texto: #e0e0e0;
             --cor-texto-secundario: #a0a0a0;
             --cor-borda: #444;
+            --cor-alerta: #ffcc00;
             --sombra: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
@@ -71,31 +72,54 @@
             background-color: var(--cor-fundo-card);
             border: 1px solid var(--cor-borda);
             border-radius: 8px;
-            padding: 1.5rem;
             box-shadow: var(--sombra);
             transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* Garante que a imagem não saia do card */
         }
 
         .card-aventura:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 16px rgba(0, 170, 255, 0.1);
         }
+        
+        .card-imagem {
+            width: 100%;
+            height: 180px;
+            object-fit: cover; /* Faz a imagem cobrir o espaço sem distorcer */
+            border-bottom: 1px solid var(--cor-borda);
+        }
 
-        .card-aventura h3 {
+        .card-conteudo {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-conteudo h3 {
             color: var(--cor-primaria);
             margin-bottom: 0.5rem;
         }
 
-        .card-aventura p {
+        .card-conteudo p {
             color: var(--cor-texto-secundario);
             margin-bottom: 1rem;
-            flex-grow: 1;
         }
         
-        .card-aventura strong {
+        .card-conteudo .descricao {
+             flex-grow: 1;
+        }
+        
+        .card-conteudo strong {
             color: var(--cor-texto);
+        }
+
+        .card-gatilho {
+            font-style: italic;
+            color: var(--cor-alerta);
+            font-size: 0.9rem;
         }
         
         #mensagem-vazio {
@@ -158,6 +182,7 @@
             background-color: var(--cor-primaria);
             color: #fff;
             width: 100%;
+            margin-top: 1rem;
         }
 
         .btn-primario:hover {
@@ -208,6 +233,18 @@
                         <input type="text" id="sistema" required>
                     </div>
                     <div class="form-grupo">
+                        <label for="nivel">Nível Recomendado</label>
+                        <input type="number" id="nivel" min="1" required>
+                    </div>
+                     <div class="form-grupo">
+                        <label for="imagem">URL da Imagem</label>
+                        <input type="url" id="imagem" placeholder="https://exemplo.com/imagem.png">
+                    </div>
+                     <div class="form-grupo">
+                        <label for="gatilho">Alertas de Gatilho (Opcional)</label>
+                        <input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência Gráfica">
+                    </div>
+                    <div class="form-grupo">
                         <label for="descricao">Descrição</label>
                         <textarea id="descricao" required></textarea>
                     </div>
@@ -218,93 +255,85 @@
     </div>
 
     <script>
-        // Seleciona os elementos do HTML que vamos manipular
         const formAventura = document.getElementById('form-aventura');
         const muralAventuras = document.getElementById('mural-aventuras');
 
-        // Função para buscar as aventuras salvas no navegador
         const getAventuras = () => {
-            // Se houver 'aventuras' salvas, converte de volta para objeto, senão, retorna um array vazio
             return JSON.parse(localStorage.getItem('aventuras')) || [];
         };
 
-        // Função para salvar as aventuras no navegador
         const salvarAventuras = (aventuras) => {
-            // Converte o array de objetos para uma string JSON e salva
             localStorage.setItem('aventuras', JSON.stringify(aventuras));
         };
 
-        // Função para renderizar (mostrar) as aventuras na tela
         const renderizarAventuras = () => {
-            // Limpa o mural antes de adicionar as novas aventuras
             muralAventuras.innerHTML = '';
-
             const aventuras = getAventuras();
 
-            // Se não houver aventuras, mostra uma mensagem
             if (aventuras.length === 0) {
                 muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda. Seja o primeiro!</p>';
                 return;
             }
 
-            // Para cada aventura no array, cria um card HTML
             aventuras.forEach((aventura, index) => {
                 const card = document.createElement('div');
                 card.className = 'card-aventura';
                 
+                // Adiciona a imagem apenas se a URL for fornecida
+                const imagemHtml = aventura.imagem ? `<img src="${aventura.imagem}" alt="Imagem da aventura ${aventura.titulo}" class="card-imagem">` : '';
+
+                // Adiciona o alerta de gatilho apenas se for fornecido
+                const gatilhoHtml = aventura.gatilho ? `<p class="card-gatilho">⚠️ <strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
+
                 card.innerHTML = `
-                    <h3>${aventura.titulo}</h3>
-                    <p>
-                        <strong>Mestre:</strong> ${aventura.mestre}<br>
-                        <strong>Sistema:</strong> ${aventura.sistema}
-                    </p>
-                    <p>${aventura.descricao}</p>
-                    <button class="btn-deletar" onclick="deletarAventura(${index})">Deletar</button>
+                    ${imagemHtml}
+                    <div class="card-conteudo">
+                        <h3>${aventura.titulo}</h3>
+                        <p>
+                            <strong>Mestre:</strong> ${aventura.mestre}<br>
+                            <strong>Sistema:</strong> ${aventura.sistema}<br>
+                            <strong>Nível:</strong> ${aventura.nivel}
+                        </p>
+                        ${gatilhoHtml}
+                        <p class="descricao">${aventura.descricao}</p>
+                        <button class="btn-deletar" onclick="deletarAventura(${index})">Deletar</button>
+                    </div>
                 `;
                 
                 muralAventuras.appendChild(card);
             });
         };
 
-        // Função para deletar uma aventura
         const deletarAventura = (index) => {
             if (confirm('Tem certeza que deseja deletar esta aventura?')) {
                 const aventuras = getAventuras();
-                // Remove a aventura do array pelo seu índice
                 aventuras.splice(index, 1);
                 salvarAventuras(aventuras);
                 renderizarAventuras();
             }
         };
 
-        // Adiciona um "ouvinte" para o evento de submissão do formulário
         formAventura.addEventListener('submit', (event) => {
-            // Previne que a página recarregue ao enviar o formulário
             event.preventDefault();
 
-            // Pega os valores dos campos do formulário
             const novaAventura = {
                 titulo: document.getElementById('titulo').value,
                 mestre: document.getElementById('mestre').value,
                 sistema: document.getElementById('sistema').value,
+                nivel: document.getElementById('nivel').value,
+                imagem: document.getElementById('imagem').value,
+                gatilho: document.getElementById('gatilho').value,
                 descricao: document.getElementById('descricao').value,
             };
 
             const aventuras = getAventuras();
-            // Adiciona a nova aventura no início do array
             aventuras.unshift(novaAventura);
             salvarAventuras(aventuras);
-
-            // Limpa os campos do formulário
             formAventura.reset();
-
-            // Re-renderiza a lista de aventuras na tela
             renderizarAventuras();
         });
 
-        // Renderiza as aventuras salvas assim que a página carrega
         document.addEventListener('DOMContentLoaded', renderizarAventuras);
-
     </script>
 </body>
 </html>
