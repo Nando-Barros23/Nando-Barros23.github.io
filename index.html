@@ -28,11 +28,19 @@
         body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: var(--cor-texto); line-height: 1.6; }
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 992px) { .container { grid-template-columns: 2fr 1fr; } }
-        header { text-align: center; padding: 2rem 1rem; }
-        header .logo { max-width: 150px; margin-bottom: 1rem; }
-        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 4rem; }
+        
+        /* Cabeçalho e Autenticação */
+        header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
+        header .logo { max-width: 100px; }
+        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
+        
+        #user-auth-area button { margin-left: 0.5rem; }
+        #user-info-area { display: flex; align-items: center; gap: 1rem; }
+        
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+
         #mural-aventuras { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
         .card-aventura { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
         .card-aventura:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
@@ -43,26 +51,42 @@
         .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
         .card-gatilho { font-style: italic; color: var(--cor-alerta-texto); background-color: var(--cor-alerta-fundo); border: 1px solid var(--cor-alerta-texto); padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; }
         #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
-        .painel-mestre { background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
+        
+        /* Painel do Mestre (escondido por padrão) */
+        .painel-mestre { display: none; background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
         .form-grupo input, .form-grupo textarea { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
-        .form-grupo input[type="file"] { padding: 0.5rem; }
         .form-grupo textarea { resize: vertical; min-height: 100px; }
         .form-grupo input:focus, .form-grupo textarea:focus { border-color: var(--cor-primaria); outline: none; }
+        
         button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
-        .btn-primario { background-color: var(--cor-primaria); color: #fff; width: 100%; margin-top: 1rem; }
+        .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+        .btn-primario { background-color: var(--cor-primaria); color: #fff; }
         .btn-primario:hover { background-color: #b85b30; }
         .btn-primario:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
+        .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
         .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-end; margin-top: 1rem; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
+
+        /* Modal de Login/Cadastro */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; border: none; background: none; color: var(--cor-texto); }
+        .modal h2 { text-align: center; }
+        #google-login-btn { width: 100%; margin-top: 1rem; background-color: #4285F4; color: white; }
+        #google-login-btn:hover { background-color: #357ae8; }
     </style>
 </head>
 <body>
     
     <header>
-        <img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo">
-        <h1>Dados & Calangos</h1>
+        <div class="header-top">
+            <img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo">
+            <h1>Dados & Calangos</h1>
+            <div id="user-area"></div>
+        </div>
     </header>
 
     <div class="container">
@@ -72,14 +96,14 @@
         </main>
         
         <aside>
-            <div class="painel-mestre">
+            <div class="painel-mestre" id="painel-mestre">
                 <h2>Painel do Mestre</h2>
                 <form id="form-aventura">
                     <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
                     <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required></div>
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
                     <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="number" id="nivel" min="1" required></div>
-                    <div class="form-grupo"><label for="imagem">Imagem da Aventura</label><input type="file" id="imagem" accept="image/*"></div>
+                    <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (cole o link da imagem aqui)"></div>
                     <div class="form-grupo"><label for="gatilho">Alertas de Gatilho (Opcional)</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência"></div>
                     <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
                     <button type="submit" class="btn-primario" id="btn-publicar">Publicar Aventura</button>
@@ -88,9 +112,13 @@
         </aside>
     </div>
 
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal" id="modal-content"></div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -104,18 +132,87 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
         const aventurasCollection = db.collection('aventuras');
 
-        const formAventura = document.getElementById('form-aventura');
+        const userArea = document.getElementById('user-area');
+        const painelMestre = document.getElementById('painel-mestre');
         const muralAventuras = document.getElementById('mural-aventuras');
-        const btnPublicar = document.getElementById('btn-publicar');
-        const inputImagem = document.getElementById('imagem');
+        const formAventura = document.getElementById('form-aventura');
+        const authModal = document.getElementById('auth-modal');
+        const modalContent = document.getElementById('modal-content');
 
+        // --- Gerenciamento de Autenticação ---
+        auth.onAuthStateChanged(user => {
+            if (user) { // Usuário está logado
+                userArea.innerHTML = `
+                    <div id="user-info-area">
+                        <span>${user.email}</span>
+                        <button id="logout-btn" class="btn btn-secundario">Sair</button>
+                    </div>
+                `;
+                painelMestre.style.display = 'block';
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+            } else { // Usuário está deslogado
+                userArea.innerHTML = `
+                    <div id="user-auth-area">
+                        <button id="login-btn" class="btn btn-primario">Entrar</button>
+                        <button id="signup-btn" class="btn btn-secundario">Cadastrar-se</button>
+                    </div>
+                `;
+                painelMestre.style.display = 'none';
+                document.getElementById('login-btn').addEventListener('click', () => showAuthForm('login'));
+                document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
+            }
+        });
+
+        const showAuthForm = (type) => {
+            const isLogin = type === 'login';
+            modalContent.innerHTML = `
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+                <h2>${isLogin ? 'Entrar' : 'Cadastrar'}</h2>
+                <form id="email-form">
+                    <div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div>
+                    <div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div>
+                    <button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button>
+                </form>
+                <button id="google-login-btn" class="btn">Entrar com Google</button>
+            `;
+            authModal.style.display = 'flex';
+            
+            document.getElementById('modal-close-btn').addEventListener('click', () => authModal.style.display = 'none');
+            document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
+            
+            document.getElementById('email-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                if (isLogin) {
+                    auth.signInWithEmailAndPassword(email, password).catch(error => alert(error.message));
+                } else {
+                    auth.createUserWithEmailAndPassword(email, password).catch(error => alert(error.message));
+                }
+                authModal.style.display = 'none';
+            });
+        };
+
+        const signInWithGoogle = () => {
+            auth.signInWithPopup(googleProvider).catch(error => alert(error.message));
+            authModal.style.display = 'none';
+        };
+        
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+            }
+        });
+        
+        // --- Gerenciamento de Aventuras (Firestore) ---
         const renderizarAventuras = (aventurasDocs) => {
             muralAventuras.innerHTML = '';
             if (aventurasDocs.empty) {
-                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda. Seja o primeiro!</p>';
+                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda.</p>';
                 return;
             }
             aventurasDocs.forEach(aventuraDoc => {
@@ -131,54 +228,37 @@
 
         aventurasCollection.orderBy('createdAt', 'desc').onSnapshot(renderizarAventuras, (error) => {
             console.error("Erro ao buscar aventuras: ", error);
-            muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras. Verifique as regras do Firebase e sua conexão.</p>';
+            muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras.</p>';
         });
 
         muralAventuras.addEventListener('click', (event) => {
             if (event.target.classList.contains('btn-deletar')) {
                 const id = event.target.dataset.id;
                 if (confirm('Tem certeza que deseja deletar esta aventura?')) {
-                    aventurasCollection.doc(id).delete().catch(error => console.error("Erro ao deletar aventura: ", error));
+                    aventurasCollection.doc(id).delete().catch(error => console.error("Erro ao deletar: ", error));
                 }
             }
         });
 
         formAventura.addEventListener('submit', async (event) => {
             event.preventDefault();
-            btnPublicar.disabled = true;
-            btnPublicar.textContent = 'Enviando...';
-
-            let imagemUrl = '';
-            const imagemArquivo = inputImagem.files[0];
-
+            const novaAventura = {
+                titulo: document.getElementById('titulo').value,
+                mestre: document.getElementById('mestre').value,
+                sistema: document.getElementById('sistema').value,
+                nivel: document.getElementById('nivel').value,
+                gatilho: document.getElementById('gatilho').value,
+                descricao: document.getElementById('descricao').value,
+                imagemUrl: document.getElementById('imagem').value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
             try {
-                if (imagemArquivo) {
-                    const nomeArquivo = `${Date.now()}-${imagemArquivo.name}`;
-                    const storageRef = storage.ref(`aventura_imagens/${nomeArquivo}`);
-                    const uploadTask = await storageRef.put(imagemArquivo);
-                    imagemUrl = await uploadTask.ref.getDownloadURL();
-                }
-
-                const novaAventura = {
-                    titulo: document.getElementById('titulo').value,
-                    mestre: document.getElementById('mestre').value,
-                    sistema: document.getElementById('sistema').value,
-                    nivel: document.getElementById('nivel').value,
-                    gatilho: document.getElementById('gatilho').value,
-                    descricao: document.getElementById('descricao').value,
-                    imagemUrl: imagemUrl,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
                 await aventurasCollection.add(novaAventura);
                 formAventura.reset();
-
             } catch (error) {
-                console.error("Erro ao publicar aventura: ", error);
-                alert("Não foi possível publicar a aventura. Verifique o console para mais detalhes.");
-            } finally {
-                btnPublicar.disabled = false;
-                btnPublicar.textContent = 'Publicar Aventura';
+                console.error("Erro ao adicionar aventura: ", error);
+                alert("Não foi possível publicar a aventura.");
             }
         });
     </script>
