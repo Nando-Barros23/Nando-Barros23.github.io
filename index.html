@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados & Calangos - Mural</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,4 +77,111 @@
                     <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required></div>
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
                     <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="number" id="nivel" min="1" required></div>
-                    <div class="form-grupo">
+                    <div class="form-grupo"><label for="imagem">URL da Imagem da Aventura</label><input type="url" id="imagem" placeholder="https://... (link da imagem)"></div>
+                    <div class="form-grupo"><label for="gatilho">Alertas de Gatilho (Opcional)</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência"></div>
+                    <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
+                    <button type="submit" class="btn-primario">Publicar Aventura</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // LINHA DE TESTE: Verifique se esta mensagem aparece no console
+        console.log("--- O SCRIPT COMEÇOU A RODAR ---");
+
+        try {
+            const firebaseConfig = {
+              apiKey: "AIzaSyCZDzu5rkcQrUM9skCxj7IPFvxfaXA4RvA",
+              authDomain: "dados-e-calangos.firebaseapp.com",
+              projectId: "dados-e-calangos",
+              storageBucket: "dados-e-calangos.firebasestorage.app",
+              messagingSenderId: "390749645282",
+              appId: "1:390749645282:web:a681bad54883652a42f1bb"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const aventurasCollection = db.collection('aventuras');
+
+            const formAventura = document.getElementById('form-aventura');
+            const muralAventuras = document.getElementById('mural-aventuras');
+
+            const renderizarAventuras = (aventurasDocs) => {
+                muralAventuras.innerHTML = '';
+                if (aventurasDocs.empty) {
+                    muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda. Seja o primeiro!</p>';
+                    return;
+                }
+
+                aventurasDocs.forEach(aventuraDoc => {
+                    const aventura = aventuraDoc.data();
+                    const card = document.createElement('div');
+                    card.className = 'card-aventura';
+                    
+                    const imagemHtml = aventura.imagem ? `<img src="${aventura.imagem}" alt="Imagem da aventura" class="card-imagem">` : '';
+                    const gatilhoHtml = aventura.gatilho ? `<p class="card-gatilho">⚠️ <strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
+
+                    card.innerHTML = `
+                        ${imagemHtml}
+                        <div class="card-conteudo">
+                            <h3>${aventura.titulo}</h3>
+                            <p>
+                                <strong>Mestre:</strong> ${aventura.mestre}<br>
+                                <strong>Sistema:</strong> ${aventura.sistema}<br>
+                                <strong>Nível:</strong> ${aventura.nivel}
+                            </p>
+                            ${gatilhoHtml}
+                            <p class="descricao">${aventura.descricao}</p>
+                            <button class="btn-deletar" data-id="${aventuraDoc.id}">Deletar</button>
+                        </div>
+                    `;
+                    muralAventuras.appendChild(card);
+                });
+            };
+
+            aventurasCollection.orderBy('createdAt', 'desc').onSnapshot(renderizarAventuras, (error) => {
+                console.error("Erro ao buscar aventuras: ", error);
+                muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras. Verifique as regras do Firebase e sua conexão.</p>';
+            });
+
+            muralAventuras.addEventListener('click', (event) => {
+                if (event.target.classList.contains('btn-deletar')) {
+                    const id = event.target.dataset.id;
+                    if (confirm('Tem certeza que deseja deletar esta aventura?')) {
+                        aventurasCollection.doc(id).delete().catch(error => {
+                            console.error("Erro ao deletar aventura: ", error);
+                        });
+                    }
+                }
+            });
+
+            formAventura.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const novaAventura = {
+                    titulo: document.getElementById('titulo').value,
+                    mestre: document.getElementById('mestre').value,
+                    sistema: document.getElementById('sistema').value,
+                    nivel: document.getElementById('nivel').value,
+                    imagem: document.getElementById('imagem').value,
+                    gatilho: document.getElementById('gatilho').value,
+                    descricao: document.getElementById('descricao').value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                aventurasCollection.add(novaAventura).then(() => {
+                    formAventura.reset();
+                }).catch(error => {
+                    console.error("Erro ao adicionar aventura: ", error);
+                    alert("Não foi possível publicar a aventura.");
+                });
+            });
+        } catch (error) {
+            console.error("--- ERRO CRÍTICO NO SCRIPT ---", error);
+        }
+    </script>
+</body>
+</html>
