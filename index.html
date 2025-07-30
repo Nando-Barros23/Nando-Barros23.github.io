@@ -47,4 +47,9 @@
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
         .form-grupo input, .form-grupo textarea { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
-        .form-grupo textarea { resize: vertical; min-height:
+        .form-grupo textarea { resize: vertical; min-height: 100px; }
+        .form-grupo input:focus, .form-grupo textarea:focus { border-color: var(--cor-primaria); outline: none; }
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
+        .btn-primario { background-color: var(--cor-primaria); color: #fff; width: 100%; margin-top: 1rem; }
+        .btn-primario:hover { background-color: #b85b30; }
+        .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-end; margin-t
