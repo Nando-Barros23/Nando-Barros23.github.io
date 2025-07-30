@@ -13,7 +13,7 @@
         /* Estilos com a paleta de cores "Dados & Calangos" - TEMA CLARO */
         :root {
             --cor-fundo: #F7F7F7;
-            --cor-fundo-card: #FFDBA7; /* Alterado para creme */
+            --cor-fundo-card: #FFDBA7;
             --cor-primaria: #D06E41;
             --cor-texto: #221A29;
             --cor-texto-secundario: #5c5561;
@@ -21,10 +21,8 @@
             --cor-alerta-texto: #8c6d3f;
             --cor-borda: #DFE0DF;
             --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-            /* Definindo as fontes */
             --fonte-titulo: 'MedievalSharp', cursive;
-            --fonte-label: 'Cinzel', serif; /* Nova fonte para labels */
+            --fonte-label: 'Cinzel', serif;
             --fonte-corpo: 'Roboto', sans-serif;
         }
 
@@ -37,47 +35,19 @@
             line-height: 1.6;
         }
 
-        /* Container Principal */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 992px) { .container { grid-template-columns: 2fr 1fr; } }
 
-        /* Cabeçalho */
         header { text-align: center; padding: 2rem 1rem; }
         header .logo { max-width: 150px; margin-bottom: 1rem; }
-        header h1 {
-            font-family: var(--fonte-titulo);
-            color: var(--cor-texto);
-            font-size: 4rem;
-        }
+        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 4rem; }
         
-        h2, h3 {
-            font-family: var(--fonte-titulo);
-            color: var(--cor-primaria);
-        }
+        h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
 
-        /* Mural de Aventuras */
         #mural-aventuras { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
 
-        .card-aventura {
-            background-color: var(--cor-fundo-card);
-            border: 1px solid var(--cor-borda);
-            border-radius: 8px;
-            box-shadow: var(--sombra);
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
+        .card-aventura { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
         .card-aventura:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
         .card-imagem { width: 100%; height: 180px; object-fit: cover; }
         .card-conteudo { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
@@ -85,158 +55,15 @@
         .card-conteudo .descricao { flex-grow: 1; }
         .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
 
-        .card-gatilho {
-            font-style: italic;
-            color: var(--cor-alerta-texto);
-            background-color: var(--cor-alerta-fundo);
-            border: 1px solid var(--cor-alerta-texto);
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
+        .card-gatilho { font-style: italic; color: var(--cor-alerta-texto); background-color: var(--cor-alerta-fundo); border: 1px solid var(--cor-alerta-texto); padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; }
         
-        #mensagem-vazio { 
-            color: var(--cor-texto-secundario); 
-            grid-column: 1 / -1; 
-            text-align: center; 
-            padding: 2rem; 
-            background-color: var(--cor-fundo-card); /* CORRIGIDO AQUI */
-            border-radius: 8px; 
-            border: 1px solid var(--cor-borda); 
-        }
+        #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
 
-        /* Painel do Mestre */
         .painel-mestre { background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
         .form-grupo { margin-bottom: 1rem; }
-        .form-grupo label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            color: var(--cor-texto); 
-            font-family: var(--fonte-label); /* Fonte aplicada aqui */
-            font-weight: 700;
-        }
-        .form-grupo input, .form-grupo textarea {
-            width: 100%;
-            padding: 0.8rem;
-            background-color: var(--cor-fundo);
-            border: 1px solid var(--cor-borda);
-            border-radius: 4px;
-            color: var(--cor-texto);
-            font-size: 1rem;
-            font-family: var(--fonte-corpo);
-        }
+        .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
+        .form-grupo input, .form-grupo textarea { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
         .form-grupo textarea { resize: vertical; min-height: 100px; }
         .form-grupo input:focus, .form-grupo textarea:focus { border-color: var(--cor-primaria); outline: none; }
         
-        /* Botões */
-        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
-        .btn-primario { background-color: var(--cor-primaria); color: #fff; width: 100%; margin-top: 1rem; }
-        .btn-primario:hover { background-color: #b85b30; }
-        .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-end; margin-top: 1rem; padding: 0.5rem 1rem; }
-        .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
-
-    </style>
-</head>
-<body>
-    
-    <header>
-        <img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo">
-        <h1>Dados & Calangos</h1>
-    </header>
-
-    <div class="container">
-        <main>
-            <h2>Chamados de Aventura</h2>
-            <div id="mural-aventuras"></div>
-        </main>
-        
-        <aside>
-            <div class="painel-mestre">
-                <h2>Painel do Mestre</h2>
-                <form id="form-aventura">
-                    <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
-                    <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required></div>
-                    <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
-                    <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="number" id="nivel" min="1" required></div>
-                    <div class="form-grupo"><label for="imagem">URL da Imagem da Aventura</label><input type="url" id="imagem" placeholder="https://... (link da imagem)"></div>
-                    <div class="form-grupo"><label for="gatilho">Alertas de Gatilho (Opcional)</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência"></div>
-                    <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
-                    <button type="submit" class="btn-primario">Publicar Aventura</button>
-                </form>
-            </div>
-        </aside>
-    </div>
-
-    <script>
-        const formAventura = document.getElementById('form-aventura');
-        const muralAventuras = document.getElementById('mural-aventuras');
-
-        const getAventuras = () => JSON.parse(localStorage.getItem('aventuras_calangos')) || [];
-        const salvarAventuras = (aventuras) => localStorage.setItem('aventuras_calangos', JSON.stringify(aventuras));
-
-        const renderizarAventuras = () => {
-            muralAventuras.innerHTML = '';
-            const aventuras = getAventuras();
-
-            if (aventuras.length === 0) {
-                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda. Seja o primeiro!</p>';
-                return;
-            }
-
-            aventuras.forEach((aventura, index) => {
-                const card = document.createElement('div');
-                card.className = 'card-aventura';
-                
-                const imagemHtml = aventura.imagem ? `<img src="${aventura.imagem}" alt="Imagem da aventura" class="card-imagem">` : '';
-                const gatilhoHtml = aventura.gatilho ? `<p class="card-gatilho">⚠️ <strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
-
-                card.innerHTML = `
-                    ${imagemHtml}
-                    <div class="card-conteudo">
-                        <h3>${aventura.titulo}</h3>
-                        <p>
-                            <strong>Mestre:</strong> ${aventura.mestre}<br>
-                            <strong>Sistema:</strong> ${aventura.sistema}<br>
-                            <strong>Nível:</strong> ${aventura.nivel}
-                        </p>
-                        ${gatilhoHtml}
-                        <p class="descricao">${aventura.descricao}</p>
-                        <button class="btn-deletar" onclick="deletarAventura(${index})">Deletar</button>
-                    </div>
-                `;
-                
-                muralAventuras.appendChild(card);
-            });
-        };
-
-        window.deletarAventura = (index) => {
-            if (confirm('Tem certeza que deseja deletar esta aventura?')) {
-                const aventuras = getAventuras();
-                aventuras.splice(index, 1);
-                salvarAventuras(aventuras);
-                renderizarAventuras();
-            }
-        };
-
-        formAventura.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const novaAventura = {
-                titulo: document.getElementById('titulo').value,
-                mestre: document.getElementById('mestre').value,
-                sistema: document.getElementById('sistema').value,
-                nivel: document.getElementById('nivel').value,
-                imagem: document.getElementById('imagem').value,
-                gatilho: document.getElementById('gatilho').value,
-                descricao: document.getElementById('descricao').value,
-            };
-            const aventuras = getAventuras();
-            aventuras.unshift(novaAventura);
-            salvarAventuras(aventuras);
-            formAventura.reset();
-            renderizarAventuras();
-        });
-
-        document.addEventListener('DOMContentLoaded', renderizarAventuras);
-    </script>
-</body>
-</html>
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.
