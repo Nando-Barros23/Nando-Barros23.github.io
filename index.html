@@ -62,6 +62,8 @@
         .form-grupo textarea { resize: vertical; min-height: 100px; }
         .form-grupo input:focus, .form-grupo textarea:focus, .form-grupo select:focus { border-color: var(--cor-primaria); outline: none; }
         
+        .status-select { padding: 0.2rem; font-size: 0.9rem; border-radius: 4px; border: 1px solid var(--cor-primaria); background-color: var(--cor-fundo); }
+        
         button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
         .btn-primario { background-color: var(--cor-primaria); color: #fff; }
@@ -72,7 +74,6 @@
         .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-start; margin-top: 1rem; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -109,15 +110,6 @@
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
                     <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="text" id="nivel" required></div>
                     <div class="form-grupo"><label for="vagas">Número de Vagas</label><input type="number" id="vagas" min="1" required></div>
-                    <div class="form-grupo">
-                        <label for="status">Status da Aventura</label>
-                        <select id="status" required>
-                            <option value="Recrutando">Recrutando</option>
-                            <option value="Cheio">Cheio</option>
-                            <option value="Em Andamento">Em Andamento</option>
-                            <option value="Finalizada">Finalizada</option>
-                        </select>
-                    </div>
                     <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (cole o link da imagem aqui)"></div>
                     <div class="form-grupo"><label for="gatilho">Alertas de Gatilho</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência" required></div>
                     <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
@@ -180,13 +172,7 @@
                     currentUserProfile = newProfile;
                 }
                 
-                userArea.innerHTML = `
-                    <div id="user-info-area">
-                        <a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a>
-                        <span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span>
-                        <button id="logout-btn" class="btn btn-secundario">Sair</button>
-                    </div>
-                `;
+                userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
                 if (currentUserProfile.role === 'master') {
@@ -195,16 +181,10 @@
                 } else {
                     painelMestre.style.display = 'none';
                 }
-
             } else {
                 currentUser = null;
                 currentUserProfile = null;
-                userArea.innerHTML = `
-                    <div id="user-auth-area">
-                        <button id="login-btn" class="btn btn-primario">Entrar</button>
-                        <button id="signup-btn" class="btn btn-secundario">Cadastrar-se</button>
-                    </div>
-                `;
+                userArea.innerHTML = `<div id="user-auth-area"><button id="login-btn" class="btn btn-primario">Entrar</button><button id="signup-btn" class="btn btn-secundario">Cadastrar-se</button></div>`;
                 painelMestre.style.display = 'none';
                 document.getElementById('login-btn').addEventListener('click', () => showAuthForm('login'));
                 document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
@@ -213,22 +193,10 @@
 
         const showAuthForm = (type) => {
             const isLogin = type === 'login';
-            modalContent.innerHTML = `
-                <button class="modal-close" id="modal-close-btn">&times;</button>
-                <img src="https://i.imgur.com/SzXWxJe.png" alt="Logo" class="logo">
-                <h2>${isLogin ? 'Entrar' : 'Cadastrar'}</h2>
-                <form id="email-form">
-                    <div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div>
-                    <div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div>
-                    <button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button>
-                </form>
-                <button id="google-login-btn" class="btn">Entrar com Google</button>
-            `;
+            modalContent.innerHTML = `<button class="modal-close" id="modal-close-btn">&times;</button><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo" class="logo"><h2>${isLogin ? 'Entrar' : 'Cadastrar'}</h2><form id="email-form"><div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div><div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div><button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button></form><button id="google-login-btn" class="btn">Entrar com Google</button>`;
             authModal.style.display = 'flex';
-            
             document.getElementById('modal-close-btn').addEventListener('click', () => authModal.style.display = 'none');
             document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
-            
             document.getElementById('email-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
@@ -258,7 +226,6 @@
                 const aventura = aventuraDoc.data();
                 const docId = aventuraDoc.id;
                 
-                // --- Lógica de Vagas ---
                 const jogadores = aventura.jogadores || [];
                 const suplentes = aventura.suplentes || [];
                 const totalInscritos = jogadores.length;
@@ -274,16 +241,23 @@
                     suplentesHtml = '<strong>Suplentes:</strong><ul class="jogadores-lista">' + suplentes.map(p => `<li>${p.username}</li>`).join('') + '</ul>';
                 }
 
-                // --- Lógica de Botões de Ação ---
                 let acaoHtml = '';
-                if (currentUser) {
-                    const isMestre = currentUser.uid === aventura.mestreUid;
+                let statusHtml = `<strong>Status:</strong> ${aventura.status}`;
+                if (currentUser && currentUser.uid === aventura.mestreUid) {
+                    statusHtml = `
+                        <strong>Status:</strong> 
+                        <select class="status-select" data-id="${docId}">
+                            <option value="Recrutando" ${aventura.status === 'Recrutando' ? 'selected' : ''}>Recrutando</option>
+                            <option value="Cheio" ${aventura.status === 'Cheio' ? 'selected' : ''}>Cheio</option>
+                            <option value="Em Andamento" ${aventura.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                            <option value="Finalizada" ${aventura.status === 'Finalizada' ? 'selected' : ''}>Finalizada</option>
+                        </select>
+                    `;
+                    acaoHtml = `<button class="btn-deletar" data-id="${docId}">Deletar Aventura</button>`;
+                } else if (currentUser) {
                     const isJogadorInscrito = jogadores.some(p => p.uid === currentUser.uid);
                     const isSuplenteInscrito = suplentes.some(p => p.uid === currentUser.uid);
-
-                    if (isMestre) {
-                        acaoHtml = `<button class="btn-deletar" data-id="${docId}">Deletar Aventura</button>`;
-                    } else if (isJogadorInscrito || isSuplenteInscrito) {
+                    if (isJogadorInscrito || isSuplenteInscrito) {
                         acaoHtml = `<button class="btn-secundario" data-action="sair" data-id="${docId}">Sair da Mesa</button>`;
                     } else {
                         acaoHtml = `<button class="btn-primario" data-action="entrar" data-id="${docId}">Quero Jogar!</button>`;
@@ -303,7 +277,7 @@
                             <strong>Mestre:</strong> ${aventura.mestre}<br>
                             <strong>Sistema:</strong> ${aventura.sistema}<br>
                             <strong>Nível:</strong> ${aventura.nivel}<br>
-                            <strong>Status:</strong> ${aventura.status}
+                            ${statusHtml}
                         </p>
                         <p>${vagasHtml}</p>
                         <div>${jogadoresHtml}</div>
@@ -324,48 +298,55 @@
 
         muralAventuras.addEventListener('click', async (event) => {
             if (!currentUser) {
-                alert('Você precisa estar logado para interagir com as aventuras.');
+                if(event.target.dataset.action) alert('Você precisa estar logado para interagir com as aventuras.');
                 return;
             }
-
             const action = event.target.dataset.action;
             const docId = event.target.dataset.id;
-            const aventuraRef = aventurasCollection.doc(docId);
-
+            
             if (event.target.classList.contains('btn-deletar')) {
                 if (confirm('Tem certeza que deseja deletar esta aventura?')) {
-                    aventuraRef.delete().catch(error => console.error("Erro ao deletar: ", error));
+                    aventurasCollection.doc(docId).delete().catch(error => console.error("Erro ao deletar: ", error));
                 }
                 return;
             }
 
-            const jogadorInfo = { uid: currentUser.uid, username: currentUserProfile.username };
+            if (action === 'entrar' || action === 'sair') {
+                const jogadorInfo = { uid: currentUser.uid, username: currentUserProfile.username };
+                const aventuraRef = aventurasCollection.doc(docId);
+                try {
+                    await db.runTransaction(async (transaction) => {
+                        const aventuraDoc = await transaction.get(aventuraRef);
+                        if (!aventuraDoc.exists) { throw "Aventura não encontrada!"; }
+                        const aventura = aventuraDoc.data();
+                        const jogadores = aventura.jogadores || [];
+                        const suplentes = aventura.suplentes || [];
 
-            try {
-                await db.runTransaction(async (transaction) => {
-                    const aventuraDoc = await transaction.get(aventuraRef);
-                    if (!aventuraDoc.exists) { throw "Aventura não encontrada!"; }
-
-                    const aventura = aventuraDoc.data();
-                    const jogadores = aventura.jogadores || [];
-                    const suplentes = aventura.suplentes || [];
-
-                    if (action === 'entrar') {
-                        if (jogadores.length < aventura.vagas) {
-                            transaction.update(aventuraRef, { jogadores: firebase.firestore.FieldValue.arrayUnion(jogadorInfo) });
-                        } else {
-                            transaction.update(aventuraRef, { suplentes: firebase.firestore.FieldValue.arrayUnion(jogadorInfo) });
+                        if (action === 'entrar') {
+                            if (jogadores.length < aventura.vagas) {
+                                transaction.update(aventuraRef, { jogadores: firebase.firestore.FieldValue.arrayUnion(jogadorInfo) });
+                            } else {
+                                transaction.update(aventuraRef, { suplentes: firebase.firestore.FieldValue.arrayUnion(jogadorInfo) });
+                            }
+                        } else if (action === 'sair') {
+                            transaction.update(aventuraRef, { 
+                                jogadores: firebase.firestore.FieldValue.arrayRemove(jogadorInfo),
+                                suplentes: firebase.firestore.FieldValue.arrayRemove(jogadorInfo)
+                            });
                         }
-                    } else if (action === 'sair') {
-                        transaction.update(aventuraRef, { 
-                            jogadores: firebase.firestore.FieldValue.arrayRemove(jogadorInfo),
-                            suplentes: firebase.firestore.FieldValue.arrayRemove(jogadorInfo)
-                        });
-                    }
-                });
-            } catch (error) {
-                console.error("Erro ao se inscrever/sair: ", error);
-                alert("Ocorreu um erro. Tente novamente.");
+                    });
+                } catch (error) {
+                    console.error("Erro ao se inscrever/sair: ", error);
+                    alert("Ocorreu um erro. Tente novamente.");
+                }
+            }
+        });
+        
+        muralAventuras.addEventListener('change', (event) => {
+            if(event.target.classList.contains('status-select')) {
+                const docId = event.target.dataset.id;
+                const newStatus = event.target.value;
+                aventurasCollection.doc(docId).update({ status: newStatus });
             }
         });
 
@@ -382,7 +363,7 @@
                 sistema: document.getElementById('sistema').value,
                 nivel: document.getElementById('nivel').value,
                 vagas: parseInt(document.getElementById('vagas').value),
-                status: document.getElementById('status').value,
+                status: 'Recrutando', // Default status
                 gatilho: document.getElementById('gatilho').value,
                 descricao: document.getElementById('descricao').value,
                 imagemUrl: document.getElementById('imagem').value,
