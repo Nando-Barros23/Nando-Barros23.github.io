@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Aventura - Dados & Calangos</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --cor-fundo: #F7F7F7;
@@ -26,117 +24,52 @@
         body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: var(--cor-texto); line-height: 1.6; }
         a { color: var(--cor-primaria); text-decoration: none; }
         a:hover { text-decoration: underline; }
-        
         header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
-        .header-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding-bottom: 1rem;
-            flex-wrap: wrap; 
-            justify-content: center; 
-        }
-
-        header .site-logo-banner {
-            max-width: 350px; 
-            width: 100%; 
-            height: auto;
-            display: block; 
-            margin-bottom: 1rem; 
-        }
-
-        /* Esconder o logo e o h1 antigos */
-        header .logo, header h1 {
-            display: none; 
-        }
-
-        @media (min-width: 768px) {
-            header .header-top {
-                justify-content: space-between; 
-            }
-            header .site-logo-banner {
-                margin-bottom: 0; 
-            }
-        }
-        
+        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
+        header .logo { max-width: 100px; }
+        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
         #user-info-area { display: flex; align-items: center; gap: 1rem; }
         #user-info-area img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-
         .container { max-width: 900px; margin: 2rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; }
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
-
         .aventura-detalhes img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem; }
         .aventura-detalhes h2 { text-align: center; margin-bottom: 2rem; font-size: 2.5rem; }
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
         .info-item strong { color: var(--cor-texto); }
-        
         .secao { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--cor-borda); }
         .secao h3 { margin-bottom: 1rem; }
-        
         .jogadores-lista { list-style-type: none; }
         .jogadores-lista li { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; }
         .jogadores-lista img { width: 30px; height: 30px; border-radius: 50%; }
-
         #comment-form { display: none; margin-top: 1.5rem; }
         #comment-form textarea { width: 100%; min-height: 80px; padding: 0.8rem; border: 1px solid var(--cor-borda); border-radius: 4px; font-family: var(--fonte-corpo); font-size: 1rem; }
         #comment-form button { margin-top: 0.5rem; }
-
         .comment-thread { margin-top: 1.5rem; }
         .comment { display: flex; gap: 15px; margin-bottom: 1.5rem; }
         .comment img { width: 45px; height: 45px; border-radius: 50%; }
         .comment-body { display: flex; flex-direction: column; }
         .comment-author { font-weight: bold; color: var(--cor-texto); }
         .comment-text { color: var(--cor-texto-secundario); }
-
         button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
         .btn-primario { background-color: var(--cor-primaria); color: #fff; }
         .btn-primario:hover { background-color: #b85b30; }
         .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
         .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
-
-        /* Estilo para mensagens de notificação (alerta) */
-        .notification-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #4CAF50; /* Verde para sucesso */
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1001;
-            display: none; /* Inicia oculto */
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .notification-message.error {
-            background-color: #f44336; /* Vermelho para erro */
-        }
     </style>
 </head>
 <body>
-
     <header>
         <div class="header-top">
-            <a href="index.html">
-                <img src="https://i.imgur.com/zY5dK3z.jpeg" alt="Dados & Calangos RPG de Mesa" class="site-logo-banner">
-            </a>
-            <div id="user-area"></div>
+            <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+            <a href="index.html"><h1>Dados & Calangos</h1></a>
+            <div id="user-area"><a href="index.html">Voltar para o Mural</a></div>
         </div>
     </header>
-
-    <div class="container" id="aventura-container">
-    </div>
-
-    <div id="notification-message" class="notification-message"></div>
-
+    <div class="container" id="aventura-container"></div>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-    
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyAyIrdaURuGFvBXXzrmQEDhtHwX5ll8Do4",
@@ -146,46 +79,17 @@
           messagingSenderId: "1021912207307",
           appId: "1:1021912207307:web:2b29c38483a30696ecb04e"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         const usersCollection = db.collection('users');
-
         const userArea = document.getElementById('user-area');
         const aventuraContainer = document.getElementById('aventura-container');
-        const notificationMessage = document.getElementById('notification-message');
-
         let currentUser = null;
         let currentUserProfile = null;
-        let currentAventura = null; 
-
         const urlParams = new URLSearchParams(window.location.search);
         const aventuraId = urlParams.get('id');
-
-        if (!aventuraId) {
-            aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>';
-        }
-
-        // Função para exibir notificações
-        function showNotification(message, isError = false) {
-            notificationMessage.textContent = message;
-            notificationMessage.classList.remove('error');
-            if (isError) {
-                notificationMessage.classList.add('error');
-            }
-            notificationMessage.style.display = 'block';
-            notificationMessage.style.opacity = '1';
-
-            setTimeout(() => {
-                notificationMessage.style.opacity = '0';
-                setTimeout(() => {
-                    notificationMessage.style.display = 'none';
-                }, 500); 
-            }, 3000); 
-        }
-
-
+        if (!aventuraId) { aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>'; }
         auth.onAuthStateChanged(async user => {
             if (user) {
                 currentUser = user;
@@ -193,124 +97,46 @@
                 currentUserProfile = userProfileDoc.data();
                 userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-            } else {
-                currentUser = null;
-                currentUserProfile = null;
-                 userArea.innerHTML = `<a href="index.html">Voltar para o Mural</a>`;
             }
-            // Usa onSnapshot para escutar mudanças em tempo real na aventura
-            db.collection('aventuras').doc(aventuraId).onSnapshot(docSnapshot => {
-                if (docSnapshot.exists) {
-                    currentAventura = docSnapshot.data();
-                    renderizarPaginaAventura();
-                } else {
-                    aventuraContainer.innerHTML = '<h2>Aventura não encontrada ou foi deletada.</h2>';
-                }
-            }, error => {
-                console.error("Erro ao escutar mudanças na aventura: ", error);
-                aventuraContainer.innerHTML = '<h2>Erro ao carregar os detalhes da aventura.</h2>';
-                showNotification("Erro ao carregar os detalhes da aventura.", true);
-            });
+            renderizarPaginaAventura();
         });
-
         async function renderizarPaginaAventura() {
-            // currentAventura já estará populada pelo onSnapshot
-            const aventura = currentAventura;
-
+            const aventuraRef = db.collection('aventuras').doc(aventuraId);
+            const aventuraDoc = await aventuraRef.get();
+            if (!aventuraDoc.exists) { aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>'; return; }
+            const aventura = aventuraDoc.data();
             const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura">` : '';
             const gatilhoHtml = aventura.gatilho ? `<p><strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
-            
             const jogadores = aventura.jogadores || [];
             const suplentes = aventura.suplentes || [];
             let jogadoresHtml = '<strong>Jogadores:</strong><ul class="jogadores-lista">' + jogadores.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (jogadores.length === 0) jogadoresHtml = '<strong>Jogadores:</strong> Nenhuma vaga preenchida.';
-            
             let suplentesHtml = '<strong>Suplentes:</strong><ul class="jogadores-lista">' + suplentes.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (suplentes.length === 0) suplentesHtml = '<strong>Suplentes:</strong> Sem suplentes no momento.';
-
-            let joinButtonHtml = '';
-            // Apenas mostra o botão para não-mestres desta aventura e se o usuário está logado
-            if (currentUser && currentUser.uid !== aventura.mestreUid) { 
-                const isPlayer = jogadores.some(p => p.uid === currentUser.uid);
-                const isSuplente = suplentes.some(p => p.uid === currentUser.uid);
-
-                if (isPlayer) {
-                    joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Sair da Mesa</button>`;
-                } else if (isSuplente) {
-                    joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Sair da Lista de Suplentes</button>`;
-                } else if (jogadores.length < aventura.vagas) {
-                    joinButtonHtml = `<button id="join-leave-btn" class="btn-primario">Quero Jogar!</button>`;
-                } else {
-                    joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Entrar na Lista de Suplentes</button>`;
-                }
-            } else if (!currentUser) {
-                joinButtonHtml = `<p>Faça login para se juntar a esta aventura.</p>`;
-            } else if (currentUser && currentUser.uid === aventura.mestreUid) {
-                joinButtonHtml = `<p>Você é o Mestre desta aventura.</p>`;
-            }
-
-
-            aventuraContainer.innerHTML = `
-                <div class="aventura-detalhes">
-                    ${imagemHtml}
-                    <h2>${aventura.titulo}</h2>
-                    <div class="info-grid">
-                        <p class="info-item"><strong>Mestre:</strong> ${aventura.mestre}</p>
-                        <p class="info-item"><strong>Sistema:</strong> ${aventura.sistema}</p>
-                        <p class="info-item"><strong>Nível:</strong> ${aventura.nivel}</p>
-                        <p class="info-item"><strong>Tipo:</strong> ${aventura.tipo}</p>
-                        <p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventura.vagas}</p>
-                        <p class="info-item"><strong>Status:</strong> ${aventura.status}</p>
-                    </div>
-                    ${gatilhoHtml}
-                    <p>${aventura.descricao}</p>
-                    ${joinButtonHtml}
-                </div>
-                <div class="secao">
-                    <h3>Jogadores</h3>
-                    ${jogadoresHtml}
-                    <br>
-                    ${suplentesHtml}
-                </div>
-                <div class="secao">
-                    <h3>Comentários</h3>
-                    <div id="comment-thread"></div>
-                    <form id="comment-form">
-                        <textarea id="comment-text" placeholder="Escreva seu comentário..." required></textarea>
-                        <button type="submit" class="btn-primario" id="post-comment-btn">Postar Comentário</button>
-                    </form>
-                </div>
-            `;
-            
+            aventuraContainer.innerHTML = `<div class="aventura-detalhes">${imagemHtml}<h2>${aventura.titulo}</h2><div class="info-grid"><p class="info-item"><strong>Mestre:</strong> ${aventura.mestre}</p><p class="info-item"><strong>Sistema:</strong> ${aventura.sistema}</p><p class="info-item"><strong>Nível:</strong> ${aventura.nivel}</p><p class="info-item"><strong>Tipo:</strong> ${aventura.tipo}</p><p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventura.vagas}</p><p class="info-item"><strong>Status:</strong> ${aventura.status}</p></div>${gatilhoHtml}<p>${aventura.descricao}</p></div><div class="secao"><h3>Jogadores</h3>${jogadoresHtml}<br>${suplentesHtml}</div><div class="secao"><h3>Comentários</h3><div id="comment-thread"></div><form id="comment-form"><textarea id="comment-text" placeholder="Escreva seu comentário..." required></textarea><button type="submit" class="btn-primario">Postar Comentário</button></form></div>`;
             const commentForm = document.getElementById('comment-form');
             if (currentUser) {
                 commentForm.style.display = 'block';
                 commentForm.addEventListener('submit', postarComentario);
             }
-
-            const joinLeaveBtn = document.getElementById('join-leave-btn');
-            if (joinLeaveBtn) {
-                joinLeaveBtn.addEventListener('click', toggleJoinAdventure);
-            }
+            const commentsRef = aventuraRef.collection('comments').orderBy('createdAt');
+            commentsRef.onSnapshot(snapshot => {
+                const commentThread = document.getElementById('comment-thread');
+                commentThread.innerHTML = '';
+                if (snapshot.empty) { commentThread.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro!</p>'; }
+                snapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const commentEl = document.createElement('div');
+                    commentEl.className = 'comment';
+                    commentEl.innerHTML = `<img src="${comment.author_photoURL}" alt="avatar"><div class="comment-body"><span class="comment-author">${comment.author_username}</span><p class="comment-text">${comment.text}</p></div>`;
+                    commentThread.appendChild(commentEl);
+                });
+            });
         }
-        
         async function postarComentario(event) {
             event.preventDefault();
             const commentText = document.getElementById('comment-text');
-            const postCommentBtn = document.getElementById('post-comment-btn');
-
-            if (commentText.value.trim() === '') {
-                showNotification('O comentário não pode ser vazio.', true);
-                return;
-            }
-            if (!currentUser || !currentUserProfile) {
-                showNotification('Você precisa estar logado para comentar.', true);
-                return;
-            }
-
-            postCommentBtn.disabled = true;
-            postCommentBtn.textContent = 'Enviando...';
-
+            if (commentText.value.trim() === '') return;
             const newComment = {
                 text: commentText.value,
                 author_uid: currentUser.uid,
@@ -318,83 +144,8 @@
                 author_photoURL: currentUserProfile.photoURL,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-
-            try {
-                await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
-                commentText.value = '';
-                showNotification('Comentário postado com sucesso!');
-            } catch (error) {
-                console.error("Erro ao postar comentário:", error);
-                showNotification("Não foi possível postar o comentário.", true);
-            } finally {
-                postCommentBtn.disabled = false;
-                postCommentBtn.textContent = 'Postar Comentário';
-            }
-        }
-
-        async function toggleJoinAdventure() {
-            if (!currentUser || !currentUserProfile) {
-                showNotification('Você precisa estar logado para interagir com a aventura.', true);
-                return;
-            }
-
-            const joinLeaveBtn = document.getElementById('join-leave-btn');
-            joinLeaveBtn.disabled = true;
-            joinLeaveBtn.textContent = 'Processando...';
-
-            const aventuraRef = db.collection('aventuras').doc(aventuraId);
-            let currentJogadores = currentAventura.jogadores || [];
-            let currentSuplentes = currentAventura.suplentes || [];
-
-            const isPlayer = currentJogadores.some(p => p.uid === currentUser.uid);
-            const isSuplente = currentSuplentes.some(p => p.uid === currentUser.uid);
-
-            let updatedJogadores = [...currentJogadores];
-            let updatedSuplentes = [...currentSuplentes];
-
-            const playerInfo = {
-                uid: currentUser.uid,
-                username: currentUserProfile.username,
-                photoURL: currentUserProfile.photoURL
-            };
-
-            try {
-                if (isPlayer) {
-                    updatedJogadores = updatedJogadores.filter(p => p.uid !== currentUser.uid);
-                    showNotification('Você saiu da mesa.');
-                } else if (isSuplente) {
-                    updatedSuplentes = updatedSuplentes.filter(p => p.uid !== currentUser.uid);
-                    showNotification('Você saiu da lista de suplentes.');
-                } else { // Não é jogador nem suplente
-                    if (currentJogadores.length < currentAventura.vagas) {
-                        updatedJogadores.push(playerInfo);
-                        showNotification('Você se juntou à mesa!');
-                    } else {
-                        updatedSuplentes.push(playerInfo);
-                        showNotification('Você foi adicionado à lista de suplentes.');
-                    }
-                }
-
-                // Lógica para atualizar o status da aventura automaticamente (se aplicável)
-                let newStatus = currentAventura.status;
-                if (updatedJogadores.length >= currentAventura.vagas && newStatus === 'Recrutando') {
-                    newStatus = 'Cheia';
-                } else if (updatedJogadores.length < currentAventura.vagas && newStatus === 'Cheia') {
-                    newStatus = 'Recrutando';
-                }
-
-                await aventuraRef.update({
-                    jogadores: updatedJogadores,
-                    suplentes: updatedSuplentes,
-                    status: newStatus 
-                });
-
-            } catch (error) {
-                console.error("Erro ao atualizar status da aventura:", error);
-                showNotification("Não foi possível atualizar seu status na aventura. Tente novamente.", true);
-            } finally {
-                joinLeaveBtn.disabled = false;
-            }
+            await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
+            commentText.value = '';
         }
     </script>
 </body>
