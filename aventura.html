@@ -80,7 +80,7 @@
     </header>
 
     <div class="container" id="aventura-container">
-        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
@@ -105,6 +105,7 @@
         const aventuraContainer = document.getElementById('aventura-container');
         let currentUser = null;
         let currentUserProfile = null;
+        let currentAventura = null; // Armazena os dados da aventura
 
         const urlParams = new URLSearchParams(window.location.search);
         const aventuraId = urlParams.get('id');
@@ -125,7 +126,7 @@
                 currentUserProfile = null;
                  userArea.innerHTML = `<a href="index.html">Voltar para o Mural</a>`;
             }
-            renderizarPaginaAventura(); // Renderiza com ou sem usuário
+            renderizarPaginaAventura(); 
         });
 
         async function renderizarPaginaAventura() {
@@ -137,32 +138,53 @@
                 return;
             }
 
-            const aventura = aventuraDoc.data();
-            const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura">` : '';
-            const gatilhoHtml = aventura.gatilho ? `<p><strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
+            currentAventura = aventuraDoc.data(); // Armazena os dados da aventura
+            const imagemHtml = currentAventura.imagemUrl ? `<img src="${currentAventura.imagemUrl}" alt="Imagem da aventura">` : '';
+            const gatilhoHtml = currentAventura.gatilho ? `<p><strong>Gatilhos:</strong> ${currentAventura.gatilho}</p>` : '';
             
-            const jogadores = aventura.jogadores || [];
-            const suplentes = aventura.suplentes || [];
+            const jogadores = currentAventura.jogadores || [];
+            const suplentes = currentAventura.suplentes || [];
             let jogadoresHtml = '<strong>Jogadores:</strong><ul class="jogadores-lista">' + jogadores.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (jogadores.length === 0) jogadoresHtml = '<strong>Jogadores:</strong> Nenhuma vaga preenchida.';
             
             let suplentesHtml = '<strong>Suplentes:</strong><ul class="jogadores-lista">' + suplentes.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (suplentes.length === 0) suplentesHtml = '<strong>Suplentes:</strong> Sem suplentes no momento.';
 
+            let joinButtonHtml = '';
+            // Apenas mostra o botão para não-mestres desta aventura
+            if (currentUser && currentUser.uid !== currentAventura.mestreUid) { 
+                const isPlayer = jogadores.some(p => p.uid === currentUser.uid);
+                const isSuplente = suplentes.some(p => p.uid === currentUser.uid);
+
+                if (isPlayer) {
+                    joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Sair da Mesa</button>`;
+                } else if (isSuplente) {
+                    joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Sair da Lista de Suplentes</button>`;
+                } else if (jogadores.length < currentAventura.vagas) {
+                    joinButtonHtml = `<button id="join-leave-btn" class="btn-primario">Quero Jogar!</button>`;
+                } else {
+                    joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Entrar na Lista de Suplentes</button>`;
+                }
+            } else if (!currentUser) {
+                joinButtonHtml = `<p>Faça login para se juntar a esta aventura.</p>`;
+            }
+
+
             aventuraContainer.innerHTML = `
                 <div class="aventura-detalhes">
                     ${imagemHtml}
-                    <h2>${aventura.titulo}</h2>
+                    <h2>${currentAventura.titulo}</h2>
                     <div class="info-grid">
-                        <p class="info-item"><strong>Mestre:</strong> ${aventura.mestre}</p>
-                        <p class="info-item"><strong>Sistema:</strong> ${aventura.sistema}</p>
-                        <p class="info-item"><strong>Nível:</strong> ${aventura.nivel}</p>
-                        <p class="info-item"><strong>Tipo:</strong> ${aventura.tipo}</p>
-                        <p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventura.vagas}</p>
-                        <p class="info-item"><strong>Status:</strong> ${aventura.status}</p>
+                        <p class="info-item"><strong>Mestre:</strong> ${currentAventura.mestre}</p>
+                        <p class="info-item"><strong>Sistema:</strong> ${currentAventura.sistema}</p>
+                        <p class="info-item"><strong>Nível:</strong> ${currentAventura.nivel}</p>
+                        <p class="info-item"><strong>Tipo:</strong> ${currentAventura.tipo}</p>
+                        <p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${currentAventura.vagas}</p>
+                        <p class="info-item"><strong>Status:</strong> ${currentAventura.status}</p>
                     </div>
                     ${gatilhoHtml}
-                    <p>${aventura.descricao}</p>
+                    <p>${currentAventura.descricao}</p>
+                    ${joinButtonHtml}
                 </div>
                 <div class="secao">
                     <h3>Jogadores</h3>
@@ -184,6 +206,11 @@
             if (currentUser) {
                 commentForm.style.display = 'block';
                 commentForm.addEventListener('submit', postarComentario);
+            }
+
+            const joinLeaveBtn = document.getElementById('join-leave-btn');
+            if (joinLeaveBtn) {
+                joinLeaveBtn.addEventListener('click', toggleJoinAdventure);
             }
 
             // Carregar e renderizar comentários
@@ -225,6 +252,61 @@
 
             await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
             commentText.value = '';
+        }
+
+        async function toggleJoinAdventure() {
+            if (!currentUser || !currentUserProfile) {
+                alert('Você precisa estar logado para interagir com a aventura.');
+                return;
+            }
+
+            const aventuraRef = db.collection('aventuras').doc(aventuraId);
+            const currentJogadores = currentAventura.jogadores || [];
+            const currentSuplentes = currentAventura.suplentes || [];
+
+            const isPlayer = currentJogadores.some(p => p.uid === currentUser.uid);
+            const isSuplente = currentSuplentes.some(p => p.uid === currentUser.uid);
+
+            let updatedJogadores = [...currentJogadores];
+            let updatedSuplentes = [...currentSuplentes];
+
+            const playerInfo = {
+                uid: currentUser.uid,
+                username: currentUserProfile.username,
+                photoURL: currentUserProfile.photoURL
+            };
+
+            try {
+                if (isPlayer) {
+                    // Usuário é um jogador, então quer sair
+                    updatedJogadores = updatedJogadores.filter(p => p.uid !== currentUser.uid);
+                    alert('Você saiu da mesa.');
+                } else if (isSuplente) {
+                    // Usuário é um suplente, então quer sair da lista de suplentes
+                    updatedSuplentes = updatedSuplentes.filter(p => p.uid !== currentUser.uid);
+                    alert('Você saiu da lista de suplentes.');
+                } else if (currentJogadores.length < currentAventura.vagas) {
+                    // Há vagas abertas, usuário quer se juntar como jogador
+                    updatedJogadores.push(playerInfo);
+                    alert('Você se juntou à mesa!');
+                } else {
+                    // Não há vagas abertas, usuário se junta como suplente
+                    updatedSuplentes.push(playerInfo);
+                    alert('Você foi adicionado à lista de suplentes.');
+                }
+
+                await aventuraRef.update({
+                    jogadores: updatedJogadores,
+                    suplentes: updatedSuplentes
+                });
+
+                // Renderiza novamente a página para mostrar as listas atualizadas e o estado do botão
+                renderizarPaginaAventura(); 
+
+            } catch (error) {
+                console.error("Erro ao atualizar status da aventura:", error);
+                alert("Não foi possível atualizar seu status na aventura. Tente novamente.");
+            }
         }
     </script>
 </body>
