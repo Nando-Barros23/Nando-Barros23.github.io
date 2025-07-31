@@ -72,29 +72,73 @@
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
 
-        /* Estilos para o painel de filtros */
-        .filter-panel {
+        /* Estilos para o painel de filtros - Agora mais integrado */
+        .search-and-filter-bar {
             background-color: var(--cor-fundo-card);
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid var(--cor-borda);
             margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column; /* Organiza itens em coluna para mobile */
+            gap: 1rem; /* Espaçamento entre os grupos de pesquisa/filtros */
+        }
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        .search-input-group input {
+            flex-grow: 1; /* Ocupa o máximo de espaço */
+        }
+        .filter-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 2 colunas para telas menores */
+            gap: 1rem;
         }
         .filter-panel .form-grupo {
-            margin-bottom: 0.8rem;
+            margin-bottom: 0; /* Remove margem extra dos grupos dentro da grid */
         }
         .filter-panel .form-grupo label {
             font-size: 0.9rem;
             margin-bottom: 0.3rem;
+            font-family: var(--fonte-corpo); /* Usar fonte corpo para labels de filtro */
+            font-weight: 400;
         }
         .filter-panel input, .filter-panel select {
             padding: 0.6rem;
+            background-color: var(--cor-fundo);
         }
         .filter-actions {
             display: flex;
             gap: 10px;
-            margin-top: 1rem;
+            margin-top: 1rem; /* Espaço entre os filtros e os botões */
             justify-content: flex-end;
+        }
+
+        @media (min-width: 768px) {
+            .search-and-filter-bar {
+                flex-direction: row; /* Volta para linha em telas maiores */
+                align-items: flex-start; /* Alinha itens no topo */
+            }
+            .search-input-group {
+                flex-basis: 40%; /* Dá mais espaço para a pesquisa */
+            }
+            .filter-options-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Mais colunas para filtros em desktop */
+                flex-grow: 1; /* Ocupa o espaço restante */
+            }
+        }
+        @media (min-width: 992px) { /* Ajustes para o layout principal do container */
+            .search-and-filter-bar {
+                flex-wrap: wrap; /* Permite quebrar linha se os filtros forem muitos */
+            }
+            .search-input-group {
+                flex-basis: auto; /* Deixa o flex-grow cuidar */
+            }
+            .filter-options-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
         }
 
 
@@ -179,42 +223,40 @@
         <main>
             <h2>Chamados de Aventura</h2>
             
-            <div class="filter-panel">
-                <h3>Filtrar Aventuras</h3>
-                <div class="form-grupo">
-                    <label for="filter-titulo">Título:</label>
-                    <input type="text" id="filter-titulo" placeholder="Buscar por título">
+            <div class="search-and-filter-bar">
+                <div class="search-input-group">
+                    <input type="text" id="filter-titulo" placeholder="Buscar por título...">
+                    <button id="clear-search-btn" class="btn-secundario">Limpar</button>
                 </div>
-                <div class="form-grupo">
-                    <label for="filter-mestre">Mestre:</label>
-                    <input type="text" id="filter-mestre" placeholder="Nome do mestre">
-                </div>
-                <div class="form-grupo">
-                    <label for="filter-sistema">Sistema:</label>
-                    <input type="text" id="filter-sistema" placeholder="Ex: D&D 5e">
-                </div>
-                <div class="form-grupo">
-                    <label for="filter-tipo">Tipo:</label>
-                    <select id="filter-tipo">
-                        <option value="">Todos</option>
-                        <option value="One-Shot">One-Shot</option>
-                        <option value="Campanha">Campanha</option>
-                    </select>
-                </div>
-                <div class="form-grupo">
-                    <label for="filter-status">Status:</label>
-                    <select id="filter-status">
-                        <option value="">Todos</option>
-                        <option value="Recrutando">Recrutando</option>
-                        <option value="Cheia">Cheia</option>
-                        <option value="Em Andamento">Em Andamento</option>
-                        <option value="Finalizada">Finalizada</option>
-                        <option value="Cancelada">Cancelada</option>
-                    </select>
-                </div>
-                <div class="filter-actions">
-                    <button id="apply-filters-btn" class="btn-primario">Aplicar Filtros</button>
-                    <button id="clear-filters-btn" class="btn-secundario">Limpar Filtros</button>
+                
+                <div class="filter-options-grid">
+                    <div class="form-grupo">
+                        <label for="filter-mestre">Mestre:</label>
+                        <input type="text" id="filter-mestre" placeholder="Nome do mestre">
+                    </div>
+                    <div class="form-grupo">
+                        <label for="filter-sistema">Sistema:</label>
+                        <input type="text" id="filter-sistema" placeholder="Ex: D&D 5e">
+                    </div>
+                    <div class="form-grupo">
+                        <label for="filter-tipo">Tipo:</label>
+                        <select id="filter-tipo">
+                            <option value="">Todos</option>
+                            <option value="One-Shot">One-Shot</option>
+                            <option value="Campanha">Campanha</option>
+                        </select>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="filter-status">Status:</label>
+                        <select id="filter-status">
+                            <option value="">Todos</option>
+                            <option value="Recrutando">Recrutando</option>
+                            <option value="Cheia">Cheia</option>
+                            <option value="Em Andamento">Em Andamento</option>
+                            <option value="Finalizada">Finalizada</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -309,7 +351,7 @@
         const aventuraIdEditarInput = document.getElementById('aventura-id-editar');
         const painelMestreTitulo = document.getElementById('painel-mestre-titulo');
         const statusAventuraSelect = document.getElementById('status-aventura');
-        const statusGroup = document.getElementById('status-group'); // O grupo do campo de status
+        const statusGroup = document.getElementById('status-group'); 
 
         // Elementos de filtro
         const filterTitulo = document.getElementById('filter-titulo');
@@ -317,16 +359,16 @@
         const filterSistema = document.getElementById('filter-sistema');
         const filterTipo = document.getElementById('filter-tipo');
         const filterStatus = document.getElementById('filter-status');
-        const applyFiltersBtn = document.getElementById('apply-filters-btn');
-        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        const clearSearchBtn = document.getElementById('clear-search-btn'); // Novo botão
+
 
         // Mensagens de notificação
         const notificationMessage = document.getElementById('notification-message');
 
         let currentUser = null;
         let currentUserProfile = null;
-        let editingAventuraId = null; // Para controlar o modo de edição
-        let currentFilters = {}; // Para armazenar os filtros ativos
+        let editingAventuraId = null; 
+        let currentFilters = {}; 
 
 
         // --- Funções Auxiliares ---
@@ -345,8 +387,8 @@
                 notificationMessage.style.opacity = '0';
                 setTimeout(() => {
                     notificationMessage.style.display = 'none';
-                }, 500); // Tempo da transição
-            }, 3000); // Exibe por 3 segundos
+                }, 500); 
+            }, 3000); 
         }
 
         // Validação básica do formulário de aventura
@@ -376,12 +418,11 @@
                 userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
                 
-                // Exibe o painel do mestre apenas para mestres ou admins
                 if (currentUserProfile.role === 'master' || currentUserProfile.isAdmin) {
                     painelMestre.style.display = 'block';
                     mestreInput.value = currentUserProfile.username;
                     mestreInput.disabled = true; 
-                    statusGroup.style.display = 'block'; // Mostra o status para mestre/admin
+                    statusGroup.style.display = 'block'; 
                 } else {
                     painelMestre.style.display = 'none';
                     statusGroup.style.display = 'none';
@@ -395,8 +436,7 @@
                 document.getElementById('login-btn').addEventListener('click', () => showAuthForm('login'));
                 document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
             }
-            // Chama a renderização inicial das aventuras com filtros vazios
-            applyFilters();
+            applyFilters(); // Aplica filtros na inicialização (sempre exibe tudo por padrão se filtros vazios)
         });
 
         const showAuthForm = (type) => {
@@ -500,6 +540,7 @@
         };
 
         // Função para aplicar os filtros
+        // Esta função agora é chamada sempre que um filtro muda
         function applyFilters() {
             currentFilters = {
                 titulo: filterTitulo.value.toLowerCase(),
@@ -510,10 +551,6 @@
             };
 
             let query = aventurasCollection.orderBy('createdAt', 'desc');
-
-            // Firestore não permite múltiplas cláusulas 'where' em campos diferentes sem índices compostos.
-            // Para simplificar aqui, faremos a filtragem no lado do cliente para campos de texto.
-            // Para filtros de seleção (tipo, status), podemos usar where diretamente.
 
             if (currentFilters.tipo) {
                 query = query.where('tipo', '==', currentFilters.tipo);
@@ -538,15 +575,14 @@
             });
         }
 
-        // Event Listeners para os botões de filtro
-        applyFiltersBtn.addEventListener('click', applyFilters);
-        filterTitulo.addEventListener('input', applyFilters); // Aplica filtro ao digitar
-        filterMestre.addEventListener('input', applyFilters); // Aplica filtro ao digitar
-        filterSistema.addEventListener('input', applyFilters); // Aplica filtro ao digitar
-        filterTipo.addEventListener('change', applyFilters); // Aplica filtro ao mudar seleção
-        filterStatus.addEventListener('change', applyFilters); // Aplica filtro ao mudar seleção
+        // Event Listeners para os campos de filtro e botão de limpar
+        filterTitulo.addEventListener('input', applyFilters); 
+        filterMestre.addEventListener('input', applyFilters); 
+        filterSistema.addEventListener('input', applyFilters); 
+        filterTipo.addEventListener('change', applyFilters); 
+        filterStatus.addEventListener('change', applyFilters); 
 
-        clearFiltersBtn.addEventListener('click', () => {
+        clearSearchBtn.addEventListener('click', () => {
             filterTitulo.value = '';
             filterMestre.value = '';
             filterSistema.value = '';
@@ -606,8 +642,8 @@
                 gatilhoInput.value = aventura.gatilho || '';
                 descricaoTextarea.value = aventura.descricao;
                 aventuraIdEditarInput.value = docId; 
-                statusAventuraSelect.value = aventura.status || 'Recrutando'; // Preenche o status
-                statusGroup.style.display = 'block'; // Garante que o campo de status esteja visível
+                statusAventuraSelect.value = aventura.status || 'Recrutando'; 
+                statusGroup.style.display = 'block'; 
 
                 btnPublicar.textContent = 'Salvar Alterações';
                 painelMestreTitulo.textContent = 'Editar Aventura';
@@ -620,13 +656,13 @@
                 showNotification("Não foi possível carregar a aventura para edição.", true);
             } finally {
                 btnPublicar.disabled = false;
-                btnPublicar.textContent = 'Salvar Alterações'; // Retorna ao texto de salvar
+                btnPublicar.textContent = 'Salvar Alterações'; 
             }
         }
 
         function resetFormAndExitEditMode() {
             formAventura.reset();
-            if (currentUserProfile) { // Garante que o perfil esteja carregado
+            if (currentUserProfile) { 
                 mestreInput.value = currentUserProfile.username; 
             }
             btnPublicar.textContent = 'Publicar Aventura';
@@ -634,7 +670,7 @@
             btnCancelarEdicao.style.display = 'none';
             editingAventuraId = null; 
             aventuraIdEditarInput.value = ''; 
-            statusGroup.style.display = 'none'; // Oculta o status ao criar nova
+            statusGroup.style.display = 'none'; 
         }
 
         btnCancelarEdicao.addEventListener('click', resetFormAndExitEditMode);
@@ -666,7 +702,7 @@
                 gatilho: gatilhoInput.value,
                 descricao: descricaoTextarea.value,
                 imagemUrl: imagemInput.value,
-                status: statusAventuraSelect.value // Pega o status do select
+                status: statusAventuraSelect.value 
             };
 
             if (editingAventuraId) {
@@ -679,13 +715,10 @@
                     showNotification("Não foi possível atualizar a aventura. Verifique suas permissões.", true);
                 } finally {
                     btnPublicar.disabled = false;
-                    // O texto do botão será redefinido por resetFormAndExitEditMode ou no próximo uso.
-                    // btnPublicar.textContent = 'Salvar Alterações'; 
                 }
             } else {
                 aventuraData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                // O status inicial será "Recrutando" se não for edição
-                aventuraData.status = 'Recrutando'; // Novas aventuras SEMPRE começam como Recrutando
+                aventuraData.status = 'Recrutando'; 
                 aventuraData.jogadores = [];
                 aventuraData.suplentes = [];
 
