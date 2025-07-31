@@ -47,6 +47,7 @@
         .card-conteudo { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
         .card-conteudo p { color: var(--cor-texto-secundario); margin-bottom: 1rem; }
         .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
+        .card-gatilho { font-style: italic; color: var(--cor-alerta-texto); background-color: #fadcb3; border: 1px solid #8c6d3f; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; margin-top: 1rem; }
         #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
         .painel-mestre { display: none; background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
         .form-grupo { margin-bottom: 1rem; }
@@ -66,7 +67,7 @@
         .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
         .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
-        .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; flex-wrap: wrap; gap: 0.5rem; }
+        .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; flex-wrap: wrap; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--cor-borda); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .modal .logo { max-width: 80px; margin-bottom: 1rem; }
@@ -214,7 +215,8 @@
                 const card = document.createElement('div');
                 card.className = 'card-aventura';
                 const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura" class="card-imagem">` : '';
-                card.innerHTML = `${imagemHtml}<div class="card-conteudo"><h3>${aventura.titulo}</h3><p><strong>Mestre:</strong> ${aventura.mestre}<br><strong>Tipo:</strong> ${aventura.tipo || 'Não especificado'}<br><strong>Sistema:</strong> ${aventura.sistema}<br>${statusHtml}</p><div class="card-actions">${acaoHtml}</div></div>`;
+                const gatilhoHtml = aventura.gatilho ? `<p class="card-gatilho">⚠️ <strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
+                card.innerHTML = `${imagemHtml}<div class="card-conteudo"><h3>${aventura.titulo}</h3><p><strong>Mestre:</strong> ${aventura.mestre}<br><strong>Tipo:</strong> ${aventura.tipo || 'Não especificado'}<br><strong>Sistema:</strong> ${aventura.sistema}<br>${statusHtml}</p>${gatilhoHtml}<div class="card-actions">${acaoHtml}</div></div>`;
                 muralAventuras.appendChild(card);
             });
         };
