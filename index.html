@@ -113,7 +113,7 @@
             display: flex;
             gap: 10px;
             margin-top: 1rem; 
-            justify-content: flex-end; /* Alinha botões à direita */
+            justify-content: flex-end; 
         }
 
         @media (min-width: 768px) {
@@ -360,8 +360,8 @@
         const filterSistema = document.getElementById('filter-sistema');
         const filterTipo = document.getElementById('filter-tipo');
         const filterStatus = document.getElementById('filter-status');
-        const searchBtn = document.getElementById('search-btn'); // Botão Buscar
-        const clearFiltersBtn = document.getElementById('clear-filters-btn'); // Botão Limpar
+        const searchBtn = document.getElementById('search-btn'); 
+        const clearFiltersBtn = document.getElementById('clear-filters-btn'); 
 
         // Mensagens de notificação
         const notificationMessage = document.getElementById('notification-message');
@@ -370,7 +370,7 @@
         let currentUserProfile = null;
         let editingAventuraId = null; 
         let currentFilters = {}; 
-        let unsubscribeAventuras = null; // Para guardar a função de unsubscribe do Firestore
+        let unsubscribeAventuras = null; 
 
 
         // --- Funções Auxiliares ---
@@ -438,8 +438,7 @@
                 document.getElementById('login-btn').addEventListener('click', () => showAuthForm('login'));
                 document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
             }
-            // Chamado inicial para mostrar todas as aventuras
-            startListeningForAventuras();
+            // Não chamar applyFilters() aqui. startListeningForAventuras() será chamado uma vez no final do script.
         });
 
         const showAuthForm = (type) => {
@@ -544,18 +543,18 @@
 
         // Função que inicia o listener para as aventuras (sem filtros iniciais)
         function startListeningForAventuras() {
-            // Desinscreve o listener anterior, se houver
             if (unsubscribeAventuras) {
-                unsubscribeAventuras();
+                unsubscribeAventuras(); // Desinscreve o listener anterior para evitar duplicidade
             }
 
-            // Inicia um novo listener que busca todas as aventuras ordenadas por data de criação
+            // Escuta TODAS as aventuras, ordenadas por data de criação.
+            // A filtragem por texto é feita no lado do cliente após os dados serem recebidos.
             unsubscribeAventuras = aventurasCollection.orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-                // Filtra os documentos em memória APENAS se houver filtros ativos
-                let filteredDocs = snapshot.docs;
+                let displayedDocs = snapshot.docs;
 
-                if (Object.keys(currentFilters).length > 0) { // Verifica se há algum filtro definido
-                    filteredDocs = snapshot.docs.filter(doc => {
+                // Aplica filtros se eles estiverem definidos (ou seja, se o botão Buscar foi clicado)
+                if (Object.keys(currentFilters).length > 0) {
+                    displayedDocs = snapshot.docs.filter(doc => {
                         const data = doc.data();
                         const matchesTitulo = currentFilters.titulo ? data.titulo.toLowerCase().includes(currentFilters.titulo) : true;
                         const matchesMestre = currentFilters.mestre ? data.mestre.toLowerCase().includes(currentFilters.mestre) : true;
@@ -565,7 +564,7 @@
                         return matchesTitulo && matchesMestre && matchesSistema && matchesTipo && matchesStatus;
                     });
                 }
-                renderizarAventuras({ docs: filteredDocs, empty: filteredDocs.length === 0 });
+                renderizarAventuras({ docs: displayedDocs, empty: displayedDocs.length === 0 });
             }, (error) => {
                 console.error("Erro ao buscar aventuras: ", error);
                 showNotification("Erro ao carregar as aventuras.", true);
@@ -573,10 +572,8 @@
             });
         }
 
-
         // Função para aplicar os filtros quando o botão Buscar é clicado
-        function applyFilters() {
-            // Atualiza os filtros atuais com os valores dos campos
+        searchBtn.addEventListener('click', () => {
             currentFilters = {
                 titulo: filterTitulo.value.toLowerCase(),
                 mestre: filterMestre.value.toLowerCase(),
@@ -584,21 +581,18 @@
                 tipo: filterTipo.value,
                 status: filterStatus.value
             };
-            // Chama o listener novamente para re-renderizar com os novos filtros
-            startListeningForAventuras();
-        }
+            startListeningForAventuras(); // Re-executa o listener para aplicar os novos filtros
+        });
 
-        // Event Listeners para os botões de filtro
-        searchBtn.addEventListener('click', applyFilters); // Chamar applyFilters ao clicar em Buscar
-
+        // Event Listener para o botão Limpar Filtros
         clearFiltersBtn.addEventListener('click', () => {
             filterTitulo.value = '';
             filterMestre.value = '';
             filterSistema.value = '';
             filterTipo.value = '';
             filterStatus.value = '';
-            currentFilters = {}; // Limpa os filtros ativos
-            startListeningForAventuras(); // Re-renderiza com todos os chamados
+            currentFilters = {}; // Reseta os filtros atuais
+            startListeningForAventuras(); // Re-executa o listener para mostrar todas as aventuras
         });
 
 
@@ -659,7 +653,7 @@
                 painelMestreTitulo.textContent = 'Editar Aventura';
                 btnCancelarEdicao.style.display = 'inline-block';
 
-                painelMestre.scrollIntoView({ behavior: 'smooth' });
+                painelMestre.scrollView({ behavior: 'smooth' }); // Use scrollView para rolar até o elemento
 
             } catch (error) {
                 console.error("Erro ao carregar aventura para edição: ", error);
@@ -746,6 +740,9 @@
                 }
             }
         });
+
+        // Chama startListeningForAventuras() uma vez ao final do script para carregar as aventuras.
+        startListeningForAventuras();
     </script>
 </body>
 </html>
