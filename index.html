@@ -59,6 +59,8 @@
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
         .form-grupo input, .form-grupo textarea, .form-grupo select { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
+        .form-grupo-radio { display: flex; gap: 1rem; align-items: center; }
+        .form-grupo-radio label { font-family: var(--fonte-corpo); font-weight: 400; }
         .form-grupo textarea { resize: vertical; min-height: 100px; }
         .form-grupo input:focus, .form-grupo textarea:focus, .form-grupo select:focus { border-color: var(--cor-primaria); outline: none; }
         
@@ -107,6 +109,13 @@
                 <form id="form-aventura">
                     <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
                     <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required disabled></div>
+                    <div class="form-grupo">
+                        <label>Tipo de Aventura</label>
+                        <div class="form-grupo-radio">
+                            <input type="radio" id="tipo-oneshot" name="tipo_aventura" value="One-Shot" checked><label for="tipo-oneshot">One-Shot</label>
+                            <input type="radio" id="tipo-campanha" name="tipo_aventura" value="Campanha"><label for="tipo-campanha">Campanha</label>
+                        </div>
+                    </div>
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
                     <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="text" id="nivel" required></div>
                     <div class="form-grupo"><label for="vagas">Número de Vagas</label><input type="number" id="vagas" min="1" required></div>
@@ -275,6 +284,7 @@
                         <h3>${aventura.titulo}</h3>
                         <p>
                             <strong>Mestre:</strong> ${aventura.mestre}<br>
+                            <strong>Tipo:</strong> ${aventura.tipo || 'Não especificado'}<br>
                             <strong>Sistema:</strong> ${aventura.sistema}<br>
                             <strong>Nível:</strong> ${aventura.nivel}<br>
                             ${statusHtml}
@@ -360,10 +370,11 @@
                 titulo: document.getElementById('titulo').value,
                 mestre: currentUserProfile.username,
                 mestreUid: currentUser.uid,
+                tipo: document.querySelector('input[name="tipo_aventura"]:checked').value,
                 sistema: document.getElementById('sistema').value,
                 nivel: document.getElementById('nivel').value,
                 vagas: parseInt(document.getElementById('vagas').value),
-                status: 'Recrutando', // Default status
+                status: 'Recrutando',
                 gatilho: document.getElementById('gatilho').value,
                 descricao: document.getElementById('descricao').value,
                 imagemUrl: document.getElementById('imagem').value,
