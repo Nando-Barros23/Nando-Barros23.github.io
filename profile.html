@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil - Dados & Calangos</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --cor-fundo: #F7F7F7;
@@ -26,58 +24,25 @@
         body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: var(--cor-texto); line-height: 1.6; }
         a { color: var(--cor-primaria); text-decoration: none; }
         a:hover { text-decoration: underline; }
-        
         header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
-        .header-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding-bottom: 1rem;
-            flex-wrap: wrap; 
-            justify-content: center; 
-        }
-
-        header .site-logo-banner {
-            max-width: 350px; 
-            width: 100%; 
-            height: auto;
-            display: block; 
-            margin-bottom: 1rem; 
-        }
-
-        /* Esconder o logo e o h1 antigos */
-        header .logo, header h1 {
-            display: none; 
-        }
-
-        @media (min-width: 768px) {
-            header .header-top {
-                justify-content: space-between; 
-            }
-            header .site-logo-banner {
-                margin-bottom: 0; 
-            }
-        }
-        
+        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
+        header .logo { max-width: 100px; }
+        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
         .container { max-width: 800px; margin: 2rem auto; padding: 2rem; background: var(--cor-fundo-card); border-radius: 8px; }
         h2 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bottom: 1.5rem; text-align: center; }
-
         .profile-info { text-align: center; margin-bottom: 2rem; }
         .profile-info img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--cor-primaria); }
         .profile-info h3 { margin-top: 1rem; }
         .profile-info p { color: var(--cor-texto-secundario); }
-
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
         .form-grupo input { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
-        
         button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s; font-family: var(--fonte-corpo); }
         .btn-primario { background-color: var(--cor-primaria); color: #fff; }
         .btn-primario:hover { background-color: #b85b30; }
         .btn-primario:disabled { background-color: #a0a0a0; }
-
+        .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
+        .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
         .mestre-section { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--cor-borda); text-align: center; }
         .mestre-section p { color: var(--cor-texto-secundario); }
         .mestre-section span { font-family: var(--fonte-label); color: var(--cor-primaria); font-weight: bold; }
@@ -86,20 +51,15 @@
 <body>
     <header>
         <div class="header-top">
-            <a href="index.html">
-                <img src="https://i.imgur.com/zY5dK3z.jpeg" alt="Dados & Calangos RPG de Mesa" class="site-logo-banner">
-            </a>
+            <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+            <a href="index.html"><h1>Dados & Calangos</h1></a>
             <div id="user-area"></div>
         </div>
     </header>
-
-    <div class="container" id="profile-container">
-        </div>
-    
+    <div class="container" id="profile-container"></div>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyAyIrdaURuGFvBXXzrmQEDhtHwX5ll8Do4",
@@ -109,17 +69,14 @@
           messagingSenderId: "1021912207307",
           appId: "1:1021912207307:web:2b29c38483a30696ecb04e"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         const usersCollection = db.collection('users');
-
         const userArea = document.getElementById('user-area');
         const profileContainer = document.getElementById('profile-container');
         let currentUser = null;
         let currentUserProfile = null;
-
         auth.onAuthStateChanged(async user => {
             if (user) {
                 currentUser = user;
@@ -128,35 +85,13 @@
                     currentUserProfile = userProfileDoc.data();
                     renderHeader();
                     renderProfilePage();
-                } else {
-                    const newProfile = { 
-                        email: user.email, 
-                        username: user.displayName || 'Novo Calango', 
-                        photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', 
-                        role: 'player', 
-                        masterRequest: false,
-                        isAdmin: false 
-                    };
-                    await usersCollection.doc(user.uid).set(newProfile);
-                    currentUserProfile = newProfile;
-                    renderHeader();
-                    renderProfilePage();
-                }
-            } else {
-                window.location.href = 'index.html';
-            }
+                } else { window.location.href = 'index.html'; }
+            } else { window.location.href = 'index.html'; }
         });
-
         function renderHeader() {
-            userArea.innerHTML = `
-                <div id="user-info-area">
-                    <span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span>
-                    <button id="logout-btn" class="btn btn-secundario">Sair</button>
-                </div>
-            `;
+            userArea.innerHTML = `<div id="user-info-area"><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
             document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
         }
-
         function renderProfilePage() {
             let mestreHtml = '';
             if (currentUserProfile.role === 'master') {
@@ -166,76 +101,41 @@
             } else {
                 mestreHtml = `<div class="mestre-section"><p>Deseja publicar suas próprias aventuras?</p><button id="request-master-btn" class="btn-primario">Quero ser Mestre</button></div>`;
             }
-
-            profileContainer.innerHTML = `
-                <h2>Meu Perfil</h2>
-                <div class="profile-info">
-                    <img src="${currentUserProfile.photoURL}" alt="Avatar">
-                    <h3>${currentUserProfile.username}</h3>
-                    <p>${currentUserProfile.email}</p>
-                    ${currentUserProfile.isAdmin ? '<p style="color: red; font-weight: bold;">(Administrador)</p>' : ''}
-                </div>
-                
-                <form id="profile-form">
-                    <h2>Editar Informações</h2>
-                    <div class="form-grupo">
-                        <label for="username">Nome de Usuário</label>
-                        <input type="text" id="username" value="${currentUserProfile.username}" required>
-                    </div>
-                    <div class="form-grupo">
-                        <label for="photoURL">URL da Foto de Perfil</label>
-                        <input type="url" id="photoURL" value="${currentUserProfile.photoURL}" required>
-                    </div>
-                    <button type="submit" class="btn-primario" id="save-profile-btn">Salvar Alterações</button>
-                </form>
-
-                ${mestreHtml}
-            `;
-
+            profileContainer.innerHTML = `<h2>Meu Perfil</h2><div class="profile-info"><img src="${currentUserProfile.photoURL}" alt="Avatar"><h3>${currentUserProfile.username}</h3><p>${currentUserProfile.email}</p></div><form id="profile-form"><h2>Editar Informações</h2><div class="form-grupo"><label for="username">Nome de Usuário</label><input type="text" id="username" value="${currentUserProfile.username}" required></div><div class="form-grupo"><label for="photoURL">URL da Foto de Perfil</label><input type="url" id="photoURL" value="${currentUserProfile.photoURL}" required></div><button type="submit" class="btn-primario" id="save-profile-btn">Salvar Alterações</button></form>${mestreHtml}`;
             if (document.getElementById('request-master-btn')) {
                 document.getElementById('request-master-btn').addEventListener('click', solicitarMestre);
             }
-
             document.getElementById('profile-form').addEventListener('submit', salvarPerfil);
         }
-
         async function salvarPerfil(event) {
             event.preventDefault();
             const btn = document.getElementById('save-profile-btn');
             btn.disabled = true;
             btn.textContent = 'Salvando...';
-
             const newUsername = document.getElementById('username').value;
             const newPhotoURL = document.getElementById('photoURL').value;
-
             try {
-                const updatedProfile = {
-                    username: newUsername,
-                    photoURL: newPhotoURL
-                };
-
+                const updatedProfile = { username: newUsername, photoURL: newPhotoURL };
                 await usersCollection.doc(currentUser.uid).update(updatedProfile);
-                alert('Perfil atualizado com sucesso!'); 
+                alert('Perfil atualizado com sucesso!');
                 location.reload();
-
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
-                alert("Não foi possível atualizar o perfil."); 
+                alert("Não foi possível atualizar o perfil.");
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Salvar Alterações';
             }
         }
-
         async function solicitarMestre() {
             if (confirm('Você confirma que deseja solicitar para se tornar um Mestre?')) {
                 try {
                     await usersCollection.doc(currentUser.uid).update({ masterRequest: true });
-                    alert('Solicitação enviada! Um administrador irá revisar seu pedido.'); 
+                    alert('Solicitação enviada! Um administrador irá revisar seu pedido.');
                     location.reload();
                 } catch (error) {
                     console.error("Erro ao solicitar:", error);
-                    alert("Não foi possível enviar sua solicitação."); 
+                    alert("Não foi possível enviar sua solicitação.");
                 }
             }
         }
