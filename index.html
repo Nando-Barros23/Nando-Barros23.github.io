@@ -43,6 +43,10 @@
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
 
+        #search-container { margin-bottom: 2rem; }
+        #search-form { display: flex; gap: 10px; }
+        #search-input { flex-grow: 1; padding: 0.8rem; border: 1px solid var(--cor-borda); border-radius: 4px; font-size: 1rem; }
+
         #mural-aventuras { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
         .card-aventura { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
         .card-aventura:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
@@ -59,6 +63,8 @@
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
         .form-grupo input, .form-grupo textarea, .form-grupo select { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
+        .form-grupo-radio { display: flex; gap: 1rem; align-items: center; }
+        .form-grupo-radio label { font-family: var(--fonte-corpo); font-weight: 400; }
         .form-grupo textarea { resize: vertical; min-height: 100px; }
         .form-grupo input:focus, .form-grupo textarea:focus, .form-grupo select:focus { border-color: var(--cor-primaria); outline: none; }
         
@@ -98,6 +104,12 @@
     <div class="container">
         <main>
             <h2>Chamados de Aventura</h2>
+            <div id="search-container">
+                <form id="search-form">
+                    <input type="text" id="search-input" placeholder="Buscar por título ou mestre...">
+                    <button type="submit" class="btn-primario btn">Buscar</button>
+                </form>
+            </div>
             <div id="mural-aventuras"></div>
         </main>
         
@@ -105,7 +117,23 @@
             <div class="painel-mestre" id="painel-mestre">
                 <h2>Painel do Mestre</h2>
                 <form id="form-aventura">
-                    </form>
+                    <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
+                    <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required disabled></div>
+                    <div class="form-grupo">
+                        <label>Tipo de Aventura</label>
+                        <div class="form-grupo-radio">
+                            <input type="radio" id="tipo-oneshot" name="tipo_aventura" value="One-Shot" checked><label for="tipo-oneshot">One-Shot</label>
+                            <input type="radio" id="tipo-campanha" name="tipo_aventura" value="Campanha"><label for="tipo-campanha">Campanha</label>
+                        </div>
+                    </div>
+                    <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
+                    <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="text" id="nivel" required></div>
+                    <div class="form-grupo"><label for="vagas">Número de Vagas</label><input type="number" id="vagas" min="1" required></div>
+                    <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (cole o link da imagem aqui)"></div>
+                    <div class="form-grupo"><label for="gatilho">Alertas de Gatilho</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência" required></div>
+                    <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
+                    <button type="submit" class="btn-primario" id="btn-publicar">Publicar Aventura</button>
+                </form>
             </div>
         </aside>
     </div>
@@ -139,11 +167,14 @@
         const painelMestre = document.getElementById('painel-mestre');
         const muralAventuras = document.getElementById('mural-aventuras');
         const formAventura = document.getElementById('form-aventura');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
         const authModal = document.getElementById('auth-modal');
         const modalContent = document.getElementById('modal-content');
 
         let currentUser = null;
         let currentUserProfile = null;
+        let todasAventuras = [];
 
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -152,13 +183,13 @@
                 if (userProfileDoc.exists) {
                     currentUserProfile = userProfileDoc.data();
                 } else {
-                    const newProfile = { email: user.email, username: user.displayName || 'Novo Calango', photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', role: 'player', masterRequest: false };
+                    const newProfile = { email: user.email, username: user.displayName || 'Novo Calango', photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', role: 'player', masterRequest: false, isAdmin: false };
                     await usersCollection.doc(user.uid).set(newProfile);
                     currentUserProfile = newProfile;
                 }
                 userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-                if (currentUserProfile.role === 'master') {
+                if (currentUserProfile.role === 'master' || currentUserProfile.isAdmin) {
                     painelMestre.style.display = 'block';
                     document.getElementById('mestre').value = currentUserProfile.username;
                 } else {
@@ -201,8 +232,8 @@
 
         const renderizarAventuras = (aventurasDocs) => {
             muralAventuras.innerHTML = '';
-            if (aventurasDocs.empty) {
-                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura publicada ainda.</p>';
+            if (!aventurasDocs || aventurasDocs.length === 0) {
+                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura encontrada.</p>';
                 return;
             }
             aventurasDocs.forEach(aventuraDoc => {
@@ -251,9 +282,36 @@
             });
         };
 
-        aventurasCollection.orderBy('createdAt', 'desc').onSnapshot(renderizarAventuras, (error) => {
+        aventurasCollection.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+            todasAventuras = snapshot.docs;
+            renderizarAventuras(todasAventuras);
+        }, (error) => {
             console.error("Erro ao buscar aventuras: ", error);
             muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras.</p>';
+        });
+
+        searchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const termoBusca = searchInput.value.toLowerCase().trim();
+            if (termoBusca === '') {
+                renderizarAventuras(todasAventuras);
+                return;
+            }
+            const resultados = todasAventuras.filter(doc => {
+                const aventura = doc.data();
+                const titulo = aventura.titulo.toLowerCase();
+                const mestre = aventura.mestre.toLowerCase();
+                return titulo.includes(termoBusca) || mestre.includes(termoBusca);
+            });
+            renderizarAventuras(resultados);
+        });
+        
+        muralAventuras.addEventListener('change', (event) => {
+            if(event.target.classList.contains('status-select')) {
+                const docId = event.target.dataset.id;
+                const newStatus = event.target.value;
+                aventurasCollection.doc(docId).update({ status: newStatus });
+            }
         });
 
         muralAventuras.addEventListener('click', (event) => {
@@ -266,18 +324,10 @@
             }
         });
         
-        muralAventuras.addEventListener('change', (event) => {
-            if(event.target.classList.contains('status-select')) {
-                const docId = event.target.dataset.id;
-                const newStatus = event.target.value;
-                aventurasCollection.doc(docId).update({ status: newStatus });
-            }
-        });
-        
         formAventura.addEventListener('submit', async (event) => {
             event.preventDefault();
-            if (!currentUser || !currentUserProfile || currentUserProfile.role !== 'master') {
-                alert('Apenas mestres podem publicar aventuras.');
+            if (!currentUser || !currentUserProfile || !(currentUserProfile.role === 'master' || currentUserProfile.isAdmin)) {
+                alert('Apenas mestres ou administradores podem publicar aventuras.');
                 return;
             }
             const novaAventura = {
