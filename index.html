@@ -72,7 +72,7 @@
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
 
-        /* Estilos para o painel de filtros - Agora mais integrado */
+        /* Estilos para a barra de pesquisa e filtros */
         .search-and-filter-bar {
             background-color: var(--cor-fundo-card);
             padding: 1.5rem;
@@ -113,7 +113,7 @@
             display: flex;
             gap: 10px;
             margin-top: 1rem; 
-            justify-content: flex-end;
+            justify-content: flex-end; /* Alinha botões à direita */
         }
 
         @media (min-width: 768px) {
@@ -226,8 +226,7 @@
             <div class="search-and-filter-bar">
                 <div class="search-input-group">
                     <input type="text" id="filter-titulo" placeholder="Buscar por título...">
-                    <button id="clear-search-btn" class="btn-secundario">Limpar</button>
-                </div>
+                    <button id="search-btn" class="btn-primario">Buscar</button> </div>
                 
                 <div class="filter-options-grid">
                     <div class="form-grupo">
@@ -258,6 +257,8 @@
                         </select>
                     </div>
                 </div>
+                <div class="filter-actions">
+                    <button id="clear-filters-btn" class="btn-secundario">Limpar Filtros</button> </div>
             </div>
 
             <div id="mural-aventuras"></div>
@@ -359,8 +360,8 @@
         const filterSistema = document.getElementById('filter-sistema');
         const filterTipo = document.getElementById('filter-tipo');
         const filterStatus = document.getElementById('filter-status');
-        const clearSearchBtn = document.getElementById('clear-search-btn');
-
+        const searchBtn = document.getElementById('search-btn'); // Botão Buscar
+        const clearFiltersBtn = document.getElementById('clear-filters-btn'); // Botão Limpar
 
         // Mensagens de notificação
         const notificationMessage = document.getElementById('notification-message');
@@ -369,6 +370,7 @@
         let currentUserProfile = null;
         let editingAventuraId = null; 
         let currentFilters = {}; 
+        let unsubscribeAventuras = null; // Para guardar a função de unsubscribe do Firestore
 
 
         // --- Funções Auxiliares ---
@@ -436,7 +438,8 @@
                 document.getElementById('login-btn').addEventListener('click', () => showAuthForm('login'));
                 document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
             }
-            applyFilters(); // Chama applyFilters() aqui para garantir que o mural seja carregado.
+            // Chamado inicial para mostrar todas as aventuras
+            startListeningForAventuras();
         });
 
         const showAuthForm = (type) => {
@@ -539,8 +542,41 @@
             });
         };
 
-        // Função para aplicar os filtros
+        // Função que inicia o listener para as aventuras (sem filtros iniciais)
+        function startListeningForAventuras() {
+            // Desinscreve o listener anterior, se houver
+            if (unsubscribeAventuras) {
+                unsubscribeAventuras();
+            }
+
+            // Inicia um novo listener que busca todas as aventuras ordenadas por data de criação
+            unsubscribeAventuras = aventurasCollection.orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                // Filtra os documentos em memória APENAS se houver filtros ativos
+                let filteredDocs = snapshot.docs;
+
+                if (Object.keys(currentFilters).length > 0) { // Verifica se há algum filtro definido
+                    filteredDocs = snapshot.docs.filter(doc => {
+                        const data = doc.data();
+                        const matchesTitulo = currentFilters.titulo ? data.titulo.toLowerCase().includes(currentFilters.titulo) : true;
+                        const matchesMestre = currentFilters.mestre ? data.mestre.toLowerCase().includes(currentFilters.mestre) : true;
+                        const matchesSistema = currentFilters.sistema ? data.sistema.toLowerCase().includes(currentFilters.sistema) : true;
+                        const matchesTipo = currentFilters.tipo ? data.tipo === currentFilters.tipo : true;
+                        const matchesStatus = currentFilters.status ? data.status === currentFilters.status : true;
+                        return matchesTitulo && matchesMestre && matchesSistema && matchesTipo && matchesStatus;
+                    });
+                }
+                renderizarAventuras({ docs: filteredDocs, empty: filteredDocs.length === 0 });
+            }, (error) => {
+                console.error("Erro ao buscar aventuras: ", error);
+                showNotification("Erro ao carregar as aventuras.", true);
+                muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras.</p>';
+            });
+        }
+
+
+        // Função para aplicar os filtros quando o botão Buscar é clicado
         function applyFilters() {
+            // Atualiza os filtros atuais com os valores dos campos
             currentFilters = {
                 titulo: filterTitulo.value.toLowerCase(),
                 mestre: filterMestre.value.toLowerCase(),
@@ -548,51 +584,21 @@
                 tipo: filterTipo.value,
                 status: filterStatus.value
             };
-
-            // A query base sempre busca todas as aventuras ordenadas
-            let query = aventurasCollection.orderBy('createdAt', 'desc');
-
-            // Aqui aplicamos os filtros de tipo e status diretamente na query do Firestore,
-            // pois eles são para campos exatos (==).
-            if (currentFilters.tipo) {
-                query = query.where('tipo', '==', currentFilters.tipo);
-            }
-            if (currentFilters.status) {
-                query = query.where('status', '==', currentFilters.status);
-            }
-
-            query.onSnapshot(snapshot => {
-                // A filtragem por texto (titulo, mestre, sistema) é feita no lado do cliente,
-                // porque o Firestore não suporta consultas "contains" ou múltiplas "where" em campos diferentes sem índices compostos.
-                let filteredDocs = snapshot.docs.filter(doc => {
-                    const data = doc.data();
-                    const matchesTitulo = currentFilters.titulo ? data.titulo.toLowerCase().includes(currentFilters.titulo) : true;
-                    const matchesMestre = currentFilters.mestre ? data.mestre.toLowerCase().includes(currentFilters.mestre) : true;
-                    const matchesSistema = currentFilters.sistema ? data.sistema.toLowerCase().includes(currentFilters.sistema) : true;
-                    return matchesTitulo && matchesMestre && matchesSistema;
-                });
-                renderizarAventuras({ docs: filteredDocs, empty: filteredDocs.length === 0 });
-            }, (error) => {
-                console.error("Erro ao buscar aventuras com filtros: ", error);
-                showNotification("Erro ao carregar as aventuras com os filtros aplicados.", true);
-                muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras com os filtros aplicados.</p>';
-            });
+            // Chama o listener novamente para re-renderizar com os novos filtros
+            startListeningForAventuras();
         }
 
-        // Event Listeners para os campos de filtro e botão de limpar
-        filterTitulo.addEventListener('input', applyFilters); 
-        filterMestre.addEventListener('input', applyFilters); 
-        filterSistema.addEventListener('input', applyFilters); 
-        filterTipo.addEventListener('change', applyFilters); 
-        filterStatus.addEventListener('change', applyFilters); 
+        // Event Listeners para os botões de filtro
+        searchBtn.addEventListener('click', applyFilters); // Chamar applyFilters ao clicar em Buscar
 
-        clearSearchBtn.addEventListener('click', () => {
+        clearFiltersBtn.addEventListener('click', () => {
             filterTitulo.value = '';
             filterMestre.value = '';
             filterSistema.value = '';
             filterTipo.value = '';
             filterStatus.value = '';
-            applyFilters(); // Aplica os filtros limpos, que resultará em todas as aventuras
+            currentFilters = {}; // Limpa os filtros ativos
+            startListeningForAventuras(); // Re-renderiza com todos os chamados
         });
 
 
