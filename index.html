@@ -32,38 +32,9 @@
         @media (min-width: 992px) { .container { grid-template-columns: 2fr 1fr; } }
         
         header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
-        .header-top {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding-bottom: 1rem;
-            flex-wrap: wrap; 
-            justify-content: center; 
-        }
-
-        header .site-logo-banner {
-            max-width: 350px; 
-            width: 100%; 
-            height: auto;
-            display: block; 
-            margin-bottom: 1rem; 
-        }
-
-        /* Esconder o logo e o h1 antigos */
-        header .logo, header h1 {
-            display: none; 
-        }
-
-        @media (min-width: 768px) {
-            header .header-top {
-                justify-content: space-between; 
-            }
-            header .site-logo-banner {
-                margin-bottom: 0; 
-            }
-        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
+        header .logo { max-width: 100px; }
+        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
         
         #user-auth-area button { margin-left: 0.5rem; }
         #user-info-area { display: flex; align-items: center; gap: 1rem; }
@@ -72,75 +43,9 @@
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
 
-        /* Estilos para a barra de pesquisa e filtros */
-        .search-and-filter-bar {
-            background-color: var(--cor-fundo-card);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--cor-borda);
-            margin-bottom: 2rem;
-            display: flex;
-            flex-direction: column; 
-            gap: 1rem; 
-        }
-        .search-input-group {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
-        .search-input-group input {
-            flex-grow: 1; 
-        }
-        .filter-options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 1rem;
-        }
-        .filter-panel .form-grupo {
-            margin-bottom: 0; 
-        }
-        .filter-panel .form-grupo label {
-            font-size: 0.9rem;
-            margin-bottom: 0.3rem;
-            font-family: var(--fonte-corpo); 
-            font-weight: 400;
-        }
-        .filter-panel input, .filter-panel select {
-            padding: 0.6rem;
-            background-color: var(--cor-fundo);
-        }
-        .filter-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 1rem; 
-            justify-content: flex-end; 
-        }
-
-        @media (min-width: 768px) {
-            .search-and-filter-bar {
-                flex-direction: row; 
-                align-items: flex-start; 
-            }
-            .search-input-group {
-                flex-basis: 40%; 
-            }
-            .filter-options-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
-                flex-grow: 1; 
-            }
-        }
-        @media (min-width: 992px) { 
-            .search-and-filter-bar {
-                flex-wrap: wrap; 
-            }
-            .search-input-group {
-                flex-basis: auto; 
-            }
-            .filter-options-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-
+        #search-container { margin-bottom: 2rem; }
+        #search-form { display: flex; gap: 10px; }
+        #search-input { flex-grow: 1; padding: 0.8rem; border: 1px solid var(--cor-borda); border-radius: 4px; font-size: 1rem; }
 
         #mural-aventuras { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
         .card-aventura { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
@@ -175,28 +80,6 @@
         .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-start; margin-top: 1rem; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; flex-wrap: wrap; gap: 0.5rem; }
-        .btn-editar { background-color: transparent; border: 1px solid #4CAF50; color: #4CAF50; margin-left: 0.5rem; }
-        .btn-editar:hover { background-color: #4CAF50; color: #fff; }
-
-        /* Estilo para mensagens de notificação (alerta) */
-        .notification-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #4CAF50; /* Verde para sucesso */
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1001;
-            display: none; /* Inicia oculto */
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .notification-message.error {
-            background-color: #f44336; /* Vermelho para erro */
-        }
-
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -212,9 +95,8 @@
     
     <header>
         <div class="header-top">
-            <a href="index.html">
-                <img src="https://i.imgur.com/zY5dK3z.jpeg" alt="Dados & Calangos RPG de Mesa" class="site-logo-banner">
-            </a>
+            <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+            <a href="index.html"><h1>Dados & Calangos</h1></a>
             <div id="user-area"></div>
         </div>
     </header>
@@ -222,53 +104,20 @@
     <div class="container">
         <main>
             <h2>Chamados de Aventura</h2>
-            
-            <div class="search-and-filter-bar">
-                <div class="search-input-group">
-                    <input type="text" id="filter-titulo" placeholder="Buscar por título...">
-                    <button id="search-btn" class="btn-primario">Buscar</button> </div>
-                
-                <div class="filter-options-grid">
-                    <div class="form-grupo">
-                        <label for="filter-mestre">Mestre:</label>
-                        <input type="text" id="filter-mestre" placeholder="Nome do mestre">
-                    </div>
-                    <div class="form-grupo">
-                        <label for="filter-sistema">Sistema:</label>
-                        <input type="text" id="filter-sistema" placeholder="Ex: D&D 5e">
-                    </div>
-                    <div class="form-grupo">
-                        <label for="filter-tipo">Tipo:</label>
-                        <select id="filter-tipo">
-                            <option value="">Todos</option>
-                            <option value="One-Shot">One-Shot</option>
-                            <option value="Campanha">Campanha</option>
-                        </select>
-                    </div>
-                    <div class="form-grupo">
-                        <label for="filter-status">Status:</label>
-                        <select id="filter-status">
-                            <option value="">Todos</option>
-                            <option value="Recrutando">Recrutando</option>
-                            <option value="Cheia">Cheia</option>
-                            <option value="Em Andamento">Em Andamento</option>
-                            <option value="Finalizada">Finalizada</option>
-                            <option value="Cancelada">Cancelada</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="filter-actions">
-                    <button id="clear-filters-btn" class="btn-secundario">Limpar Filtros</button> </div>
+            <div id="search-container">
+                <form id="search-form">
+                    <input type="text" id="search-input" placeholder="Buscar por título ou mestre...">
+                    <button type="submit" class="btn-primario btn">Buscar</button>
+                </form>
             </div>
-
             <div id="mural-aventuras"></div>
         </main>
         
         <aside>
             <div class="painel-mestre" id="painel-mestre">
-                <h2 id="painel-mestre-titulo">Painel do Mestre</h2>
+                <h2>Painel do Mestre</h2>
                 <form id="form-aventura">
-                    <input type="hidden" id="aventura-id-editar"> <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
+                    <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
                     <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required disabled></div>
                     <div class="form-grupo">
                         <label>Tipo de Aventura</label>
@@ -280,29 +129,14 @@
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
                     <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="text" id="nivel" required></div>
                     <div class="form-grupo"><label for="vagas">Número de Vagas</label><input type="number" id="vagas" min="1" required></div>
-                    
-                    <div class="form-grupo" id="status-group" style="display:none;">
-                        <label for="status-aventura">Status da Aventura</label>
-                        <select id="status-aventura">
-                            <option value="Recrutando">Recrutando</option>
-                            <option value="Cheia">Cheia</option>
-                            <option value="Em Andamento">Em Andamento</option>
-                            <option value="Finalizada">Finalizada</option>
-                            <option value="Cancelada">Cancelada</option>
-                        </select>
-                    </div>
-
                     <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (cole o link da imagem aqui)"></div>
                     <div class="form-grupo"><label for="gatilho">Alertas de Gatilho</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência" required></div>
                     <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
                     <button type="submit" class="btn-primario" id="btn-publicar">Publicar Aventura</button>
-                    <button type="button" class="btn-secundario" id="btn-cancelar-edicao" style="display:none; margin-top: 10px;">Cancelar Edição</button>
                 </form>
             </div>
         </aside>
     </div>
-
-    <div id="notification-message" class="notification-message"></div>
 
     <div class="modal-overlay" id="auth-modal">
         <div class="modal" id="modal-content"></div>
@@ -333,78 +167,14 @@
         const painelMestre = document.getElementById('painel-mestre');
         const muralAventuras = document.getElementById('mural-aventuras');
         const formAventura = document.getElementById('form-aventura');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
         const authModal = document.getElementById('auth-modal');
         const modalContent = document.getElementById('modal-content');
 
-        // Elementos do formulário
-        const tituloInput = document.getElementById('titulo');
-        const mestreInput = document.getElementById('mestre');
-        const tipoOneshotRadio = document.getElementById('tipo-oneshot');
-        const tipoCampanhaRadio = document.getElementById('tipo-campanha');
-        const sistemaInput = document.getElementById('sistema');
-        const nivelInput = document.getElementById('nivel');
-        const vagasInput = document.getElementById('vagas');
-        const imagemInput = document.getElementById('imagem');
-        const gatilhoInput = document.getElementById('gatilho');
-        const descricaoTextarea = document.getElementById('descricao');
-        const btnPublicar = document.getElementById('btn-publicar');
-        const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
-        const aventuraIdEditarInput = document.getElementById('aventura-id-editar');
-        const painelMestreTitulo = document.getElementById('painel-mestre-titulo');
-        const statusAventuraSelect = document.getElementById('status-aventura');
-        const statusGroup = document.getElementById('status-group'); 
-
-        // Elementos de filtro
-        const filterTitulo = document.getElementById('filter-titulo');
-        const filterMestre = document.getElementById('filter-mestre');
-        const filterSistema = document.getElementById('filter-sistema');
-        const filterTipo = document.getElementById('filter-tipo');
-        const filterStatus = document.getElementById('filter-status');
-        const searchBtn = document.getElementById('search-btn'); 
-        const clearFiltersBtn = document.getElementById('clear-filters-btn'); 
-
-        // Mensagens de notificação
-        const notificationMessage = document.getElementById('notification-message');
-
         let currentUser = null;
         let currentUserProfile = null;
-        let editingAventuraId = null; 
-        let currentFilters = {}; 
-        let unsubscribeAventuras = null; 
-
-
-        // --- Funções Auxiliares ---
-
-        // Função para exibir notificações
-        function showNotification(message, isError = false) {
-            notificationMessage.textContent = message;
-            notificationMessage.classList.remove('error');
-            if (isError) {
-                notificationMessage.classList.add('error');
-            }
-            notificationMessage.style.display = 'block';
-            notificationMessage.style.opacity = '1';
-
-            setTimeout(() => {
-                notificationMessage.style.opacity = '0';
-                setTimeout(() => {
-                    notificationMessage.style.display = 'none';
-                }, 500); 
-            }, 3000); 
-        }
-
-        // Validação básica do formulário de aventura
-        function validateAventuraForm() {
-            if (tituloInput.value.trim() === '') { showNotification('O título é obrigatório.', true); return false; }
-            if (sistemaInput.value.trim() === '') { showNotification('O sistema é obrigatório.', true); return false; }
-            if (nivelInput.value.trim() === '') { showNotification('O nível recomendado é obrigatório.', true); return false; }
-            if (vagasInput.value.trim() === '' || parseInt(vagasInput.value) < 1) { showNotification('O número de vagas deve ser pelo menos 1.', true); return false; }
-            if (gatilhoInput.value.trim() === '') { showNotification('Alertas de gatilho são obrigatórios (coloque "Nenhum" se não houver).', true); return false; }
-            if (descricaoTextarea.value.trim() === '') { showNotification('A descrição é obrigatória.', true); return false; }
-            return true;
-        }
-
-        // --- Autenticação e Perfil do Usuário ---
+        let todasAventuras = []; // Array para guardar todas as aventuras
 
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -413,111 +183,80 @@
                 if (userProfileDoc.exists) {
                     currentUserProfile = userProfileDoc.data();
                 } else {
-                    const newProfile = { email: user.email, username: user.displayName || 'Novo Calango', photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', role: 'player', masterRequest: false, isAdmin: false };
+                    const newProfile = { email: user.email, username: user.displayName || 'Novo Calango', photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', role: 'player', masterRequest: false };
                     await usersCollection.doc(user.uid).set(newProfile);
                     currentUserProfile = newProfile;
                 }
                 userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-                
-                if (currentUserProfile.role === 'master' || currentUserProfile.isAdmin) {
+                if (currentUserProfile.role === 'master') {
                     painelMestre.style.display = 'block';
-                    mestreInput.value = currentUserProfile.username;
-                    mestreInput.disabled = true; 
-                    statusGroup.style.display = 'block'; 
+                    document.getElementById('mestre').value = currentUserProfile.username;
                 } else {
                     painelMestre.style.display = 'none';
-                    statusGroup.style.display = 'none';
                 }
             } else {
                 currentUser = null;
                 currentUserProfile = null;
                 userArea.innerHTML = `<div id="user-auth-area"><button id="login-btn" class="btn btn-primario">Entrar</button><button id="signup-btn" class="btn btn-secundario">Cadastrar-se</button></div>`;
                 painelMestre.style.display = 'none';
-                statusGroup.style.display = 'none';
                 document.getElementById('login-btn').addEventListener('click', () => showAuthForm('login'));
                 document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
             }
-            // Não chamar applyFilters() aqui. startListeningForAventuras() será chamado uma vez no final do script.
         });
 
         const showAuthForm = (type) => {
             const isLogin = type === 'login';
-            modalContent.innerHTML = `<button class="modal-close" id="modal-close-btn">&times;</button><img src="https://i.imgur.com/zY5dK3z.jpeg" alt="Logo" class="logo"><h2>${isLogin ? 'Entrar' : 'Cadastrar'}</h2><form id="email-form"><div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div><div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div><button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button></form><button id="google-login-btn" class="btn">Entrar com Google</button>`;
+            modalContent.innerHTML = `<button class="modal-close" id="modal-close-btn">&times;</button><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo" class="logo"><h2>${isLogin ? 'Entrar' : 'Cadastrar'}</h2><form id="email-form"><div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div><div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div><button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button></form><button id="google-login-btn" class="btn">Entrar com Google</button>`;
             authModal.style.display = 'flex';
             document.getElementById('modal-close-btn').addEventListener('click', () => authModal.style.display = 'none');
             document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
-            document.getElementById('email-form').addEventListener('submit', async (e) => { 
+            document.getElementById('email-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
-                try {
-                    const userCredential = isLogin 
-                        ? await auth.signInWithEmailAndPassword(email, password)
-                        : await auth.createUserWithEmailAndPassword(email, password);
-                    
-                    if (!isLogin) {
-                        await usersCollection.doc(userCredential.user.uid).set({
-                            email: userCredential.user.email,
-                            username: userCredential.user.displayName || 'Novo Calango',
-                            photoURL: userCredential.user.photoURL || 'https://i.imgur.com/sB0r32J.png',
-                            role: 'player',
-                            masterRequest: false,
-                            isAdmin: false
-                        });
-                    }
-                    authModal.style.display = 'none';
-                    showNotification(isLogin ? 'Login realizado com sucesso!' : 'Cadastro realizado com sucesso!');
-                } catch (error) {
-                    showNotification(error.message, true);
-                }
+                const authPromise = isLogin ? auth.signInWithEmailAndPassword(email, password) : auth.createUserWithEmailAndPassword(email, password);
+                authPromise.catch(error => alert(error.message));
+                authModal.style.display = 'none';
             });
         };
 
-        const signInWithGoogle = async () => { 
-            try {
-                const userCredential = await auth.signInWithPopup(googleProvider);
-                const userProfileDoc = await usersCollection.doc(userCredential.user.uid).get();
-                if (!userProfileDoc.exists) {
-                    await usersCollection.doc(userCredential.user.uid).set({
-                        email: userCredential.user.email,
-                        username: userCredential.user.displayName || 'Novo Calango',
-                        photoURL: userCredential.user.photoURL || 'https://i.imgur.com/sB0r32J.png',
-                        role: 'player',
-                        masterRequest: false,
-                        isAdmin: false
-                    });
-                }
-                authModal.style.display = 'none';
-                showNotification('Login com Google realizado com sucesso!');
-            } catch (error) {
-                showNotification(error.message, true);
-            }
+        const signInWithGoogle = () => {
+            auth.signInWithPopup(googleProvider).catch(error => alert(error.message));
+            authModal.style.display = 'none';
         };
         
         authModal.addEventListener('click', (e) => {
             if (e.target === authModal) { authModal.style.display = 'none'; }
         });
         
-        // --- Renderização de Aventuras e Filtragem ---
-
         const renderizarAventuras = (aventurasDocs) => {
             muralAventuras.innerHTML = '';
-            if (aventurasDocs.empty) {
-                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura encontrada com os filtros atuais.</p>';
+            if (!aventurasDocs || aventurasDocs.length === 0) {
+                muralAventuras.innerHTML = '<p id="mensagem-vazio">Nenhuma aventura encontrada.</p>';
                 return;
             }
             aventurasDocs.forEach(aventuraDoc => {
                 const aventura = aventuraDoc.data();
                 const docId = aventuraDoc.id;
-                const isMestreDaAventura = currentUser && currentUser.uid === aventura.mestreUid;
-                const isAdminUser = currentUserProfile && currentUserProfile.isAdmin;
-
-                let acaoHtml = `<a href="aventura.html?id=${docId}" class="btn-secundario btn-link">Ver Detalhes e Comentar</a>`;
+                const isMestre = currentUser && currentUser.uid === aventura.mestreUid;
                 
-                if (isMestreDaAventura || isAdminUser) {
-                    acaoHtml += `<button class="btn btn-editar" data-id="${docId}" data-action="edit">Editar</button>`;
-                    acaoHtml += `<button class="btn btn-deletar" data-id="${docId}" data-action="delete">Deletar</button>`;
+                let acaoHtml = `<a href="aventura.html?id=${docId}" class="btn-secundario btn-link">Ver Detalhes e Comentar</a>`;
+                if (isMestre) {
+                    acaoHtml += `<button class="btn-deletar" data-id="${docId}">Deletar</button>`;
+                }
+
+                let statusHtml = `<strong>Status:</strong> ${aventura.status}`;
+                if (isMestre) {
+                    statusHtml = `
+                        <strong>Status:</strong> 
+                        <select class="status-select" data-id="${docId}">
+                            <option value="Recrutando" ${aventura.status === 'Recrutando' ? 'selected' : ''}>Recrutando</option>
+                            <option value="Cheio" ${aventura.status === 'Cheio' ? 'selected' : ''}>Cheio</option>
+                            <option value="Em Andamento" ${aventura.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                            <option value="Finalizada" ${aventura.status === 'Finalizada' ? 'selected' : ''}>Finalizada</option>
+                        </select>
+                    `;
                 }
 
                 const card = document.createElement('div');
@@ -532,7 +271,7 @@
                             <strong>Mestre:</strong> ${aventura.mestre}<br>
                             <strong>Tipo:</strong> ${aventura.tipo || 'Não especificado'}<br>
                             <strong>Sistema:</strong> ${aventura.sistema}<br>
-                            <strong>Status:</strong> ${aventura.status}
+                            ${statusHtml}
                         </p>
                         <div class="card-actions">${acaoHtml}</div>
                     </div>
@@ -541,208 +280,72 @@
             });
         };
 
-        // Função que inicia o listener para as aventuras (sem filtros iniciais)
-        function startListeningForAventuras() {
-            if (unsubscribeAventuras) {
-                unsubscribeAventuras(); // Desinscreve o listener anterior para evitar duplicidade
+        aventurasCollection.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+            todasAventuras = snapshot.docs; // Guarda a lista completa
+            renderizarAventuras(todasAventuras); // Renderiza a lista completa
+        }, (error) => {
+            console.error("Erro ao buscar aventuras: ", error);
+            muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras.</p>';
+        });
+
+        searchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const termoBusca = searchInput.value.toLowerCase().trim();
+
+            if (termoBusca === '') {
+                renderizarAventuras(todasAventuras); // Mostra tudo se a busca estiver vazia
+                return;
             }
 
-            // Escuta TODAS as aventuras, ordenadas por data de criação.
-            // A filtragem por texto é feita no lado do cliente após os dados serem recebidos.
-            unsubscribeAventuras = aventurasCollection.orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-                let displayedDocs = snapshot.docs;
-
-                // Aplica filtros se eles estiverem definidos (ou seja, se o botão Buscar foi clicado)
-                if (Object.keys(currentFilters).length > 0) {
-                    displayedDocs = snapshot.docs.filter(doc => {
-                        const data = doc.data();
-                        const matchesTitulo = currentFilters.titulo ? data.titulo.toLowerCase().includes(currentFilters.titulo) : true;
-                        const matchesMestre = currentFilters.mestre ? data.mestre.toLowerCase().includes(currentFilters.mestre) : true;
-                        const matchesSistema = currentFilters.sistema ? data.sistema.toLowerCase().includes(currentFilters.sistema) : true;
-                        const matchesTipo = currentFilters.tipo ? data.tipo === currentFilters.tipo : true;
-                        const matchesStatus = currentFilters.status ? data.status === currentFilters.status : true;
-                        return matchesTitulo && matchesMestre && matchesSistema && matchesTipo && matchesStatus;
-                    });
-                }
-                renderizarAventuras({ docs: displayedDocs, empty: displayedDocs.length === 0 });
-            }, (error) => {
-                console.error("Erro ao buscar aventuras: ", error);
-                showNotification("Erro ao carregar as aventuras.", true);
-                muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras.</p>';
+            const resultados = todasAventuras.filter(doc => {
+                const aventura = doc.data();
+                const titulo = aventura.titulo.toLowerCase();
+                const mestre = aventura.mestre.toLowerCase();
+                return titulo.includes(termoBusca) || mestre.includes(termoBusca);
             });
-        }
 
-        // Função para aplicar os filtros quando o botão Buscar é clicado
-        searchBtn.addEventListener('click', () => {
-            currentFilters = {
-                titulo: filterTitulo.value.toLowerCase(),
-                mestre: filterMestre.value.toLowerCase(),
-                sistema: filterSistema.value.toLowerCase(),
-                tipo: filterTipo.value,
-                status: filterStatus.value
-            };
-            startListeningForAventuras(); // Re-executa o listener para aplicar os novos filtros
+            renderizarAventuras(resultados);
         });
-
-        // Event Listener para o botão Limpar Filtros
-        clearFiltersBtn.addEventListener('click', () => {
-            filterTitulo.value = '';
-            filterMestre.value = '';
-            filterSistema.value = '';
-            filterTipo.value = '';
-            filterStatus.value = '';
-            currentFilters = {}; // Reseta os filtros atuais
-            startListeningForAventuras(); // Re-executa o listener para mostrar todas as aventuras
-        });
-
-
-        // --- Ações do Mural (Editar/Deletar) ---
-
-        muralAventuras.addEventListener('click', async (event) => { 
-            const target = event.target;
-            const docId = target.dataset.id;
-            const action = target.dataset.action;
-
-            if (action === 'delete') {
-                if (confirm('Tem certeza que deseja deletar esta aventura?')) {
-                    try {
-                        await aventurasCollection.doc(docId).delete();
-                        showNotification('Aventura deletada com sucesso!');
-                    } catch (error) {
-                        console.error("Erro ao deletar: ", error);
-                        showNotification("Não foi possível deletar a aventura. Verifique suas permissões.", true);
-                    }
-                }
-            } else if (action === 'edit') {
-                await loadAventuraForEdit(docId);
+        
+        muralAventuras.addEventListener('change', (event) => {
+            if(event.target.classList.contains('status-select')) {
+                const docId = event.target.dataset.id;
+                const newStatus = event.target.value;
+                aventurasCollection.doc(docId).update({ status: newStatus });
             }
         });
-
-        // --- Gerenciamento do Formulário de Aventura (Criação/Edição) ---
-
-        async function loadAventuraForEdit(docId) {
-            btnPublicar.disabled = true;
-            btnPublicar.textContent = 'Carregando...';
-            try {
-                const aventuraDoc = await aventurasCollection.doc(docId).get();
-                if (!aventuraDoc.exists) {
-                    showNotification('Aventura não encontrada para edição.', true);
-                    return;
-                }
-                const aventura = aventuraDoc.data();
-                editingAventuraId = docId; 
-
-                tituloInput.value = aventura.titulo;
-                mestreInput.value = aventura.mestre; 
-                if (aventura.tipo === 'One-Shot') {
-                    tipoOneshotRadio.checked = true;
-                } else {
-                    tipoCampanhaRadio.checked = true;
-                }
-                sistemaInput.value = aventura.sistema;
-                nivelInput.value = aventura.nivel;
-                vagasInput.value = aventura.vagas;
-                imagemInput.value = aventura.imagemUrl || '';
-                gatilhoInput.value = aventura.gatilho || '';
-                descricaoTextarea.value = aventura.descricao;
-                aventuraIdEditarInput.value = docId; 
-                statusAventuraSelect.value = aventura.status || 'Recrutando'; 
-                statusGroup.style.display = 'block'; 
-
-                btnPublicar.textContent = 'Salvar Alterações';
-                painelMestreTitulo.textContent = 'Editar Aventura';
-                btnCancelarEdicao.style.display = 'inline-block';
-
-                painelMestre.scrollView({ behavior: 'smooth' }); // Use scrollView para rolar até o elemento
-
-            } catch (error) {
-                console.error("Erro ao carregar aventura para edição: ", error);
-                showNotification("Não foi possível carregar a aventura para edição.", true);
-            } finally {
-                btnPublicar.disabled = false;
-                btnPublicar.textContent = 'Salvar Alterações'; 
-            }
-        }
-
-        function resetFormAndExitEditMode() {
-            formAventura.reset();
-            if (currentUserProfile) { 
-                mestreInput.value = currentUserProfile.username; 
-            }
-            btnPublicar.textContent = 'Publicar Aventura';
-            painelMestreTitulo.textContent = 'Painel do Mestre';
-            btnCancelarEdicao.style.display = 'none';
-            editingAventuraId = null; 
-            aventuraIdEditarInput.value = ''; 
-            statusGroup.style.display = 'none'; 
-        }
-
-        btnCancelarEdicao.addEventListener('click', resetFormAndExitEditMode);
-
 
         formAventura.addEventListener('submit', async (event) => {
             event.preventDefault();
-
-            if (!validateAventuraForm()) { 
+            if (!currentUser || !currentUserProfile || currentUserProfile.role !== 'master') {
+                alert('Apenas mestres podem publicar aventuras.');
                 return;
             }
-
-            if (!currentUser || (!currentUserProfile.role === 'master' && !currentUserProfile.isAdmin)) {
-                showNotification('Apenas mestres ou administradores podem publicar/editar aventuras.', true);
-                return;
-            }
-
-            btnPublicar.disabled = true;
-            btnPublicar.textContent = editingAventuraId ? 'Salvando...' : 'Publicando...';
-
-            const aventuraData = {
-                titulo: tituloInput.value,
-                mestre: mestreInput.value,
-                mestreUid: currentUser.uid, 
+            const novaAventura = {
+                titulo: document.getElementById('titulo').value,
+                mestre: currentUserProfile.username,
+                mestreUid: currentUser.uid,
                 tipo: document.querySelector('input[name="tipo_aventura"]:checked').value,
-                sistema: sistemaInput.value,
-                nivel: nivelInput.value,
-                vagas: parseInt(vagasInput.value),
-                gatilho: gatilhoInput.value,
-                descricao: descricaoTextarea.value,
-                imagemUrl: imagemInput.value,
-                status: statusAventuraSelect.value 
+                sistema: document.getElementById('sistema').value,
+                nivel: document.getElementById('nivel').value,
+                vagas: parseInt(document.getElementById('vagas').value),
+                status: 'Recrutando',
+                gatilho: document.getElementById('gatilho').value,
+                descricao: document.getElementById('descricao').value,
+                imagemUrl: document.getElementById('imagem').value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                jogadores: [],
+                suplentes: []
             };
-
-            if (editingAventuraId) {
-                try {
-                    await aventurasCollection.doc(editingAventuraId).update(aventuraData);
-                    showNotification('Aventura atualizada com sucesso!');
-                    resetFormAndExitEditMode();
-                } catch (error) {
-                    console.error("Erro ao atualizar aventura: ", error);
-                    showNotification("Não foi possível atualizar a aventura. Verifique suas permissões.", true);
-                } finally {
-                    btnPublicar.disabled = false;
-                }
-            } else {
-                aventuraData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                aventuraData.status = 'Recrutando'; 
-                aventuraData.jogadores = [];
-                aventuraData.suplentes = [];
-
-                try {
-                    await aventurasCollection.add(aventuraData);
-                    showNotification('Aventura publicada com sucesso!');
-                    formAventura.reset();
-                    mestreInput.value = currentUserProfile.username; 
-                } catch (error) {
-                    console.error("Erro ao adicionar aventura: ", error);
-                    showNotification("Não foi possível publicar a aventura.", true);
-                } finally {
-                    btnPublicar.disabled = false;
-                    btnPublicar.textContent = 'Publicar Aventura'; 
-                }
+            try {
+                await aventurasCollection.add(novaAventura);
+                formAventura.reset();
+                document.getElementById('mestre').value = currentUserProfile.username;
+            } catch (error) {
+                console.error("Erro ao adicionar aventura: ", error);
+                alert("Não foi possível publicar a aventura.");
             }
         });
-
-        // Chama startListeningForAventuras() uma vez ao final do script para carregar as aventuras.
-        startListeningForAventuras();
     </script>
 </body>
 </html>
