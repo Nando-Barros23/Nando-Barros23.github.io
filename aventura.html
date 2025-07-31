@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Aventura - Dados & Calangos</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --cor-fundo: #F7F7F7;
+            --cor-fundo-card: #FFDBA7;
+            --cor-primaria: #D06E41;
+            --cor-texto: #221A29;
+            --cor-texto-secundario: #5c5561;
+            --cor-borda: #DFE0DF;
+            --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --fonte-titulo: 'MedievalSharp', cursive;
+            --fonte-label: 'Cinzel', serif;
+            --fonte-corpo: 'Roboto', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: var(--cor-texto); line-height: 1.6; }
+        a { color: var(--cor-primaria); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
+        header .logo { max-width: 100px; }
+        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
+        
+        #user-info-area { display: flex; align-items: center; gap: 1rem; }
+        #user-info-area img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+        .container { max-width: 900px; margin: 2rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; }
+        h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
+
+        .aventura-detalhes img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem; }
+        .aventura-detalhes h2 { text-align: center; margin-bottom: 2rem; font-size: 2.5rem; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .info-item strong { color: var(--cor-texto); }
+        
+        .secao { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--cor-borda); }
+        .secao h3 { margin-bottom: 1rem; }
+        
+        .jogadores-lista { list-style-type: none; }
+        .jogadores-lista li { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; }
+        .jogadores-lista img { width: 30px; height: 30px; border-radius: 50%; }
+
+        #comment-form { display: none; margin-top: 1.5rem; }
+        #comment-form textarea { width: 100%; min-height: 80px; padding: 0.8rem; border: 1px solid var(--cor-borda); border-radius: 4px; font-family: var(--fonte-corpo); font-size: 1rem; }
+        #comment-form button { margin-top: 0.5rem; }
+
+        .comment-thread { margin-top: 1.5rem; }
+        .comment { display: flex; gap: 15px; margin-bottom: 1.5rem; }
+        .comment img { width: 45px; height: 45px; border-radius: 50%; }
+        .comment-body { display: flex; flex-direction: column; }
+        .comment-author { font-weight: bold; color: var(--cor-texto); }
+        .comment-text { color: var(--cor-texto-secundario); }
+
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
+        .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+        .btn-primario { background-color: var(--cor-primaria); color: #fff; }
+        .btn-primario:hover { background-color: #b85b30; }
+        .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
+        .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+            <a href="index.html"><h1>Dados & Calangos</h1></a>
+            <div id="user-area"></div>
+        </div>
+    </header>
+
+    <div class="container" id="aventura-container">
+        </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyAyIrdaURuGFvBXXzrmQEDhtHwX5ll8Do4",
+          authDomain: "dados-e-calangos-467521.firebaseapp.com",
+          projectId: "dados-e-calangos-467521",
+          storageBucket: "dados-e-calangos-467521.appspot.com",
+          messagingSenderId: "1021912207307",
+          appId: "1:1021912207307:web:2b29c38483a30696ecb04e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const usersCollection = db.collection('users');
+
+        const userArea = document.getElementById('user-area');
+        const aventuraContainer = document.getElementById('aventura-container');
+        let currentUser = null;
+        let currentUserProfile = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const aventuraId = urlParams.get('id');
+
+        if (!aventuraId) {
+            aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>';
+        }
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                currentUser = user;
+                const userProfileDoc = await usersCollection.doc(user.uid).get();
+                currentUserProfile = userProfileDoc.data();
+                userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
+                document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+            } else {
+                currentUser = null;
+                currentUserProfile = null;
+                 userArea.innerHTML = `<a href="index.html">Voltar para o Mural</a>`;
+            }
+            renderizarPaginaAventura(); // Renderiza com ou sem usuário
+        });
+
+        async function renderizarPaginaAventura() {
+            const aventuraRef = db.collection('aventuras').doc(aventuraId);
+            const aventuraDoc = await aventuraRef.get();
+
+            if (!aventuraDoc.exists) {
+                aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>';
+                return;
+            }
+
+            const aventura = aventuraDoc.data();
+            const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura">` : '';
+            const gatilhoHtml = aventura.gatilho ? `<p><strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
+            
+            const jogadores = aventura.jogadores || [];
+            const suplentes = aventura.suplentes || [];
+            let jogadoresHtml = '<strong>Jogadores:</strong><ul class="jogadores-lista">' + jogadores.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
+            if (jogadores.length === 0) jogadoresHtml = '<strong>Jogadores:</strong> Nenhuma vaga preenchida.';
+            
+            let suplentesHtml = '<strong>Suplentes:</strong><ul class="jogadores-lista">' + suplentes.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
+            if (suplentes.length === 0) suplentesHtml = '<strong>Suplentes:</strong> Sem suplentes no momento.';
+
+            aventuraContainer.innerHTML = `
+                <div class="aventura-detalhes">
+                    ${imagemHtml}
+                    <h2>${aventura.titulo}</h2>
+                    <div class="info-grid">
+                        <p class="info-item"><strong>Mestre:</strong> ${aventura.mestre}</p>
+                        <p class="info-item"><strong>Sistema:</strong> ${aventura.sistema}</p>
+                        <p class="info-item"><strong>Nível:</strong> ${aventura.nivel}</p>
+                        <p class="info-item"><strong>Tipo:</strong> ${aventura.tipo}</p>
+                        <p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventura.vagas}</p>
+                        <p class="info-item"><strong>Status:</strong> ${aventura.status}</p>
+                    </div>
+                    ${gatilhoHtml}
+                    <p>${aventura.descricao}</p>
+                </div>
+                <div class="secao">
+                    <h3>Jogadores</h3>
+                    ${jogadoresHtml}
+                    <br>
+                    ${suplentesHtml}
+                </div>
+                <div class="secao">
+                    <h3>Comentários</h3>
+                    <div id="comment-thread"></div>
+                    <form id="comment-form">
+                        <textarea id="comment-text" placeholder="Escreva seu comentário..." required></textarea>
+                        <button type="submit" class="btn-primario">Postar Comentário</button>
+                    </form>
+                </div>
+            `;
+            
+            const commentForm = document.getElementById('comment-form');
+            if (currentUser) {
+                commentForm.style.display = 'block';
+                commentForm.addEventListener('submit', postarComentario);
+            }
+
+            // Carregar e renderizar comentários
+            const commentsRef = aventuraRef.collection('comments').orderBy('createdAt');
+            commentsRef.onSnapshot(snapshot => {
+                const commentThread = document.getElementById('comment-thread');
+                commentThread.innerHTML = '';
+                if (snapshot.empty) {
+                    commentThread.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro!</p>';
+                }
+                snapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const commentEl = document.createElement('div');
+                    commentEl.className = 'comment';
+                    commentEl.innerHTML = `
+                        <img src="${comment.author_photoURL}" alt="avatar">
+                        <div class="comment-body">
+                            <span class="comment-author">${comment.author_username}</span>
+                            <p class="comment-text">${comment.text}</p>
+                        </div>
+                    `;
+                    commentThread.appendChild(commentEl);
+                });
+            });
+        }
+        
+        async function postarComentario(event) {
+            event.preventDefault();
+            const commentText = document.getElementById('comment-text');
+            if (commentText.value.trim() === '') return;
+
+            const newComment = {
+                text: commentText.value,
+                author_uid: currentUser.uid,
+                author_username: currentUserProfile.username,
+                author_photoURL: currentUserProfile.photoURL,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
+            commentText.value = '';
+        }
+    </script>
+</body>
+</html>
