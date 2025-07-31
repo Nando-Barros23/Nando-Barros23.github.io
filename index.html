@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados & Calangos - Mural</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --cor-fundo: #F7F7F7;
@@ -42,12 +44,12 @@
         .card-aventura { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
         .card-aventura:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
         .card-imagem { width: 100%; height: 180px; object-fit: cover; }
-        .card-conteudo { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-conteudo { padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1; } /* Padding Reduzido */
         .card-conteudo p { color: var(--cor-texto-secundario); margin-bottom: 1rem; }
         .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
         .card-gatilho { font-style: italic; color: #8c6d3f; background-color: #fadcb3; border: 1px solid #8c6d3f; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; margin-top: 1rem; }
         #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
-        .painel-mestre { display: none; background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
+        .painel-mestre { display: none; background-color: var(--cor-fundo-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; } /* Padding Reduzido */
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
         .form-grupo input, .form-grupo textarea, .form-grupo select { width: 100%; padding: 0.8rem; background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto); font-size: 1rem; font-family: var(--fonte-corpo); }
@@ -66,6 +68,7 @@
         .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; flex-wrap: wrap; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--cor-borda); }
+        .card-actions > * { flex: 1; } /* Regra para botões de tamanho igual */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .modal .logo { max-width: 80px; margin-bottom: 1rem; }
@@ -206,7 +209,7 @@
                 if (isMestre || isAdmin) {
                     statusHtml = `<strong>Status:</strong> <select class="status-select" data-id="${docId}"><option value="Recrutando" ${aventura.status === 'Recrutando' ? 'selected' : ''}>Recrutando</option><option value="Cheio" ${aventura.status === 'Cheio' ? 'selected' : ''}>Cheio</option><option value="Em Andamento" ${aventura.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option><option value="Finalizada" ${aventura.status === 'Finalizada' ? 'selected' : ''}>Finalizada</option></select>`;
                 }
-                let acaoHtml = `<a href="aventura.html?id=${docId}" class="btn-secundario btn-link">Ver Detalhes & Comentar</a>`;
+                let acaoHtml = `<a href="aventura.html?id=${docId}" class="btn-secundario btn-link">Detalhes</a>`;
                 if (isMestre || isAdmin) {
                     acaoHtml += `<a href="editar.html?id=${docId}" class="btn-secundario btn-link">Editar</a><button class="btn-deletar" data-id="${docId}">Deletar</button>`;
                 }
