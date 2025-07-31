@@ -129,15 +129,13 @@
                     renderHeader();
                     renderProfilePage();
                 } else {
-                    // Se o perfil não existe (primeiro login, talvez via google ou email sem dados iniciais)
-                    // Cria um perfil padrão e redireciona ou renderiza
                     const newProfile = { 
                         email: user.email, 
                         username: user.displayName || 'Novo Calango', 
                         photoURL: user.photoURL || 'https://i.imgur.com/sB0r32J.png', 
                         role: 'player', 
                         masterRequest: false,
-                        isAdmin: false // Define como false por padrão
+                        isAdmin: false 
                     };
                     await usersCollection.doc(user.uid).set(newProfile);
                     currentUserProfile = newProfile;
@@ -217,12 +215,12 @@
                 };
 
                 await usersCollection.doc(currentUser.uid).update(updatedProfile);
-                alert('Perfil atualizado com sucesso!'); // Mantenho alert por simplicidade no perfil
+                alert('Perfil atualizado com sucesso!'); 
                 location.reload();
 
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
-                alert("Não foi possível atualizar o perfil."); // Mantenho alert por simplicidade no perfil
+                alert("Não foi possível atualizar o perfil."); 
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Salvar Alterações';
@@ -233,11 +231,11 @@
             if (confirm('Você confirma que deseja solicitar para se tornar um Mestre?')) {
                 try {
                     await usersCollection.doc(currentUser.uid).update({ masterRequest: true });
-                    alert('Solicitação enviada! Um administrador irá revisar seu pedido.'); // Mantenho alert por simplicidade
+                    alert('Solicitação enviada! Um administrador irá revisar seu pedido.'); 
                     location.reload();
                 } catch (error) {
                     console.error("Erro ao solicitar:", error);
-                    alert("Não foi possível enviar sua solicitação."); // Mantenho alert por simplicidade
+                    alert("Não foi possível enviar sua solicitação."); 
                 }
             }
         }
