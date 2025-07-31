@@ -47,7 +47,7 @@
         .card-conteudo { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
         .card-conteudo p { color: var(--cor-texto-secundario); margin-bottom: 1rem; }
         .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
-        .card-gatilho { font-style: italic; color: var(--cor-alerta-texto); background-color: #fadcb3; border: 1px solid #8c6d3f; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; margin-top: 1rem; }
+        .card-gatilho { font-style: italic; color: #8c6d3f; background-color: #fadcb3; border: 1px solid #8c6d3f; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; margin-top: 1rem; }
         #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
         .painel-mestre { display: none; background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
         .form-grupo { margin-bottom: 1rem; }
@@ -283,6 +283,7 @@
             };
             try {
                 await aventurasCollection.add(novaAventura);
+                alert('Aventura publicada com sucesso!');
                 formAventura.reset();
                 document.getElementById('mestre').value = currentUserProfile.username;
             } catch (error) {
