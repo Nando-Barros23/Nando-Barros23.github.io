@@ -47,15 +47,17 @@
         .comment-thread { margin-top: 1.5rem; }
         .comment { display: flex; gap: 15px; margin-bottom: 1.5rem; }
         .comment img { width: 45px; height: 45px; border-radius: 50%; }
-        .comment-body { display: flex; flex-direction: column; }
+        .comment-body { display: flex; flex-direction: column; flex-grow: 1; }
         .comment-author { font-weight: bold; color: var(--cor-texto); }
         .comment-text { color: var(--cor-texto-secundario); }
+        .comment-actions { margin-left: auto; }
         button { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
         .btn-primario { background-color: var(--cor-primaria); color: #fff; }
         .btn-primario:hover { background-color: #b85b30; }
         .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
         .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
+        .btn-deletar-comment { background: none; color: #ff4d4d; padding: 0.2rem; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -63,7 +65,7 @@
         <div class="header-top">
             <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
             <a href="index.html"><h1>Dados & Calangos</h1></a>
-            <div id="user-area"><a href="index.html">Voltar para o Mural</a></div>
+            <div id="user-area"></div>
         </div>
     </header>
     <div class="container" id="aventura-container"></div>
@@ -87,6 +89,7 @@
         const aventuraContainer = document.getElementById('aventura-container');
         let currentUser = null;
         let currentUserProfile = null;
+        let aventuraAtual = null;
         const urlParams = new URLSearchParams(window.location.search);
         const aventuraId = urlParams.get('id');
         if (!aventuraId) { aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>'; }
@@ -97,23 +100,27 @@
                 currentUserProfile = userProfileDoc.data();
                 userArea.innerHTML = `<div id="user-info-area"><a href="profile.html"><img src="${currentUserProfile.photoURL}" alt="Avatar"></a><span>Olá, <a href="profile.html">${currentUserProfile.username}</a>!</span><button id="logout-btn" class="btn btn-secundario">Sair</button></div>`;
                 document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+            } else {
+                currentUser = null;
+                currentUserProfile = null;
+                 userArea.innerHTML = `<a href="index.html" class="btn btn-secundario">Voltar para o Mural</a>`;
             }
-            renderizarPaginaAventura();
+            renderizarPaginaAventura(); 
         });
         async function renderizarPaginaAventura() {
             const aventuraRef = db.collection('aventuras').doc(aventuraId);
             const aventuraDoc = await aventuraRef.get();
             if (!aventuraDoc.exists) { aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>'; return; }
-            const aventura = aventuraDoc.data();
-            const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura">` : '';
-            const gatilhoHtml = aventura.gatilho ? `<p><strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
-            const jogadores = aventura.jogadores || [];
-            const suplentes = aventura.suplentes || [];
+            aventuraAtual = aventuraDoc.data();
+            const imagemHtml = aventuraAtual.imagemUrl ? `<img src="${aventuraAtual.imagemUrl}" alt="Imagem da aventura">` : '';
+            const gatilhoHtml = aventuraAtual.gatilho ? `<p><strong>Gatilhos:</strong> ${aventuraAtual.gatilho}</p>` : '';
+            const jogadores = aventuraAtual.jogadores || [];
+            const suplentes = aventuraAtual.suplentes || [];
             let jogadoresHtml = '<strong>Jogadores:</strong><ul class="jogadores-lista">' + jogadores.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (jogadores.length === 0) jogadoresHtml = '<strong>Jogadores:</strong> Nenhuma vaga preenchida.';
-            let suplentesHtml = '<strong>Suplentes:</strong><ul class="jogadores-lista">' + suplentes.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
+            let suplentesHtml = '<strong>Suplentes:</strong><ul class="jogadores-lista">' + suplentes.map(p => `<li><img src="${p.photoURL || 'https.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (suplentes.length === 0) suplentesHtml = '<strong>Suplentes:</strong> Sem suplentes no momento.';
-            aventuraContainer.innerHTML = `<div class="aventura-detalhes">${imagemHtml}<h2>${aventura.titulo}</h2><div class="info-grid"><p class="info-item"><strong>Mestre:</strong> ${aventura.mestre}</p><p class="info-item"><strong>Sistema:</strong> ${aventura.sistema}</p><p class="info-item"><strong>Nível:</strong> ${aventura.nivel}</p><p class="info-item"><strong>Tipo:</strong> ${aventura.tipo}</p><p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventura.vagas}</p><p class="info-item"><strong>Status:</strong> ${aventura.status}</p></div>${gatilhoHtml}<p>${aventura.descricao}</p></div><div class="secao"><h3>Jogadores</h3>${jogadoresHtml}<br>${suplentesHtml}</div><div class="secao"><h3>Comentários</h3><div id="comment-thread"></div><form id="comment-form"><textarea id="comment-text" placeholder="Escreva seu comentário..." required></textarea><button type="submit" class="btn-primario">Postar Comentário</button></form></div>`;
+            aventuraContainer.innerHTML = `<div class="aventura-detalhes">${imagemHtml}<h2>${aventuraAtual.titulo}</h2><div class="info-grid"><p class="info-item"><strong>Mestre:</strong> ${aventuraAtual.mestre}</p><p class="info-item"><strong>Sistema:</strong> ${aventuraAtual.sistema}</p><p class="info-item"><strong>Nível:</strong> ${aventuraAtual.nivel}</p><p class="info-item"><strong>Tipo:</strong> ${aventuraAtual.tipo}</p><p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventuraAtual.vagas}</p><p class="info-item"><strong>Status:</strong> ${aventuraAtual.status}</p></div>${gatilhoHtml}<p>${aventuraAtual.descricao}</p></div><div class="secao"><h3>Jogadores</h3>${jogadoresHtml}<br>${suplentesHtml}</div><div class="secao"><h3>Comentários</h3><div id="comment-thread"></div><form id="comment-form"><textarea id="comment-text" placeholder="Escreva seu comentário..." required></textarea><button type="submit" class="btn-primario">Postar Comentário</button></form></div>`;
             const commentForm = document.getElementById('comment-form');
             if (currentUser) {
                 commentForm.style.display = 'block';
@@ -128,7 +135,14 @@
                     const comment = doc.data();
                     const commentEl = document.createElement('div');
                     commentEl.className = 'comment';
-                    commentEl.innerHTML = `<img src="${comment.author_photoURL}" alt="avatar"><div class="comment-body"><span class="comment-author">${comment.author_username}</span><p class="comment-text">${comment.text}</p></div>`;
+                    let deleteBtnHtml = '';
+                    const isAuthor = currentUser && currentUser.uid === comment.author_uid;
+                    const isMaster = currentUser && currentUser.uid === aventuraAtual.mestreUid;
+                    const isAdmin = currentUserProfile && currentUserProfile.isAdmin === true;
+                    if(isAuthor || isMaster || isAdmin) {
+                        deleteBtnHtml = `<button class="btn-deletar-comment" data-comment-id="${doc.id}">Apagar</button>`;
+                    }
+                    commentEl.innerHTML = `<img src="${comment.author_photoURL}" alt="avatar"><div class="comment-body"><span class="comment-author">${comment.author_username}</span><p class="comment-text">${comment.text}</p></div><div class="comment-actions">${deleteBtnHtml}</div>`;
                     commentThread.appendChild(commentEl);
                 });
             });
@@ -145,8 +159,17 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
+            alert('Comentário postado com sucesso!');
             commentText.value = '';
         }
+        aventuraContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('btn-deletar-comment')) {
+                const commentId = event.target.dataset.commentId;
+                if(confirm('Tem certeza que deseja apagar este comentário?')) {
+                    db.collection('aventuras').doc(aventuraId).collection('comments').doc(commentId).delete();
+                }
+            }
+        });
     </script>
 </body>
 </html>
