@@ -181,8 +181,8 @@
                 notificationMessage.style.opacity = '0';
                 setTimeout(() => {
                     notificationMessage.style.display = 'none';
-                }, 500); // Tempo da transição
-            }, 3000); // Exibe por 3 segundos
+                }, 500); 
+            }, 3000); 
         }
 
 
@@ -292,10 +292,6 @@
             if (joinLeaveBtn) {
                 joinLeaveBtn.addEventListener('click', toggleJoinAdventure);
             }
-
-            // Carregar e renderizar comentários (onSnapshot já foi iniciado no auth.onAuthStateChanged)
-            // Apenas certifique-se de que a UI de comentários é atualizada corretamente
-            // O listener de comentários já está no auth.onAuthStateChanged, então ele se encarregará de atualizar.
         }
         
         async function postarComentario(event) {
@@ -369,12 +365,14 @@
                 } else if (isSuplente) {
                     updatedSuplentes = updatedSuplentes.filter(p => p.uid !== currentUser.uid);
                     showNotification('Você saiu da lista de suplentes.');
-                } else if (currentJogadores.length < currentAventura.vagas) {
-                    updatedJogadores.push(playerInfo);
-                    showNotification('Você se juntou à mesa!');
-                } else {
-                    updatedSuplentes.push(playerInfo);
-                    showNotification('Você foi adicionado à lista de suplentes.');
+                } else { // Não é jogador nem suplente
+                    if (currentJogadores.length < currentAventura.vagas) {
+                        updatedJogadores.push(playerInfo);
+                        showNotification('Você se juntou à mesa!');
+                    } else {
+                        updatedSuplentes.push(playerInfo);
+                        showNotification('Você foi adicionado à lista de suplentes.');
+                    }
                 }
 
                 // Lógica para atualizar o status da aventura automaticamente (se aplicável)
@@ -388,19 +386,14 @@
                 await aventuraRef.update({
                     jogadores: updatedJogadores,
                     suplentes: updatedSuplentes,
-                    status: newStatus // Atualiza o status automaticamente
+                    status: newStatus 
                 });
-
-                // Não precisa chamar renderizarPaginaAventura() explicitamente aqui
-                // O onSnapshot no auth.onAuthStateChanged já irá lidar com a re-renderização
-                // quando a aventura for atualizada no Firestore.
 
             } catch (error) {
                 console.error("Erro ao atualizar status da aventura:", error);
                 showNotification("Não foi possível atualizar seu status na aventura. Tente novamente.", true);
             } finally {
                 joinLeaveBtn.disabled = false;
-                // O texto do botão será atualizado pela re-renderização completa da página via onSnapshot
             }
         }
     </script>
