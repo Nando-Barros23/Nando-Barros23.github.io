@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados & Calangos - Mural</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --cor-fundo: #F7F7F7;
@@ -16,8 +14,6 @@
             --cor-primaria: #D06E41;
             --cor-texto: #221A29;
             --cor-texto-secundario: #5c5561;
-            --cor-alerta-fundo: #fadcb3;
-            --cor-alerta-texto: #8c6d3f;
             --cor-borda: #DFE0DF;
             --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
             --fonte-titulo: 'MedievalSharp', cursive;
@@ -30,35 +26,26 @@
         a:hover { text-decoration: underline; }
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 992px) { .container { grid-template-columns: 2fr 1fr; } }
-        
         header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
         .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
         header .logo { max-width: 100px; }
         header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
-        
         #user-auth-area button { margin-left: 0.5rem; }
         #user-info-area { display: flex; align-items: center; gap: 1rem; }
         #user-info-area img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        
         h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); }
         h2 { border-bottom: 2px solid var(--cor-borda); padding-bottom: 0.5rem; margin-bottom: 1rem; }
-
         #search-container { margin-bottom: 2rem; }
         #search-form { display: flex; gap: 10px; }
         #search-input { flex-grow: 1; padding: 0.8rem; border: 1px solid var(--cor-borda); border-radius: 4px; font-size: 1rem; }
-
         #mural-aventuras { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
         .card-aventura { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
         .card-aventura:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
         .card-imagem { width: 100%; height: 180px; object-fit: cover; }
         .card-conteudo { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
         .card-conteudo p { color: var(--cor-texto-secundario); margin-bottom: 1rem; }
-        .card-conteudo .descricao { flex-grow: 1; }
         .card-conteudo strong { color: var(--cor-texto); font-weight: 700; }
-        .card-gatilho { font-style: italic; color: var(--cor-alerta-texto); background-color: var(--cor-alerta-fundo); border: 1px solid var(--cor-alerta-texto); padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; }
-        .jogadores-lista { font-size: 0.9rem; list-style-position: inside; }
         #mensagem-vazio { color: var(--cor-texto-secundario); grid-column: 1 / -1; text-align: center; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; border: 1px solid var(--cor-borda); }
-        
         .painel-mestre { display: none; background-color: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
         .form-grupo { margin-bottom: 1rem; }
         .form-grupo label { display: block; margin-bottom: 0.5rem; color: var(--cor-texto); font-family: var(--fonte-label); font-weight: 700; }
@@ -67,20 +54,17 @@
         .form-grupo-radio label { font-family: var(--fonte-corpo); font-weight: 400; }
         .form-grupo textarea { resize: vertical; min-height: 100px; }
         .form-grupo input:focus, .form-grupo textarea:focus, .form-grupo select:focus { border-color: var(--cor-primaria); outline: none; }
-        
         .status-select { padding: 0.2rem; font-size: 0.9rem; border-radius: 4px; border: 1px solid var(--cor-primaria); background-color: var(--cor-fundo); }
-        
-        button, .btn-link { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); text-align: center; }
+        button, .btn-link { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; transition: background-color 0.2s, color 0.2s; font-family: var(--fonte-corpo); text-align: center; display: inline-block; }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
         .btn-primario { background-color: var(--cor-primaria); color: #fff; }
         .btn-primario:hover { background-color: #b85b30; }
         .btn-primario:disabled { background-color: #a0a0a0; cursor: not-allowed; }
         .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
         .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
-        .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; align-self: flex-start; margin-top: 1rem; padding: 0.5rem 1rem; }
+        .btn-deletar { background-color: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 0.5rem 1rem; }
         .btn-deletar:hover { background-color: #ff4d4d; color: #fff; }
         .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; flex-wrap: wrap; gap: 0.5rem; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: var(--cor-fundo-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .modal .logo { max-width: 80px; margin-bottom: 1rem; }
@@ -92,7 +76,6 @@
     </style>
 </head>
 <body>
-    
     <header>
         <div class="header-top">
             <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
@@ -100,36 +83,28 @@
             <div id="user-area"></div>
         </div>
     </header>
-
     <div class="container">
         <main>
             <h2>Chamados de Aventura</h2>
             <div id="search-container">
                 <form id="search-form">
-                    <input type="text" id="search-input" placeholder="Buscar por título ou mestre...">
+                    <input type="text" id="search-input" placeholder="Buscar por título, mestre ou sistema...">
                     <button type="submit" class="btn-primario btn">Buscar</button>
                 </form>
             </div>
             <div id="mural-aventuras"></div>
         </main>
-        
         <aside>
             <div class="painel-mestre" id="painel-mestre">
                 <h2>Painel do Mestre</h2>
                 <form id="form-aventura">
                     <div class="form-grupo"><label for="titulo">Título da Aventura</label><input type="text" id="titulo" required></div>
                     <div class="form-grupo"><label for="mestre">Nome do Mestre</label><input type="text" id="mestre" required disabled></div>
-                    <div class="form-grupo">
-                        <label>Tipo de Aventura</label>
-                        <div class="form-grupo-radio">
-                            <input type="radio" id="tipo-oneshot" name="tipo_aventura" value="One-Shot" checked><label for="tipo-oneshot">One-Shot</label>
-                            <input type="radio" id="tipo-campanha" name="tipo_aventura" value="Campanha"><label for="tipo-campanha">Campanha</label>
-                        </div>
-                    </div>
+                    <div class="form-grupo"><label>Tipo de Aventura</label><div class="form-grupo-radio"><input type="radio" id="tipo-oneshot" name="tipo_aventura" value="One-Shot" checked><label for="tipo-oneshot">One-Shot</label><input type="radio" id="tipo-campanha" name="tipo_aventura" value="Campanha"><label for="tipo-campanha">Campanha</label></div></div>
                     <div class="form-grupo"><label for="sistema">Sistema de RPG</label><input type="text" id="sistema" required></div>
                     <div class="form-grupo"><label for="nivel">Nível Recomendado</label><input type="text" id="nivel" required></div>
                     <div class="form-grupo"><label for="vagas">Número de Vagas</label><input type="number" id="vagas" min="1" required></div>
-                    <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (cole o link da imagem aqui)"></div>
+                    <div class="form-grupo"><label for="imagem">URL da Imagem</label><input type="url" id="imagem" placeholder="https://... (link da imagem aqui)"></div>
                     <div class="form-grupo"><label for="gatilho">Alertas de Gatilho</label><input type="text" id="gatilho" placeholder="Ex: Aracnofobia, Violência" required></div>
                     <div class="form-grupo"><label for="descricao">Descrição</label><textarea id="descricao" required></textarea></div>
                     <button type="submit" class="btn-primario" id="btn-publicar">Publicar Aventura</button>
@@ -137,15 +112,10 @@
             </div>
         </aside>
     </div>
-
-    <div class="modal-overlay" id="auth-modal">
-        <div class="modal" id="modal-content"></div>
-    </div>
-
+    <div class="modal-overlay" id="auth-modal"><div class="modal" id="modal-content"></div></div>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
-
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyAyIrdaURuGFvBXXzrmQEDhtHwX5ll8Do4",
@@ -155,14 +125,12 @@
           messagingSenderId: "1021912207307",
           appId: "1:1021912207307:web:2b29c38483a30696ecb04e"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         const googleProvider = new firebase.auth.GoogleAuthProvider();
         const aventurasCollection = db.collection('aventuras');
         const usersCollection = db.collection('users');
-
         const userArea = document.getElementById('user-area');
         const painelMestre = document.getElementById('painel-mestre');
         const muralAventuras = document.getElementById('mural-aventuras');
@@ -171,11 +139,9 @@
         const searchInput = document.getElementById('search-input');
         const authModal = document.getElementById('auth-modal');
         const modalContent = document.getElementById('modal-content');
-
         let currentUser = null;
         let currentUserProfile = null;
         let todasAventuras = [];
-
         auth.onAuthStateChanged(async user => {
             if (user) {
                 currentUser = user;
@@ -204,7 +170,6 @@
                 document.getElementById('signup-btn').addEventListener('click', () => showAuthForm('signup'));
             }
         });
-        
         const showAuthForm = (type) => {
             const isLogin = type === 'login';
             modalContent.innerHTML = `<button class="modal-close" id="modal-close-btn">&times;</button><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo" class="logo"><h2>${isLogin ? 'Entrar' : 'Cadastrar'}</h2><form id="email-form"><div class="form-grupo"><label for="email">Email</label><input type="email" id="email" required></div><div class="form-grupo"><label for="password">Senha</label><input type="password" id="password" required></div><button type="submit" class="btn-primario">${isLogin ? 'Entrar' : 'Cadastrar'}</button></form><button id="google-login-btn" class="btn">Entrar com Google</button>`;
@@ -220,16 +185,11 @@
                 authModal.style.display = 'none';
             });
         };
-
         const signInWithGoogle = () => {
             auth.signInWithPopup(googleProvider).catch(error => alert(error.message));
             authModal.style.display = 'none';
         };
-        
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) { authModal.style.display = 'none'; }
-        });
-
+        authModal.addEventListener('click', (e) => { if (e.target === authModal) { authModal.style.display = 'none'; } });
         const renderizarAventuras = (aventurasDocs) => {
             muralAventuras.innerHTML = '';
             if (!aventurasDocs || aventurasDocs.length === 0) {
@@ -239,49 +199,23 @@
             aventurasDocs.forEach(aventuraDoc => {
                 const aventura = aventuraDoc.data();
                 const docId = aventuraDoc.id;
-                
                 const isMestre = currentUser && currentUser.uid === aventura.mestreUid;
                 const isAdmin = currentUserProfile && currentUserProfile.isAdmin === true;
-
                 let statusHtml = `<strong>Status:</strong> ${aventura.status}`;
                 if (isMestre || isAdmin) {
-                    statusHtml = `
-                        <strong>Status:</strong> 
-                        <select class="status-select" data-id="${docId}">
-                            <option value="Recrutando" ${aventura.status === 'Recrutando' ? 'selected' : ''}>Recrutando</option>
-                            <option value="Cheio" ${aventura.status === 'Cheio' ? 'selected' : ''}>Cheio</option>
-                            <option value="Em Andamento" ${aventura.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
-                            <option value="Finalizada" ${aventura.status === 'Finalizada' ? 'selected' : ''}>Finalizada</option>
-                        </select>
-                    `;
+                    statusHtml = `<strong>Status:</strong> <select class="status-select" data-id="${docId}"><option value="Recrutando" ${aventura.status === 'Recrutando' ? 'selected' : ''}>Recrutando</option><option value="Cheio" ${aventura.status === 'Cheio' ? 'selected' : ''}>Cheio</option><option value="Em Andamento" ${aventura.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option><option value="Finalizada" ${aventura.status === 'Finalizada' ? 'selected' : ''}>Finalizada</option></select>`;
                 }
-
-                let acaoHtml = `<a href="aventura.html?id=${docId}" class="btn-secundario btn-link">Ver Detalhes e Comentar</a>`;
+                let acaoHtml = `<a href="aventura.html?id=${docId}" class="btn-secundario btn-link">Ver Detalhes & Comentar</a>`;
                 if (isMestre || isAdmin) {
-                    acaoHtml += `<button class="btn-deletar" data-id="${docId}">Deletar</button>`;
+                    acaoHtml += `<a href="editar.html?id=${docId}" class="btn-secundario btn-link">Editar</a><button class="btn-deletar" data-id="${docId}">Deletar</button>`;
                 }
-                
                 const card = document.createElement('div');
                 card.className = 'card-aventura';
                 const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura" class="card-imagem">` : '';
-                
-                card.innerHTML = `
-                    ${imagemHtml}
-                    <div class="card-conteudo">
-                        <h3>${aventura.titulo}</h3>
-                        <p>
-                            <strong>Mestre:</strong> ${aventura.mestre}<br>
-                            <strong>Tipo:</strong> ${aventura.tipo || 'Não especificado'}<br>
-                            <strong>Sistema:</strong> ${aventura.sistema}<br>
-                            ${statusHtml}
-                        </p>
-                        <div class="card-actions">${acaoHtml}</div>
-                    </div>
-                `;
+                card.innerHTML = `${imagemHtml}<div class="card-conteudo"><h3>${aventura.titulo}</h3><p><strong>Mestre:</strong> ${aventura.mestre}<br><strong>Tipo:</strong> ${aventura.tipo || 'Não especificado'}<br><strong>Sistema:</strong> ${aventura.sistema}<br>${statusHtml}</p><div class="card-actions">${acaoHtml}</div></div>`;
                 muralAventuras.appendChild(card);
             });
         };
-
         aventurasCollection.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
             todasAventuras = snapshot.docs;
             renderizarAventuras(todasAventuras);
@@ -289,7 +223,6 @@
             console.error("Erro ao buscar aventuras: ", error);
             muralAventuras.innerHTML = '<p id="mensagem-vazio">Erro ao carregar as aventuras.</p>';
         });
-
         searchForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const termoBusca = searchInput.value.toLowerCase().trim();
@@ -301,11 +234,11 @@
                 const aventura = doc.data();
                 const titulo = aventura.titulo.toLowerCase();
                 const mestre = aventura.mestre.toLowerCase();
-                return titulo.includes(termoBusca) || mestre.includes(termoBusca);
+                const sistema = aventura.sistema.toLowerCase();
+                return titulo.includes(termoBusca) || mestre.includes(termoBusca) || sistema.includes(termoBusca);
             });
             renderizarAventuras(resultados);
         });
-        
         muralAventuras.addEventListener('change', (event) => {
             if(event.target.classList.contains('status-select')) {
                 const docId = event.target.dataset.id;
@@ -313,7 +246,6 @@
                 aventurasCollection.doc(docId).update({ status: newStatus });
             }
         });
-
         muralAventuras.addEventListener('click', (event) => {
             const target = event.target;
             if (target.classList.contains('btn-deletar')) {
@@ -323,7 +255,6 @@
                 }
             }
         });
-        
         formAventura.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!currentUser || !currentUserProfile || !(currentUserProfile.role === 'master' || currentUserProfile.isAdmin)) {
