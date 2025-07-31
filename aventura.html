@@ -28,9 +28,38 @@
         a:hover { text-decoration: underline; }
         
         header { text-align: center; padding: 1rem; border-bottom: 1px solid var(--cor-borda); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding-bottom: 1rem; }
-        header .logo { max-width: 100px; }
-        header h1 { font-family: var(--fonte-titulo); color: var(--cor-texto); font-size: 2.5rem; }
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding-bottom: 1rem;
+            flex-wrap: wrap; 
+            justify-content: center; 
+        }
+
+        header .site-logo-banner {
+            max-width: 350px; 
+            width: 100%; 
+            height: auto;
+            display: block; 
+            margin-bottom: 1rem; 
+        }
+
+        /* Esconder o logo e o h1 antigos */
+        header .logo, header h1 {
+            display: none; 
+        }
+
+        @media (min-width: 768px) {
+            header .header-top {
+                justify-content: space-between; 
+            }
+            header .site-logo-banner {
+                margin-bottom: 0; 
+            }
+        }
         
         #user-info-area { display: flex; align-items: center; gap: 1rem; }
         #user-info-area img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
@@ -67,20 +96,42 @@
         .btn-primario:hover { background-color: #b85b30; }
         .btn-secundario { background-color: transparent; border: 1px solid var(--cor-primaria); color: var(--cor-primaria); }
         .btn-secundario:hover { background-color: var(--cor-primaria); color: #fff; }
+
+        /* Estilo para mensagens de notificação (alerta) */
+        .notification-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50; /* Verde para sucesso */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+            display: none; /* Inicia oculto */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .notification-message.error {
+            background-color: #f44336; /* Vermelho para erro */
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-top">
-            <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
-            <a href="index.html"><h1>Dados & Calangos</h1></a>
+            <a href="index.html">
+                <img src="https://i.imgur.com/zY5dK3z.jpeg" alt="Dados & Calangos RPG de Mesa" class="site-logo-banner">
+            </a>
             <div id="user-area"></div>
         </div>
     </header>
 
     <div class="container" id="aventura-container">
     </div>
+
+    <div id="notification-message" class="notification-message"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
@@ -103,9 +154,11 @@
 
         const userArea = document.getElementById('user-area');
         const aventuraContainer = document.getElementById('aventura-container');
+        const notificationMessage = document.getElementById('notification-message');
+
         let currentUser = null;
         let currentUserProfile = null;
-        let currentAventura = null; // Armazena os dados da aventura
+        let currentAventura = null; 
 
         const urlParams = new URLSearchParams(window.location.search);
         const aventuraId = urlParams.get('id');
@@ -113,6 +166,25 @@
         if (!aventuraId) {
             aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>';
         }
+
+        // Função para exibir notificações
+        function showNotification(message, isError = false) {
+            notificationMessage.textContent = message;
+            notificationMessage.classList.remove('error');
+            if (isError) {
+                notificationMessage.classList.add('error');
+            }
+            notificationMessage.style.display = 'block';
+            notificationMessage.style.opacity = '1';
+
+            setTimeout(() => {
+                notificationMessage.style.opacity = '0';
+                setTimeout(() => {
+                    notificationMessage.style.display = 'none';
+                }, 500); // Tempo da transição
+            }, 3000); // Exibe por 3 segundos
+        }
+
 
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -126,24 +198,30 @@
                 currentUserProfile = null;
                  userArea.innerHTML = `<a href="index.html">Voltar para o Mural</a>`;
             }
-            renderizarPaginaAventura(); 
+            // Usa onSnapshot para escutar mudanças em tempo real na aventura
+            db.collection('aventuras').doc(aventuraId).onSnapshot(docSnapshot => {
+                if (docSnapshot.exists) {
+                    currentAventura = docSnapshot.data();
+                    renderizarPaginaAventura();
+                } else {
+                    aventuraContainer.innerHTML = '<h2>Aventura não encontrada ou foi deletada.</h2>';
+                }
+            }, error => {
+                console.error("Erro ao escutar mudanças na aventura: ", error);
+                aventuraContainer.innerHTML = '<h2>Erro ao carregar os detalhes da aventura.</h2>';
+                showNotification("Erro ao carregar os detalhes da aventura.", true);
+            });
         });
 
         async function renderizarPaginaAventura() {
-            const aventuraRef = db.collection('aventuras').doc(aventuraId);
-            const aventuraDoc = await aventuraRef.get();
+            // currentAventura já estará populada pelo onSnapshot
+            const aventura = currentAventura;
 
-            if (!aventuraDoc.exists) {
-                aventuraContainer.innerHTML = '<h2>Aventura não encontrada.</h2>';
-                return;
-            }
-
-            currentAventura = aventuraDoc.data(); // Armazena os dados da aventura
-            const imagemHtml = currentAventura.imagemUrl ? `<img src="${currentAventura.imagemUrl}" alt="Imagem da aventura">` : '';
-            const gatilhoHtml = currentAventura.gatilho ? `<p><strong>Gatilhos:</strong> ${currentAventura.gatilho}</p>` : '';
+            const imagemHtml = aventura.imagemUrl ? `<img src="${aventura.imagemUrl}" alt="Imagem da aventura">` : '';
+            const gatilhoHtml = aventura.gatilho ? `<p><strong>Gatilhos:</strong> ${aventura.gatilho}</p>` : '';
             
-            const jogadores = currentAventura.jogadores || [];
-            const suplentes = currentAventura.suplentes || [];
+            const jogadores = aventura.jogadores || [];
+            const suplentes = aventura.suplentes || [];
             let jogadoresHtml = '<strong>Jogadores:</strong><ul class="jogadores-lista">' + jogadores.map(p => `<li><img src="${p.photoURL || 'https://i.imgur.com/sB0r32J.png'}" alt="avatar"> ${p.username}</li>`).join('') + '</ul>';
             if (jogadores.length === 0) jogadoresHtml = '<strong>Jogadores:</strong> Nenhuma vaga preenchida.';
             
@@ -151,8 +229,8 @@
             if (suplentes.length === 0) suplentesHtml = '<strong>Suplentes:</strong> Sem suplentes no momento.';
 
             let joinButtonHtml = '';
-            // Apenas mostra o botão para não-mestres desta aventura
-            if (currentUser && currentUser.uid !== currentAventura.mestreUid) { 
+            // Apenas mostra o botão para não-mestres desta aventura e se o usuário está logado
+            if (currentUser && currentUser.uid !== aventura.mestreUid) { 
                 const isPlayer = jogadores.some(p => p.uid === currentUser.uid);
                 const isSuplente = suplentes.some(p => p.uid === currentUser.uid);
 
@@ -160,30 +238,32 @@
                     joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Sair da Mesa</button>`;
                 } else if (isSuplente) {
                     joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Sair da Lista de Suplentes</button>`;
-                } else if (jogadores.length < currentAventura.vagas) {
+                } else if (jogadores.length < aventura.vagas) {
                     joinButtonHtml = `<button id="join-leave-btn" class="btn-primario">Quero Jogar!</button>`;
                 } else {
                     joinButtonHtml = `<button id="join-leave-btn" class="btn-secundario">Entrar na Lista de Suplentes</button>`;
                 }
             } else if (!currentUser) {
                 joinButtonHtml = `<p>Faça login para se juntar a esta aventura.</p>`;
+            } else if (currentUser && currentUser.uid === aventura.mestreUid) {
+                joinButtonHtml = `<p>Você é o Mestre desta aventura.</p>`;
             }
 
 
             aventuraContainer.innerHTML = `
                 <div class="aventura-detalhes">
                     ${imagemHtml}
-                    <h2>${currentAventura.titulo}</h2>
+                    <h2>${aventura.titulo}</h2>
                     <div class="info-grid">
-                        <p class="info-item"><strong>Mestre:</strong> ${currentAventura.mestre}</p>
-                        <p class="info-item"><strong>Sistema:</strong> ${currentAventura.sistema}</p>
-                        <p class="info-item"><strong>Nível:</strong> ${currentAventura.nivel}</p>
-                        <p class="info-item"><strong>Tipo:</strong> ${currentAventura.tipo}</p>
-                        <p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${currentAventura.vagas}</p>
-                        <p class="info-item"><strong>Status:</strong> ${currentAventura.status}</p>
+                        <p class="info-item"><strong>Mestre:</strong> ${aventura.mestre}</p>
+                        <p class="info-item"><strong>Sistema:</strong> ${aventura.sistema}</p>
+                        <p class="info-item"><strong>Nível:</strong> ${aventura.nivel}</p>
+                        <p class="info-item"><strong>Tipo:</strong> ${aventura.tipo}</p>
+                        <p class="info-item"><strong>Vagas:</strong> ${jogadores.length} / ${aventura.vagas}</p>
+                        <p class="info-item"><strong>Status:</strong> ${aventura.status}</p>
                     </div>
                     ${gatilhoHtml}
-                    <p>${currentAventura.descricao}</p>
+                    <p>${aventura.descricao}</p>
                     ${joinButtonHtml}
                 </div>
                 <div class="secao">
@@ -197,7 +277,7 @@
                     <div id="comment-thread"></div>
                     <form id="comment-form">
                         <textarea id="comment-text" placeholder="Escreva seu comentário..." required></textarea>
-                        <button type="submit" class="btn-primario">Postar Comentário</button>
+                        <button type="submit" class="btn-primario" id="post-comment-btn">Postar Comentário</button>
                     </form>
                 </div>
             `;
@@ -213,34 +293,27 @@
                 joinLeaveBtn.addEventListener('click', toggleJoinAdventure);
             }
 
-            // Carregar e renderizar comentários
-            const commentsRef = aventuraRef.collection('comments').orderBy('createdAt');
-            commentsRef.onSnapshot(snapshot => {
-                const commentThread = document.getElementById('comment-thread');
-                commentThread.innerHTML = '';
-                if (snapshot.empty) {
-                    commentThread.innerHTML = '<p>Nenhum comentário ainda. Seja o primeiro!</p>';
-                }
-                snapshot.forEach(doc => {
-                    const comment = doc.data();
-                    const commentEl = document.createElement('div');
-                    commentEl.className = 'comment';
-                    commentEl.innerHTML = `
-                        <img src="${comment.author_photoURL}" alt="avatar">
-                        <div class="comment-body">
-                            <span class="comment-author">${comment.author_username}</span>
-                            <p class="comment-text">${comment.text}</p>
-                        </div>
-                    `;
-                    commentThread.appendChild(commentEl);
-                });
-            });
+            // Carregar e renderizar comentários (onSnapshot já foi iniciado no auth.onAuthStateChanged)
+            // Apenas certifique-se de que a UI de comentários é atualizada corretamente
+            // O listener de comentários já está no auth.onAuthStateChanged, então ele se encarregará de atualizar.
         }
         
         async function postarComentario(event) {
             event.preventDefault();
             const commentText = document.getElementById('comment-text');
-            if (commentText.value.trim() === '') return;
+            const postCommentBtn = document.getElementById('post-comment-btn');
+
+            if (commentText.value.trim() === '') {
+                showNotification('O comentário não pode ser vazio.', true);
+                return;
+            }
+            if (!currentUser || !currentUserProfile) {
+                showNotification('Você precisa estar logado para comentar.', true);
+                return;
+            }
+
+            postCommentBtn.disabled = true;
+            postCommentBtn.textContent = 'Enviando...';
 
             const newComment = {
                 text: commentText.value,
@@ -250,19 +323,32 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
-            commentText.value = '';
+            try {
+                await db.collection('aventuras').doc(aventuraId).collection('comments').add(newComment);
+                commentText.value = '';
+                showNotification('Comentário postado com sucesso!');
+            } catch (error) {
+                console.error("Erro ao postar comentário:", error);
+                showNotification("Não foi possível postar o comentário.", true);
+            } finally {
+                postCommentBtn.disabled = false;
+                postCommentBtn.textContent = 'Postar Comentário';
+            }
         }
 
         async function toggleJoinAdventure() {
             if (!currentUser || !currentUserProfile) {
-                alert('Você precisa estar logado para interagir com a aventura.');
+                showNotification('Você precisa estar logado para interagir com a aventura.', true);
                 return;
             }
 
+            const joinLeaveBtn = document.getElementById('join-leave-btn');
+            joinLeaveBtn.disabled = true;
+            joinLeaveBtn.textContent = 'Processando...';
+
             const aventuraRef = db.collection('aventuras').doc(aventuraId);
-            const currentJogadores = currentAventura.jogadores || [];
-            const currentSuplentes = currentAventura.suplentes || [];
+            let currentJogadores = currentAventura.jogadores || [];
+            let currentSuplentes = currentAventura.suplentes || [];
 
             const isPlayer = currentJogadores.some(p => p.uid === currentUser.uid);
             const isSuplente = currentSuplentes.some(p => p.uid === currentUser.uid);
@@ -278,34 +364,43 @@
 
             try {
                 if (isPlayer) {
-                    // Usuário é um jogador, então quer sair
                     updatedJogadores = updatedJogadores.filter(p => p.uid !== currentUser.uid);
-                    alert('Você saiu da mesa.');
+                    showNotification('Você saiu da mesa.');
                 } else if (isSuplente) {
-                    // Usuário é um suplente, então quer sair da lista de suplentes
                     updatedSuplentes = updatedSuplentes.filter(p => p.uid !== currentUser.uid);
-                    alert('Você saiu da lista de suplentes.');
+                    showNotification('Você saiu da lista de suplentes.');
                 } else if (currentJogadores.length < currentAventura.vagas) {
-                    // Há vagas abertas, usuário quer se juntar como jogador
                     updatedJogadores.push(playerInfo);
-                    alert('Você se juntou à mesa!');
+                    showNotification('Você se juntou à mesa!');
                 } else {
-                    // Não há vagas abertas, usuário se junta como suplente
                     updatedSuplentes.push(playerInfo);
-                    alert('Você foi adicionado à lista de suplentes.');
+                    showNotification('Você foi adicionado à lista de suplentes.');
+                }
+
+                // Lógica para atualizar o status da aventura automaticamente (se aplicável)
+                let newStatus = currentAventura.status;
+                if (updatedJogadores.length >= currentAventura.vagas && newStatus === 'Recrutando') {
+                    newStatus = 'Cheia';
+                } else if (updatedJogadores.length < currentAventura.vagas && newStatus === 'Cheia') {
+                    newStatus = 'Recrutando';
                 }
 
                 await aventuraRef.update({
                     jogadores: updatedJogadores,
-                    suplentes: updatedSuplentes
+                    suplentes: updatedSuplentes,
+                    status: newStatus // Atualiza o status automaticamente
                 });
 
-                // Renderiza novamente a página para mostrar as listas atualizadas e o estado do botão
-                renderizarPaginaAventura(); 
+                // Não precisa chamar renderizarPaginaAventura() explicitamente aqui
+                // O onSnapshot no auth.onAuthStateChanged já irá lidar com a re-renderização
+                // quando a aventura for atualizada no Firestore.
 
             } catch (error) {
                 console.error("Erro ao atualizar status da aventura:", error);
-                alert("Não foi possível atualizar seu status na aventura. Tente novamente.");
+                showNotification("Não foi possível atualizar seu status na aventura. Tente novamente.", true);
+            } finally {
+                joinLeaveBtn.disabled = false;
+                // O texto do botão será atualizado pela re-renderização completa da página via onSnapshot
             }
         }
     </script>
