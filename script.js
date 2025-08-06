@@ -34,20 +34,21 @@ async function loadAdventures() {
     // Cria um card para cada aventura
     data.forEach(adventure => {
         const card = document.createElement('div');
-        card.classList.add('adventure-card');
-      // O NOVO CÓDIGO PARA GERAR O CARD COM O NOVO DESIGN
-card.classList.add('adventure-card');
-card.innerHTML = `
-    <div class="adventure-card-content">
-        <h4>${adventure.titulo}</h4>
-        <p><strong>Mestre:</strong> ${adventure.nome_mestre}</p>
-        <p><strong>Sistema:</strong> ${adventure.sistema_rpg}</p>
-        <p><strong>Vagas:</strong> ${adventure.vagas}</p>
-        <p><strong>Contato:</strong> ${adventure.contato}</p>
-        <br>
-        <p>${adventure.descricao}</p>
-    </div>
-`;
+        // Adiciona a classe do card, apenas uma vez é necessário
+        card.classList.add('adventure-card'); 
+
+        // Adiciona o conteúdo HTML do card com o novo design
+        card.innerHTML = `
+            <div class="adventure-card-content">
+                <h4>${adventure.titulo}</h4>
+                <p><strong>Mestre:</strong> ${adventure.nome_mestre}</p>
+                <p><strong>Sistema:</strong> ${adventure.sistema_rpg}</p>
+                <p><strong>Vagas:</strong> ${adventure.vagas}</p>
+                <p><strong>Contato:</strong> ${adventure.contato}</p>
+                <br>
+                <p>${adventure.descricao}</p>
+            </div>
+        `;
         adventuresGrid.appendChild(card);
     });
 }
