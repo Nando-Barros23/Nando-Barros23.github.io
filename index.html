@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural de Aventuras de RPG</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Mural de Aventuras de RPG</h1>
+        <p>Encontre sua próxima grande jornada!</p>
+    </header>
+
+    <main>
+        <section id="form-section">
+            <h2>Publique sua Aventura</h2>
+            <form id="adventure-form">
+                <input type="text" id="titulo" placeholder="Título da Aventura" required>
+                <input type="text" id="sistema_rpg" placeholder="Sistema (D&D 5e, Tormenta20, etc.)" required>
+                <input type="text" id="nome_mestre" placeholder="Seu nome de Mestre/Narrador" required>
+                <input type="number" id="vagas" placeholder="Nº de Vagas" required>
+                <input type="text" id="contato" placeholder="Forma de Contato (Discord, etc.)" required>
+                <textarea id="descricao" placeholder="Descreva sua aventura..." rows="4" required></textarea>
+                <button type="submit">Publicar Aventura</button>
+            </form>
+        </section>
+
+        <section id="adventures-section">
+            <h2>Aventuras Disponíveis</h2>
+            <div id="adventures-grid">
+                </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Criado com GitHub Pages & Supabase</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>
