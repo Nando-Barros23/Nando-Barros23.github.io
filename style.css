@@ -1,70 +1,79 @@
-/* Estilos básicos para começar */
-body {
-    font-family: sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
-    line-height: 1.6;
+/* Importando as variáveis de estilo e fontes do seu design */
+:root {
+    --cor-fundo: #221A29; /* Tom escuro da sua paleta */
+    --cor-fundo-card: #3a2d49; /* Um roxo/vinho um pouco mais claro */
+    --cor-primaria: #D06E41; /* Laranja/Cobre da sua paleta */
+    --cor-destaque: #FFDBA7; /* Tom de areia/bege claro */
+    --cor-texto-principal: #F7F7F7; /* Branco/cinza muito claro */
+    --cor-texto-secundario: #bca9d1; /* Lilás/roxo claro para textos de apoio */
+    --cor-borda: #4a3c5c;
+    
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --fonte-titulo: 'MedievalSharp', cursive;
+    --fonte-label: 'Cinzel', serif;
+    --fonte-corpo: 'Roboto', sans-serif;
+}
+
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: var(--fonte-corpo);
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto-principal);
+    line-height: 1.6;
+}
+
+/* --- Cabeçalho --- */
 header {
-    background-color: #333;
-    color: #fff;
-    padding: 1rem;
-    text-align: center;
-}
-
-main {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
-
-#form-section, #adventures-section {
-    background-color: #fff;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-h2 {
-    color: #5a2a88;
-    border-bottom: 2px solid #f0f2f5;
-    padding-bottom: 0.5rem;
-    margin-top: 0;
-}
-
-/* Formulário */
-#adventure-form {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--cor-fundo-card);
+    border-bottom: 2px solid var(--cor-primaria);
 }
 
-#adventure-form input, #adventure-form textarea {
-    padding: 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
+header .logo {
+    max-width: 80px; /* Ajuste o tamanho do logo */
 }
 
-#adventure-form button {
-    background-color: #5a2a88;
-    color: white;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
+header h1 {
+    font-family: var(--fonte-titulo);
+    font-size: 2.5rem;
+    color: var(--cor-destaque);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-#adventure-form button:hover {
-    background-color: #48226b;
+/* --- Layout Principal --- */
+.container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr; /* Padrão para telas pequenas */
+    gap: 2.5rem;
 }
 
-/* Grid de Aventuras */
+/* Ativa o layout de 2 colunas em telas maiores */
+@media (min-width: 992px) {
+    .container {
+        grid-template-columns: 3fr 1.5fr;
+    }
+}
+
+h2, h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-primaria);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+/* --- Mural de Aventuras (Grid da Esquerda) --- */
 #adventures-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -72,30 +81,96 @@ h2 {
 }
 
 .adventure-card {
-    border: 1px solid #ddd;
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
     border-radius: 8px;
-    padding: 1rem;
-    background-color: #fafafa;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--sombra);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.adventure-card h3 {
-    margin-top: 0;
-    color: #333;
+.adventure-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2);
+}
+
+.adventure-card-content {
+    padding: 1.2rem;
+}
+
+.adventure-card h4 { /* Usando h4 para o título do card */
+    font-family: var(--fonte-label);
+    font-size: 1.25rem;
+    color: var(--cor-destaque);
+    margin-bottom: 1rem;
 }
 
 .adventure-card p {
+    color: var(--cor-texto-secundario);
     margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
-.adventure-card .label {
+.adventure-card strong {
+    color: var(--cor-texto-principal);
+    font-weight: 700;
+}
+
+/* --- Painel Lateral (Formulário da Direita) --- */
+.painel-lateral {
+    background-color: var(--cor-fundo-card);
+    padding: 1.6rem;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+    position: sticky; /* Faz o painel "flutuar" ao rolar a página */
+    top: 2rem;
+}
+
+.form-grupo {
+    margin-bottom: 1.2rem;
+}
+
+.form-grupo label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-family: var(--fonte-label);
+    font-weight: 700;
+    color: var(--cor-primaria);
+}
+
+.form-grupo input, .form-grupo textarea {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: var(--cor-fundo);
+    border: 1px solid var(--cor-borda);
+    border-radius: 4px;
+    color: var(--cor-texto-principal);
+    font-size: 1rem;
+    font-family: var(--fonte-corpo);
+}
+
+.form-grupo textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* --- Botões --- */
+.btn-primario {
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    color: #5a2a88;
+    font-family: var(--fonte-label);
+    transition: background-color 0.2s;
+    background-color: var(--cor-primaria);
+    color: #fff;
 }
 
-footer {
-    text-align: center;
-    padding: 1rem;
-    margin-top: 2rem;
-    color: #777;
+.btn-primario:hover {
+    background-color: #b85b30; /* Um tom mais escuro do laranja */
 }
