@@ -3,42 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mural de Aventuras de RPG</title>
+    <title>Dados & Calangos - Mural de Aventuras</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>Mural de Aventuras de RPG</h1>
-        <p>Encontre sua próxima grande jornada!</p>
+        <a href="#"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+        <h1>Dados & Calangos</h1>
+        <div id="user-area"></div>
     </header>
 
-    <main>
-        <section id="form-section">
-            <h2>Publique sua Aventura</h2>
-            <form id="adventure-form">
-                <input type="text" id="titulo" placeholder="Título da Aventura" required>
-                <input type="text" id="sistema_rpg" placeholder="Sistema (D&D 5e, Tormenta20, etc.)" required>
-                <input type="text" id="nome_mestre" placeholder="Seu nome de Mestre/Narrador" required>
-                <input type="number" id="vagas" placeholder="Nº de Vagas" required>
-                <input type="text" id="contato" placeholder="Forma de Contato (Discord, etc.)" required>
-                <textarea id="descricao" placeholder="Descreva sua aventura..." rows="4" required></textarea>
-                <button type="submit">Publicar Aventura</button>
-            </form>
-        </section>
-
-        <section id="adventures-section">
-            <h2>Aventuras Disponíveis</h2>
+    <div class="container">
+        <main>
+            <h2>Chamados de Aventura</h2>
             <div id="adventures-grid">
                 </div>
-        </section>
-    </main>
-
-    <footer>
-        <p>Criado com GitHub Pages & Supabase</p>
-    </footer>
+        </main>
+        
+        <aside class="painel-lateral">
+            <h3>Publique sua Aventura</h3>
+            <form id="adventure-form">
+                <div class="form-grupo">
+                    <label for="titulo">Título da Aventura</label>
+                    <input type="text" id="titulo" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="sistema_rpg">Sistema de RPG</label>
+                    <input type="text" id="sistema_rpg" placeholder="D&D 5e, Tormenta20..." required>
+                </div>
+                <div class="form-grupo">
+                    <label for="nome_mestre">Seu nome de Mestre</label>
+                    <input type="text" id="nome_mestre" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="vagas">Número de Vagas</label>
+                    <input type="number" id="vagas" min="1" required>
+                </div>
+                 <div class="form-grupo">
+                    <label for="contato">Forma de Contato</label>
+                    <input type="text" id="contato" placeholder="Seu Discord, WhatsApp..." required>
+                </div>
+                <div class="form-grupo">
+                    <label for="descricao">Descrição</label>
+                    <textarea id="descricao" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn-primario">Publicar Aventura</button>
+            </form>
+        </aside>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
