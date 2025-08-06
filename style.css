@@ -1,14 +1,15 @@
-/* Importando as variáveis de estilo e fontes do seu design */
+/* style.css ATUALIZADO COM TEMA CLARO */
+
 :root {
-    --cor-fundo: #221A29; /* Tom escuro da sua paleta */
-    --cor-fundo-card: #3a2d49; /* Um roxo/vinho um pouco mais claro */
+    /* Paleta de Cores - TEMA CLARO */
+    --cor-fundo: #F7F7F7; /* Fundo branco/cinza muito claro da sua paleta */
+    --cor-fundo-card: #FFFAF0; /* Um branco com tom de papiro/pergaminho */
     --cor-primaria: #D06E41; /* Laranja/Cobre da sua paleta */
-    --cor-destaque: #FFDBA7; /* Tom de areia/bege claro */
-    --cor-texto-principal: #F7F7F7; /* Branco/cinza muito claro */
-    --cor-texto-secundario: #bca9d1; /* Lilás/roxo claro para textos de apoio */
-    --cor-borda: #4a3c5c;
+    --cor-texto-principal: #221A29; /* O tom escuro/roxo para textos */
+    --cor-texto-secundario: #5c5561; /* Tom de apoio para textos */
+    --cor-borda: #DFE0DF; /* Cinza claro da sua paleta para bordas */
     
-    --sombra: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
     --fonte-titulo: 'MedievalSharp', cursive;
     --fonte-label: 'Cinzel', serif;
     --fonte-corpo: 'Roboto', sans-serif;
@@ -33,8 +34,9 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: var(--cor-fundo-card);
+    background-color: #fff; /* Cabeçalho branco para destaque */
     border-bottom: 2px solid var(--cor-primaria);
+    box-shadow: var(--sombra);
 }
 
 header .logo {
@@ -44,8 +46,7 @@ header .logo {
 header h1 {
     font-family: var(--fonte-titulo);
     font-size: 2.5rem;
-    color: var(--cor-destaque);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    color: var(--cor-texto-principal);
 }
 
 /* --- Layout Principal --- */
@@ -103,7 +104,7 @@ h2, h3 {
 .adventure-card h4 { /* Usando h4 para o título do card */
     font-family: var(--fonte-label);
     font-size: 1.25rem;
-    color: var(--cor-destaque);
+    color: var(--cor-texto-principal);
     margin-bottom: 1rem;
 }
 
@@ -120,7 +121,7 @@ h2, h3 {
 
 /* --- Painel Lateral (Formulário da Direita) --- */
 .painel-lateral {
-    background-color: var(--cor-fundo-card);
+    background-color: #fff; /* Painel branco para combinar com o cabeçalho */
     padding: 1.6rem;
     border-radius: 8px;
     border: 1px solid var(--cor-borda);
@@ -143,7 +144,7 @@ h2, h3 {
 .form-grupo input, .form-grupo textarea {
     width: 100%;
     padding: 0.8rem;
-    background-color: var(--cor-fundo);
+    background-color: #fff; /* Fundo branco para os inputs */
     border: 1px solid var(--cor-borda);
     border-radius: 4px;
     color: var(--cor-texto-principal);
