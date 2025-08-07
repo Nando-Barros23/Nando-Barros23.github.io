@@ -21,18 +21,22 @@ function showMessage(element, message) {
     (element === errorMessageDiv ? successMessageDiv : errorMessageDiv).style.display = 'none';
 }
 
-// NOVO: Função para ver/esconder a senha
+// Função para ver/esconder a senha com ícones de cadeado
 passwordToggleIcons.forEach(icon => {
+    // Define o ícone inicial como cadeado fechado
+    icon.textContent = '🔒';
+    icon.style.cursor = 'pointer'; // Garante que o cursor mude para indicar que é clicável
+
     icon.addEventListener('click', () => {
         const targetInputId = icon.getAttribute('data-target');
         const passwordInput = document.getElementById(targetInputId);
 
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
-            icon.textContent = '🙈';
+            icon.textContent = '🔓'; // Cadeado aberto
         } else {
             passwordInput.type = 'password';
-            icon.textContent = '👁️';
+            icon.textContent = '🔒'; // Cadeado fechado
         }
     });
 });
@@ -63,7 +67,7 @@ registerForm.addEventListener('submit', async (event) => {
     const password = document.getElementById('register-password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
 
-    // NOVO: Validação de senha
+    // Validação de senha
     if (password !== confirmPassword) {
         showMessage(errorMessageDiv, 'As senhas não conferem.');
         return;
