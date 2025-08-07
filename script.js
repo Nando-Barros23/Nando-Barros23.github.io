@@ -1,10 +1,13 @@
 // --- 1. CONEXÃO COM O SUPABASE ---
-// IMPORTANTE: Substitua pelas suas chaves do Supabase!
-const SUPABASE_URL = 'zslokbeazldiwmblahps'; // Cole sua URL aqui
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Cole sua chave 'anon' aqui
+// A linha abaixo pega a função para criar o cliente do Supabase
+const { createClient } = supabase;
 
-// Cria o cliente do Supabase
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Suas chaves de conexão inseridas aqui
+const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+
+// Cria o cliente do Supabase com um nome de variável corrigido
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
 // --- 2. ELEMENTOS DO DOM ---
@@ -18,25 +21,22 @@ const adventureForm = document.getElementById('adventure-form');
  * Carrega as aventuras do banco de dados e as exibe na tela.
  */
 async function loadAdventures() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('aventuras')
-        .select('*') // Seleciona todas as colunas
-        .order('created_at', { ascending: false }); // Ordena pelas mais recentes
+        .select('*')
+        .order('created_at', { ascending: false });
 
     if (error) {
         console.error('Erro ao buscar aventuras:', error);
         return;
     }
 
-    // Limpa o grid antes de adicionar novos cards
     adventuresGrid.innerHTML = '';
 
-    // Cria um card para cada aventura
     data.forEach(adventure => {
         const card = document.createElement('div');
         card.classList.add('adventure-card'); 
 
-        // Adiciona o conteúdo HTML do card com os campos atualizados
         card.innerHTML = `
             <div class="adventure-card-content">
                 <h4>${adventure.titulo}</h4>
@@ -58,12 +58,11 @@ async function loadAdventures() {
  * Lida com o envio do formulário para criar uma nova aventura.
  */
 adventureForm.addEventListener('submit', async (event) => {
-    event.preventDefault(); // Impede o recarregamento da página
+    event.preventDefault();
 
     const form = event.target;
     const formData = new FormData(form);
 
-    // Pega os dados do formulário, incluindo os novos campos
     const newAdventure = {
         titulo: formData.get('titulo'),
         sistema_rpg: formData.get('sistema_rpg'),
@@ -75,26 +74,23 @@ adventureForm.addEventListener('submit', async (event) => {
         nivel: formData.get('nivel')
     };
 
-    // Envia os dados para o Supabase
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('aventuras')
         .insert([newAdventure]);
         
     if (error) {
         console.error('Erro ao inserir aventura:', error);
-        alert('Ocorreu um erro ao publicar sua aventura.');
+        alert('Ocorreu um erro ao publicar sua aventura. Verifique o console para mais detalhes (F12).');
     } else {
-        // Alerta de sucesso com o emoji
         alert('⚠️ Aventura publicada com sucesso!');
-        form.reset(); // Limpa o formulário
-        loadAdventures(); // Recarrega a lista de aventuras
+        form.reset();
+        loadAdventures();
     }
 });
 
 
 // --- 4. INICIALIZAÇÃO ---
 
-// Carrega as aventuras assim que a página é aberta
 document.addEventListener('DOMContentLoaded', () => {
     loadAdventures();
 });
