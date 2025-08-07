@@ -50,6 +50,12 @@ header h1 {
     color: var(--cor-texto-principal);
 }
 
+#user-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 /* --- Layout Principal --- */
 .container {
     max-width: 1400px;
