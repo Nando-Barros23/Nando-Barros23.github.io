@@ -1,7 +1,7 @@
 // --- 1. CONEXÃO COM O SUPABASE ---
 // Substitua pelas suas chaves do Supabase!
-const SUPABASE_URL = 'SUA_URL_DO_PROJETO_AQUI'; // Cole sua URL aqui
-const SUPABASE_ANON_KEY = 'SUA_CHAVE_ANON_PUBLICA_AQUI'; // Cole sua chave 'anon' aqui
+const SUPABASE_URL = 'zslokbeazldiwmblahps'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; 
 
 // Cria o cliente do Supabase
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
