@@ -18,6 +18,20 @@
         #error-message, #success-message { text-align: center; padding: 0.8rem; margin-top: 1rem; border-radius: 4px; display: none; }
         #error-message { background-color: #f8d7da; color: #721c24; }
         #success-message { background-color: #d4edda; color: #155724; }
+        
+        /* Estilos para o ícone de ver a senha */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-toggle-icon {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            user-select: none; /* Impede que o ícone seja selecionado como texto */
+            font-style: normal; /* Garante que o emoji não fique em itálico */
+        }
     </style>
 </head>
 <body>
@@ -43,7 +57,10 @@
             </div>
             <div class="form-grupo">
                 <label for="login-password">Senha</label>
-                <input type="password" id="login-password" required>
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" required>
+                    <i class="password-toggle-icon" data-target="login-password">👁️</i>
+                </div>
             </div>
             <button type="submit" class="btn-primario">Entrar</button>
         </form>
@@ -53,12 +70,26 @@
         <h3>Não tem uma conta? Cadastre-se</h3>
         <form id="register-form">
             <div class="form-grupo">
+                <label for="register-username">Nome de Usuário</label>
+                <input type="text" id="register-username" required>
+            </div>
+            <div class="form-grupo">
                 <label for="register-email">Email</label>
                 <input type="email" id="register-email" required>
             </div>
             <div class="form-grupo">
-                <label for="register-password">Senha (mínimo 6 caracteres)</label>
-                <input type="password" id="register-password" required>
+                <label for="register-password">Senha (mín. 1 número e 1 caractere especial)</label>
+                <div class="password-wrapper">
+                    <input type="password" id="register-password" required>
+                     <i class="password-toggle-icon" data-target="register-password">👁️</i>
+                </div>
+            </div>
+            <div class="form-grupo">
+                <label for="confirm-password">Confirmar Senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" required>
+                    <i class="password-toggle-icon" data-target="confirm-password">👁️</i>
+                </div>
             </div>
             <button type="submit" class="btn-primario">Cadastrar</button>
         </form>
