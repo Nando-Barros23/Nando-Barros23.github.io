@@ -10,52 +10,82 @@ const registerForm = document.getElementById('register-form');
 const googleLoginButton = document.getElementById('google-login-button');
 const errorMessageDiv = document.getElementById('error-message');
 const successMessageDiv = document.getElementById('success-message');
+const passwordToggleIcons = document.querySelectorAll('.password-toggle-icon');
 
-// --- 3. FUNÇÕES DE AUTENTICAÇÃO ---
+// --- 3. FUNCIONALIDADES ---
 
-// Função para mostrar mensagens
+// Função para mostrar mensagens de erro/sucesso
 function showMessage(element, message) {
     element.textContent = message;
     element.style.display = 'block';
-    // Esconde a outra mensagem
     (element === errorMessageDiv ? successMessageDiv : errorMessageDiv).style.display = 'none';
 }
 
-// LOGIN COM GOOGLE
-googleLoginButton.addEventListener('click', async () => {
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
+// NOVO: Função para ver/esconder a senha
+passwordToggleIcons.forEach(icon => {
+    icon.addEventListener('click', () => {
+        const targetInputId = icon.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetInputId);
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.textContent = '🙈';
+        } else {
+            passwordInput.type = 'password';
+            icon.textContent = '👁️';
+        }
     });
-    if (error) {
-        showMessage(errorMessageDiv, `Erro no login com Google: ${error.message}`);
-    }
 });
 
-// LOGIN COM E-MAIL E SENHA
+// --- 4. LÓGICA DE AUTENTICAÇÃO ---
+
+// LOGIN COM GOOGLE
+googleLoginButton.addEventListener('click', async () => {
+    const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+    if (error) showMessage(errorMessageDiv, `Erro no login com Google: ${error.message}`);
+});
+
+// LOGIN COM E-MAIL
 loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-
-    const { error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        showMessage(errorMessageDiv, `Erro no login: ${error.message}`);
-    }
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) showMessage(errorMessageDiv, `Erro no login: ${error.message}`);
 });
 
-// CADASTRO COM E-MAIL E SENHA
+// CADASTRO COM E-MAIL
 registerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+
+    const username = document.getElementById('register-username').value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    // NOVO: Validação de senha
+    if (password !== confirmPassword) {
+        showMessage(errorMessageDiv, 'As senhas não conferem.');
+        return;
+    }
+
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (!hasNumber || !hasSpecialChar) {
+        showMessage(errorMessageDiv, 'A senha precisa conter pelo menos um número e um caractere especial.');
+        return;
+    }
+    // Fim da validação
 
     const { error } = await supabaseClient.auth.signUp({
         email: email,
         password: password,
+        options: {
+            data: {
+                username: username // Salva o nome de usuário nos metadados
+            }
+        }
     });
 
     if (error) {
@@ -66,8 +96,7 @@ registerForm.addEventListener('submit', async (event) => {
     }
 });
 
-
-// OUVINTE DE AUTENTICAÇÃO: Redireciona após login bem-sucedido
+// OUVINTE GERAL DE AUTENTICAÇÃO
 supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN') {
         window.location.href = 'index.html';
