@@ -1,57 +1,43 @@
-// --- 1. CONEXÃO COM O SUPABASE ---
-const { createClient } = supabase;
 const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- 2. ELEMENTOS DO DOM ---
 const adventuresGrid = document.getElementById('adventures-grid');
 const adventureForm = document.getElementById('adventure-form');
 const userArea = document.getElementById('user-area');
 const publishSection = document.querySelector('.painel-lateral');
 
-// --- 3. FUNÇÕES DE UI E AUTENTICAÇÃO ---
-
-/**
- * Atualiza o cabeçalho para mostrar o estado do usuário (logado ou não)
- */
-function updateUserUI(user) {
+// Atualiza a UI do cabeçalho
+async function updateUserUI() {
+    const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-        // Usuário está logado
+        const { data: profile } = await supabase.from('profiles').select('username, role').eq('id', user.id).single();
+        const displayName = profile?.username || user.email.split('@')[0];
+        
         userArea.innerHTML = `
-            <span>Olá, ${user.email.split('@')[0]}</span>
+            <span>Olá, <a href="profile.html" style="color: var(--cor-primaria);">${displayName}</a></span>
             <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
         `;
-        publishSection.style.display = 'block'; // Mostra o formulário de publicação
-
         document.getElementById('logout-button').addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            window.location.reload(); // Recarrega a página após o logout
+            await supabase.auth.signOut();
+            window.location.reload();
         });
+
+        // NOVO: Verifica a role do usuário para mostrar o painel
+        if (profile && profile.role === 'master') {
+            publishSection.style.display = 'block';
+        } else {
+            publishSection.style.display = 'none';
+        }
     } else {
-        // Usuário não está logado
-        userArea.innerHTML = `
-            <a href="login.html" class="btn-primario" style="text-decoration: none;">Login / Cadastrar</a>
-        `;
-        publishSection.style.display = 'none'; // Esconde o formulário de publicação
+        userArea.innerHTML = `<a href="login.html" class="btn-primario" style="text-decoration: none;">Login / Cadastrar</a>`;
+        publishSection.style.display = 'none';
     }
 }
 
-/**
- * Verifica a sessão do usuário ao carregar a página
- */
-async function checkUserSession() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    updateUserUI(user);
-}
-
-// --- 4. FUNÇÕES DE AVENTURA ---
-
-/**
- * Carrega as aventuras do banco de dados e as exibe na tela.
- */
+// Carrega as aventuras
 async function loadAdventures() {
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
         .from('aventuras')
         .select('*')
         .order('created_at', { ascending: false });
@@ -64,7 +50,11 @@ async function loadAdventures() {
     data.forEach(adventure => {
         const card = document.createElement('div');
         card.classList.add('adventure-card');
+        
+        // NOVO: Adiciona a imagem no card
+        const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png'; // Uma imagem genérica
         card.innerHTML = `
+            <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image">
             <div class="adventure-card-content">
                 <h4>${adventure.titulo}</h4>
                 <p><strong>Mestre:</strong> ${adventure.nome_mestre}</p>
@@ -81,24 +71,47 @@ async function loadAdventures() {
     });
 }
 
-/**
- * Lida com o envio do formulário para criar uma nova aventura.
- */
+// Envio do formulário de aventura
 adventureForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    const formButton = adventureForm.querySelector('button');
+    formButton.disabled = true;
+    formButton.textContent = 'Publicando...';
 
-    // 1. Pega o usuário logado
-    const { data: { user } } = await supabaseClient.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        alert('Você precisa estar logado para publicar uma aventura.');
+        alert('Você precisa estar logado para publicar.');
+        formButton.disabled = false;
+        formButton.textContent = 'Publicar Aventura';
         return;
     }
 
-    const form = event.target;
-    const formData = new FormData(form);
+    // NOVO: Lógica de upload de imagem da aventura
+    const imageFile = document.getElementById('adventure-image').files[0];
+    let imageUrl = null;
 
-    // 2. Monta o objeto da aventura, incluindo o user_id
+    if (imageFile) {
+        const filePath = `public/${user.id}-${Date.now()}`;
+        const { error: uploadError } = await supabase.storage
+            .from('adventure-images')
+            .upload(filePath, imageFile);
+
+        if (uploadError) {
+            console.error('Erro no upload:', uploadError);
+            alert('Houve um erro ao enviar a imagem.');
+            formButton.disabled = false;
+            formButton.textContent = 'Publicar Aventura';
+            return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+            .from('adventure-images')
+            .getPublicUrl(filePath);
+        
+        imageUrl = publicUrlData.publicUrl;
+    }
+
+    const formData = new FormData(adventureForm);
     const newAdventure = {
         titulo: formData.get('titulo'),
         sistema_rpg: formData.get('sistema_rpg'),
@@ -108,27 +121,27 @@ adventureForm.addEventListener('submit', async (event) => {
         alerta_gatilho: formData.get('alerta_gatilho'),
         tipo_jogo: formData.get('tipo_jogo'),
         nivel: formData.get('nivel'),
-        user_id: user.id // Adiciona o ID do usuário ao post
+        user_id: user.id,
+        image_url: imageUrl // Salva a URL da imagem
     };
 
-    // 3. Envia os dados para o Supabase
-    const { data: insertData, error } = await supabaseClient
-        .from('aventuras')
-        .insert([newAdventure]);
+    const { error } = await supabase.from('aventuras').insert([newAdventure]);
         
     if (error) {
         console.error('Erro ao inserir aventura:', error);
-        alert('Ocorreu um erro ao publicar sua aventura. Verifique o console (F12).');
+        alert('Ocorreu um erro ao publicar sua aventura.');
     } else {
         alert('⚠️ Aventura publicada com sucesso!');
-        form.reset();
+        adventureForm.reset();
         loadAdventures();
     }
+    formButton.disabled = false;
+    formButton.textContent = 'Publicar Aventura';
 });
 
 
-// --- 5. INICIALIZAÇÃO ---
+// INICIALIZAÇÃO
 document.addEventListener('DOMContentLoaded', () => {
-    checkUserSession(); // Verifica o status do usuário
-    loadAdventures(); // Carrega as aventuras
+    updateUserUI();
+    loadAdventures();
 });
