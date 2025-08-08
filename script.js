@@ -2,20 +2,25 @@ const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// --- ELEMENTOS DO DOM ---
 const adventuresGrid = document.getElementById('adventures-grid');
 const adventureForm = document.getElementById('adventure-form');
 const userArea = document.getElementById('user-area');
 const publishSection = document.querySelector('.painel-lateral');
 
-// Atualiza a UI do cabeçalho
+// --- LÓGICA PRINCIPAL ---
+
+// Atualiza a UI do cabeçalho com base no status de login
 async function updateUserUI() {
     const { data: { user } } = await supabase.auth.getUser();
+
     if (user) {
+        // Se o usuário está logado, busca o perfil dele
         const { data: profile } = await supabase.from('profiles').select('username, role').eq('id', user.id).single();
         const displayName = profile?.username || user.email.split('@')[0];
         
         userArea.innerHTML = `
-            <span>Olá, <a href="profile.html" style="color: var(--cor-primaria);">${displayName}</a></span>
+            <span>Olá, <a href="profile.html" style="color: var(--cor-primaria); text-decoration: none;">${displayName}</a></span>
             <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
         `;
         document.getElementById('logout-button').addEventListener('click', async () => {
@@ -23,19 +28,20 @@ async function updateUserUI() {
             window.location.reload();
         });
 
-        // NOVO: Verifica a role do usuário para mostrar o painel
+        // Mostra ou esconde o painel de publicação com base no papel (role) do usuário
         if (profile && profile.role === 'master') {
             publishSection.style.display = 'block';
         } else {
             publishSection.style.display = 'none';
         }
     } else {
+        // Se o usuário não está logado
         userArea.innerHTML = `<a href="login.html" class="btn-primario" style="text-decoration: none;">Login / Cadastrar</a>`;
         publishSection.style.display = 'none';
     }
 }
 
-// Carrega as aventuras
+// Carrega as aventuras do banco de dados para o mural
 async function loadAdventures() {
     const { data, error } = await supabase
         .from('aventuras')
@@ -51,8 +57,7 @@ async function loadAdventures() {
         const card = document.createElement('div');
         card.classList.add('adventure-card');
         
-        // NOVO: Adiciona a imagem no card
-        const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png'; // Uma imagem genérica
+        const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png'; // Imagem padrão
         card.innerHTML = `
             <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image">
             <div class="adventure-card-content">
@@ -71,7 +76,7 @@ async function loadAdventures() {
     });
 }
 
-// Envio do formulário de aventura
+// Lida com o envio do formulário de novas aventuras
 adventureForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const formButton = adventureForm.querySelector('button');
@@ -86,7 +91,7 @@ adventureForm.addEventListener('submit', async (event) => {
         return;
     }
 
-    // NOVO: Lógica de upload de imagem da aventura
+    // Lógica para upload da imagem da aventura
     const imageFile = document.getElementById('adventure-image').files[0];
     let imageUrl = null;
 
@@ -122,7 +127,7 @@ adventureForm.addEventListener('submit', async (event) => {
         tipo_jogo: formData.get('tipo_jogo'),
         nivel: formData.get('nivel'),
         user_id: user.id,
-        image_url: imageUrl // Salva a URL da imagem
+        image_url: imageUrl
     };
 
     const { error } = await supabase.from('aventuras').insert([newAdventure]);
@@ -140,7 +145,8 @@ adventureForm.addEventListener('submit', async (event) => {
 });
 
 
-// INICIALIZAÇÃO
+// --- INICIALIZAÇÃO ---
+// Roda as funções principais quando a página carrega
 document.addEventListener('DOMContentLoaded', () => {
     updateUserUI();
     loadAdventures();
