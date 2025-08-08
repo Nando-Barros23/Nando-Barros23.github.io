@@ -1,22 +1,24 @@
+// --- 1. CONEXÃO COM O SUPABASE ---
 const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// CORREÇÃO: Usamos o objeto global 'supabase' para criar nosso cliente com um novo nome
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- ELEMENTOS DO DOM ---
+// --- 2. ELEMENTOS DO DOM ---
 const adventuresGrid = document.getElementById('adventures-grid');
 const adventureForm = document.getElementById('adventure-form');
 const userArea = document.getElementById('user-area');
 const publishSection = document.querySelector('.painel-lateral');
 
-// --- LÓGICA PRINCIPAL ---
+// --- 3. LÓGICA PRINCIPAL ---
 
 // Atualiza a UI do cabeçalho com base no status de login
 async function updateUserUI() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
     if (user) {
         // Se o usuário está logado, busca o perfil dele
-        const { data: profile } = await supabase.from('profiles').select('username, role').eq('id', user.id).single();
+        const { data: profile } = await supabaseClient.from('profiles').select('username, role').eq('id', user.id).single();
         const displayName = profile?.username || user.email.split('@')[0];
         
         userArea.innerHTML = `
@@ -24,7 +26,7 @@ async function updateUserUI() {
             <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
         `;
         document.getElementById('logout-button').addEventListener('click', async () => {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             window.location.reload();
         });
 
@@ -43,7 +45,7 @@ async function updateUserUI() {
 
 // Carrega as aventuras do banco de dados para o mural
 async function loadAdventures() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('aventuras')
         .select('*')
         .order('created_at', { ascending: false });
@@ -83,7 +85,7 @@ adventureForm.addEventListener('submit', async (event) => {
     formButton.disabled = true;
     formButton.textContent = 'Publicando...';
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) {
         alert('Você precisa estar logado para publicar.');
         formButton.disabled = false;
@@ -97,7 +99,7 @@ adventureForm.addEventListener('submit', async (event) => {
 
     if (imageFile) {
         const filePath = `public/${user.id}-${Date.now()}`;
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabaseClient.storage
             .from('adventure-images')
             .upload(filePath, imageFile);
 
@@ -109,7 +111,7 @@ adventureForm.addEventListener('submit', async (event) => {
             return;
         }
 
-        const { data: publicUrlData } = supabase.storage
+        const { data: publicUrlData } = supabaseClient.storage
             .from('adventure-images')
             .getPublicUrl(filePath);
         
@@ -130,7 +132,7 @@ adventureForm.addEventListener('submit', async (event) => {
         image_url: imageUrl
     };
 
-    const { error } = await supabase.from('aventuras').insert([newAdventure]);
+    const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
         
     if (error) {
         console.error('Erro ao inserir aventura:', error);
@@ -145,7 +147,7 @@ adventureForm.addEventListener('submit', async (event) => {
 });
 
 
-// --- INICIALIZAÇÃO ---
+// --- 4. INICIALIZAÇÃO ---
 // Roda as funções principais quando a página carrega
 document.addEventListener('DOMContentLoaded', () => {
     updateUserUI();
