@@ -1,0 +1,40 @@
+:root {
+    --cor-fundo: #F7F7F7;
+    --cor-fundo-card: #FFDBA7;
+    --cor-primaria: #D06E41;
+    --cor-fundo-painel: #FFDBA7;
+    --cor-texto-principal: #221A29;
+    --cor-texto-secundario: #5c5561;
+    --cor-borda: #DFE0DF;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --fonte-titulo: 'MedievalSharp', cursive;
+    --fonte-label: 'Cinzel', serif;
+    --fonte-corpo: 'Roboto', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: var(--cor-texto-principal); line-height: 1.6; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background-color: #fff; border-bottom: 2px solid var(--cor-primaria); box-shadow: var(--sombra); }
+header .logo { max-width: 80px; }
+header h1 { font-family: var(--fonte-titulo); font-size: 2.5rem; color: var(--cor-texto-principal); }
+#user-area { display: flex; align-items: center; gap: 1rem; }
+.container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
+@media (min-width: 992px) { .container { grid-template-columns: 3fr 1.5fr; } }
+h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--cor-borda); }
+#adventures-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.adventure-card { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; overflow: hidden; }
+.adventure-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(208, 110, 65, 0.2); }
+.adventure-card-image { width: 100%; height: 180px; object-fit: cover; }
+.adventure-card-content { padding: 1.2rem; }
+.adventure-card h4 { font-family: var(--fonte-label); font-size: 1.25rem; color: var(--cor-texto-principal); margin-bottom: 1rem; }
+.adventure-card p { color: var(--cor-texto-secundario); margin-bottom: 0.5rem; font-size: 0.95rem; }
+.adventure-card strong { color: var(--cor-texto-principal); font-weight: 700; }
+.painel-lateral { background-color: var(--cor-fundo-painel); padding: 1.6rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
+.form-grupo { margin-bottom: 1.2rem; }
+.form-grupo label { display: block; margin-bottom: 0.5rem; font-family: var(--fonte-label); font-weight: 700; color: var(--cor-primaria); }
+.form-grupo input, .form-grupo textarea, .form-grupo select { width: 100%; padding: 0.8rem; background-color: #fff; border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto-principal); font-size: 1rem; font-family: var(--fonte-corpo); }
+.form-grupo textarea { resize: vertical; min-height: 100px; }
+.radio-group { display: flex; gap: 1.5rem; align-items: center; }
+.radio-group label { margin-bottom: 0; font-weight: normal; font-family: var(--fonte-corpo); color: var(--cor-texto-principal); }
+.radio-group input { width: auto; }
+.btn-primario { cursor: pointer; width: 100%; border: none; border-radius: 4px; padding: 0.8rem 1.2rem; font-size: 1.1rem; font-weight: bold; font-family: var(--fonte-label); transition: background-color 0.2s; background-color: var(--cor-primaria); color: #fff; }
+.btn-primario:hover { background-color: #b85b30; }
