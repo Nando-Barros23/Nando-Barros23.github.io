@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Aventura - Dados & Calangos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .adventure-detail-container { max-width: 900px; margin: 2rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; }
+        .adventure-detail-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .detail-item p { margin: 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+        <h1>Dados & Calangos</h1>
+        <div id="user-area"></div>
+    </header>
+
+    <main id="adventure-detail-main" class="adventure-detail-container">
+        <h2 id="adventure-title">Carregando aventura...</h2>
+        <img src="https://i.imgur.com/Q3j5eH0.png" alt="Imagem da Aventura" id="adventure-image" class="adventure-detail-image">
+        
+        <div class="detail-grid">
+            <div class="detail-item">
+                <p><strong>Mestre:</strong> <span id="master-name">...</span></p>
+            </div>
+            <div class="detail-item">
+                <p><strong>Sistema:</strong> <span id="system-name">...</span></p>
+            </div>
+            <div class="detail-item">
+                <p><strong>Tipo:</strong> <span id="game-type">...</span></p>
+            </div>
+            <div class="detail-item">
+                <p><strong>Nível:</strong> <span id="level">...</span></p>
+            </div>
+            <div class="detail-item">
+                <p><strong>Vagas:</strong> <span id="slots">...</span></p>
+            </div>
+            <div class="detail-item">
+                <p><strong>⚠️ Alerta de Gatilho:</strong> <span id="trigger-warning">...</span></p>
+            </div>
+        </div>
+        
+        <hr style="margin: 2rem 0;">
+        
+        <h3>Descrição da Aventura</h3>
+        <p id="adventure-description">...</p>
+
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="aventura.js"></script>
+</body>
+</html>
