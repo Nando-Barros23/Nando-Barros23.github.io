@@ -1,4 +1,4 @@
-// Arquivo: script.js (Código Completo Corrigido)
+// Arquivo: script.js (Código Completo com Barra de Pesquisa)
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
@@ -12,28 +12,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const adventureForm = document.getElementById('adventure-form');
     const userArea = document.getElementById('user-area');
     const publishSection = document.querySelector('.painel-lateral');
+    const searchBar = document.getElementById('search-bar');
 
-    // Variável global para guardar o estado do usuário. Essencial para o código funcionar!
+    // Variáveis globais
     let currentUser = null;
+    let allAdventures = []; // Array para guardar todas as aventuras carregadas
 
     // 2. FUNÇÕES PRINCIPAIS
 
     /**
-     * Carrega as aventuras do banco de dados e exibe na tela.
+     * Renderiza um array de aventuras na tela.
+     * @param {Array} adventures - O array de aventuras a ser exibido.
      */
-    async function loadAdventures() {
-        // Corrigido para buscar da tabela 'aventuras'
-        const { data, error } = await supabaseClient.from('aventuras').select('*').order('created_at', { ascending: false });
-        if (error) {
-            console.error('Erro ao buscar aventuras:', error);
-            return;
-        }
+    function renderAdventures(adventures) {
         adventuresGrid.innerHTML = ''; // Limpa a grade antes de adicionar novos cards
-        data.forEach(adventure => {
+        if (adventures.length === 0) {
+            adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada.</p>';
+        }
+        adventures.forEach(adventure => {
             const card = document.createElement('div');
             card.classList.add('adventure-card');
-            const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png'; // Imagem padrão
-            // Preenche o card com os dados da aventura
+            const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
             card.innerHTML = `
                 <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image">
                 <div class="adventure-card-content">
@@ -53,62 +52,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Atualiza a interface do usuário (botões, painel do mestre) com base no estado de login.
-     * @param {object|null} user - O objeto do usuário do Supabase, ou null se não estiver logado.
+     * Carrega as aventuras do banco de dados e as exibe.
+     */
+    async function loadAdventures() {
+        const { data, error } = await supabaseClient.from('aventuras').select('*').order('created_at', { ascending: false });
+        if (error) {
+            console.error('Erro ao buscar aventuras:', error);
+            return;
+        }
+        allAdventures = data; // Salva os dados na variável global
+        renderAdventures(allAdventures); // Chama a função de renderização
+    }
+
+    /**
+     * Atualiza a interface do usuário com base no estado de login.
      */
     async function updateUI(user) {
         if (user) {
-            // Se o usuário está logado, busca o perfil para obter o nome e a role
             const { data: profile, error } = await supabaseClient.from('profiles').select('username, role').eq('id', user.id).single();
-            if (error && error.code !== 'PGRST116') { // Ignora erro se o perfil não for encontrado
+            if (error && error.code !== 'PGRST116') {
                 console.error("Erro ao buscar perfil:", error);
             }
-            
-            // Define o nome de exibição (username do perfil ou parte do email)
             const displayName = profile?.username || user.email.split('@')[0];
-
-            // Atualiza a área do usuário com o nome e o botão de sair
             userArea.innerHTML = `
-                <a href="profile.html" class="btn-primario" style="text-decoration: none; width: auto; padding: 0.5rem 1rem; font-size: 1rem; line-height: 1.2;">Olá, ${displayName}</a>
-                <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
+                <a href="profile.html" class="btn-primario">Olá, ${displayName}</a>
+                <button id="logout-button" class="btn-primario">Sair</button>
             `;
-            document.getElementById('logout-button').addEventListener('click', async () => {
-                await supabaseClient.auth.signOut();
+            document.getElementById('logout-button').addEventListener('click', () => {
+                supabaseClient.auth.signOut();
             });
-
-            // Mostra ou esconde o painel de publicação de aventura se o usuário for 'master'
             if (profile && profile.role === 'master') {
                 publishSection.style.display = 'block';
             } else {
                 publishSection.style.display = 'none';
             }
         } else {
-            // Se não há usuário logado, mostra o botão de login/cadastro e esconde o painel de mestre
-            userArea.innerHTML = `<a href="login.html" class="btn-primario" style="text-decoration: none;">Login / Cadastrar</a>`;
+            userArea.innerHTML = `<a href="login.html" class="btn-primario">Login / Cadastrar</a>`;
             publishSection.style.display = 'none';
         }
     }
 
-
     // 3. EVENT LISTENERS (OUVINTES DE EVENTOS)
+    
+    /**
+     * Listener para o campo de pesquisa. Filtra as aventuras em tempo real.
+     */
+    searchBar.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase(); // Pega o texto digitado em minúsculas
+        const filteredAdventures = allAdventures.filter(adventure => {
+            // Verifica se o texto de busca existe no título, sistema ou nome do mestre
+            const includesTitle = adventure.titulo.toLowerCase().includes(searchTerm);
+            const includesSystem = adventure.sistema_rpg.toLowerCase().includes(searchTerm);
+            const includesMaster = adventure.nome_mestre.toLowerCase().includes(searchTerm);
+            return includesTitle || includesSystem || includesMaster;
+        });
+        renderAdventures(filteredAdventures); // Renderiza apenas as aventuras filtradas
+    });
 
     /**
-     * Listener para o envio do formulário de publicação de aventura.
+     * Listener para o formulário de publicação de aventura.
      */
     adventureForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Impede o recarregamento da página
-        
-        // CORREÇÃO CRÍTICA: Usa a variável 'currentUser' que é sempre atualizada, em vez de buscar na hora.
+        event.preventDefault();
         if (!currentUser) {
             alert('Você precisa estar logado para publicar.');
             return;
         }
-
         const formButton = adventureForm.querySelector('button');
         formButton.disabled = true;
         formButton.textContent = 'Publicando...';
-
-        // Lógica para upload de imagem
         const imageFile = document.getElementById('adventure-image').files[0];
         let imageUrl = null;
         if (imageFile) {
@@ -117,30 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (uploadError) {
                 console.error('Erro no upload:', uploadError);
                 alert('Houve um erro ao enviar a imagem.');
-                formButton.disabled = false;
-                formButton.textContent = 'Publicar Aventura';
+                formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
                 return;
             }
             const { data: publicUrlData } = supabaseClient.storage.from('adventure-images').getPublicUrl(filePath);
             imageUrl = publicUrlData.publicUrl;
         }
-
-        // Monta o objeto da nova aventura com os dados do formulário
         const formData = new FormData(adventureForm);
         const newAdventure = {
-            titulo: formData.get('titulo'),
-            sistema_rpg: formData.get('sistema_rpg'),
-            nome_mestre: formData.get('nome_mestre'),
-            vagas: parseInt(formData.get('vagas')),
-            descricao: formData.get('descricao'),
-            alerta_gatilho: formData.get('alerta_gatilho'),
-            tipo_jogo: formData.get('tipo_jogo'),
-            nivel: formData.get('nivel'),
-            user_id: currentUser.id, // USA O ID DO USUÁRIO LOGADO
-            image_url: imageUrl
+            titulo: formData.get('titulo'), sistema_rpg: formData.get('sistema_rpg'), nome_mestre: formData.get('nome_mestre'), vagas: parseInt(formData.get('vagas')), descricao: formData.get('descricao'), alerta_gatilho: formData.get('alerta_gatilho'), tipo_jogo: formData.get('tipo_jogo'), nivel: formData.get('nivel'), user_id: currentUser.id, image_url: imageUrl
         };
-
-        // Insere a nova aventura no banco de dados
         const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
         if (error) {
             console.error('Erro ao inserir aventura:', error);
@@ -148,26 +146,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert('Aventura publicada com sucesso!');
             adventureForm.reset();
-            loadAdventures(); // Recarrega a lista de aventuras para mostrar a nova
+            loadAdventures();
         }
-
-        // Reativa o botão do formulário
-        formButton.disabled = false;
-        formButton.textContent = 'Publicar Aventura';
+        formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
 
     // 4. INICIALIZAÇÃO DA PÁGINA
 
     /**
-     * Listener principal do Supabase. Reage a qualquer mudança de login (entrar, sair, recarregar a página).
-     * Esta é a correção mais importante.
+     * Listener principal do Supabase.
      */
     supabaseClient.auth.onAuthStateChange((event, session) => {
-        currentUser = session?.user || null; // Atualiza a variável global 'currentUser'
-        updateUI(currentUser); // Atualiza a interface com base no novo estado
+        currentUser = session?.user || null;
+        updateUI(currentUser);
     });
 
-    // Carrega as aventuras existentes assim que a página é aberta
     loadAdventures();
 });
