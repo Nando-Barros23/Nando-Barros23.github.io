@@ -38,10 +38,32 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .radio-group input { width: auto; }
 .btn-primario { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.2rem; font-size: 1.1rem; font-weight: bold; font-family: var(--fonte-label); transition: background-color 0.2s; background-color: var(--cor-primaria); color: #fff; text-decoration: none; text-align: center; }
 .btn-primario:hover { background-color: #b85b30; }
+#user-area { display: flex; align-items: center; gap: 1rem; }
 
-/* --- CÓDIGO CORRIGIDO PARA ALINHAR OS BOTÕES DO CABEÇALHO --- */
-#user-area {
-  display: flex;
-  align-items: center; /* Alinha os itens verticalmente ao centro */
-  gap: 1rem;          /* Define um espaço entre os botões */
+/* --- NOVOS ESTILOS PARA NOTIFICAÇÕES TOAST --- */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
+.toast {
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-family: var(--fonte-corpo);
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+.toast.success { background-color: #28a745; } /* Verde para sucesso */
+.toast.error { background-color: #dc3545; }   /* Vermelho para erro */
