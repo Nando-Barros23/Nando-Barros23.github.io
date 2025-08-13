@@ -1,5 +1,3 @@
-// Arquivo: script.js (Código Completo com Posição do Ícone Corrigida)
-
 document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
     const { createClient } = supabase;
@@ -7,34 +5,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Seletores de elementos do HTML
     const adventuresGrid = document.getElementById('adventures-grid');
     const adventureForm = document.getElementById('adventure-form');
     const userArea = document.getElementById('user-area');
     const publishSection = document.querySelector('.painel-lateral');
     const searchBar = document.getElementById('search-bar');
 
-    // Variáveis globais
     let currentUser = null;
     let allAdventures = [];
 
     // 2. FUNÇÕES PRINCIPAIS
 
     /**
-     * Renderiza um array de aventuras na tela.
-     * @param {Array} adventures - O array de aventuras a ser exibido.
+     * NOVA FUNÇÃO: Mostra uma notificação toast na tela.
+     * @param {string} message - A mensagem a ser exibida.
+     * @param {string} type - O tipo de toast ('success' ou 'error').
      */
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`; // e.g., 'toast success'
+        toast.textContent = message;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000); // O toast some depois de 3 segundos
+    }
+
     function renderAdventures(adventures) {
         adventuresGrid.innerHTML = '';
         if (adventures.length === 0) {
-            adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada.</p>';
+            // Se a barra de pesquisa estiver vazia, significa que não há aventuras. Senão, é um resultado de busca.
+            adventuresGrid.innerHTML = searchBar.value 
+                ? '<p>Nenhuma aventura encontrada com este termo.</p>'
+                : '<p>Ainda não há nenhuma aventura publicada. Seja o primeiro!</p>';
         }
         adventures.forEach(adventure => {
             const card = document.createElement('div');
             card.classList.add('adventure-card');
             const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
-            
-            // A ÚNICA MUDANÇA ESTÁ AQUI DENTRO, NA LINHA DO ALERTA DE GATILHO
             card.innerHTML = `
                 <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image">
                 <div class="adventure-card-content">
@@ -53,36 +69,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Carrega as aventuras do banco de dados e as exibe.
-     */
     async function loadAdventures() {
+        // A mensagem "Carregando..." já está no HTML.
         const { data, error } = await supabaseClient.from('aventuras').select('*').order('created_at', { ascending: false });
         if (error) {
             console.error('Erro ao buscar aventuras:', error);
+            adventuresGrid.innerHTML = '<p style="color: red;">Erro ao carregar as aventuras. Tente recarregar a página.</p>';
             return;
         }
         allAdventures = data;
         renderAdventures(allAdventures);
     }
 
-    /**
-     * Atualiza a interface do usuário com base no estado de login.
-     */
     async function updateUI(user) {
         if (user) {
             const { data: profile, error } = await supabaseClient.from('profiles').select('username, role').eq('id', user.id).single();
-            if (error && error.code !== 'PGRST116') {
-                console.error("Erro ao buscar perfil:", error);
-            }
+            if (error && error.code !== 'PGRST116') { console.error("Erro ao buscar perfil:", error); }
             const displayName = profile?.username || user.email.split('@')[0];
             userArea.innerHTML = `
                 <a href="profile.html" class="btn-primario">Olá, ${displayName}</a>
                 <button id="logout-button" class="btn-primario">Sair</button>
             `;
-            document.getElementById('logout-button').addEventListener('click', () => {
-                supabaseClient.auth.signOut();
-            });
+            document.getElementById('logout-button').addEventListener('click', () => { supabaseClient.auth.signOut(); });
             if (profile && profile.role === 'master') {
                 publishSection.style.display = 'block';
             } else {
@@ -95,10 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. EVENT LISTENERS
-
-    /**
-     * Listener para o campo de pesquisa. Filtra as aventuras em tempo real.
-     */
+    
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredAdventures = allAdventures.filter(adventure => {
@@ -110,13 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAdventures(filteredAdventures);
     });
 
-    /**
-     * Listener para o formulário de publicação de aventura.
-     */
     adventureForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!currentUser) {
-            alert('Você precisa estar logado para publicar.');
+            showToast('Você precisa estar logado para publicar.', 'error'); // MUDANÇA: alert -> showToast
             return;
         }
         const formButton = adventureForm.querySelector('button');
@@ -129,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { error: uploadError } = await supabaseClient.storage.from('adventure-images').upload(filePath, imageFile);
             if (uploadError) {
                 console.error('Erro no upload:', uploadError);
-                alert('Houve um erro ao enviar a imagem.');
+                showToast('Houve um erro ao enviar a imagem.', 'error'); // MUDANÇA: alert -> showToast
                 formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
                 return;
             }
@@ -143,18 +145,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
         if (error) {
             console.error('Erro ao inserir aventura:', error);
-            alert('Ocorreu um erro ao publicar sua aventura.');
+            showToast('Ocorreu um erro ao publicar sua aventura.', 'error'); // MUDANÇA: alert -> showToast
         } else {
-            alert('Aventura publicada com sucesso!');
+            showToast('Aventura publicada com sucesso!', 'success'); // MUDANÇA: alert -> showToast
             adventureForm.reset();
             loadAdventures();
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
-
     // 4. INICIALIZAÇÃO DA PÁGINA
-
     supabaseClient.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
         updateUI(currentUser);
