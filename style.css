@@ -40,7 +40,7 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .btn-primario:hover { background-color: #b85b30; }
 #user-area { display: flex; align-items: center; gap: 1rem; }
 
-/* --- NOVOS ESTILOS PARA NOTIFICAÇÕES TOAST --- */
+/* --- ESTILOS PARA NOTIFICAÇÕES TOAST --- */
 #toast-container {
     position: fixed;
     bottom: 20px;
@@ -67,3 +67,10 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 }
 .toast.success { background-color: #28a745; } /* Verde para sucesso */
 .toast.error { background-color: #dc3545; }   /* Vermelho para erro */
+
+/* --- NOVO ESTILO PARA OS CARDS CLICÁVEIS --- */
+.adventure-card-link {
+    text-decoration: none; /* Remove o sublinhado do link */
+    color: inherit;      /* Faz o texto do card herdar a cor padrão, em vez de ficar azul */
+    display: block;      /* Garante que o link ocupe todo o espaço do card */
+}
