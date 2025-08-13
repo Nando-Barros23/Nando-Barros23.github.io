@@ -1,4 +1,4 @@
-// Arquivo: script.js (Código Completo com Barra de Pesquisa)
+// Arquivo: script.js (Código Completo com Ícone no Alerta de Gatilho)
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Variáveis globais
     let currentUser = null;
-    let allAdventures = []; // Array para guardar todas as aventuras carregadas
+    let allAdventures = [];
 
     // 2. FUNÇÕES PRINCIPAIS
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {Array} adventures - O array de aventuras a ser exibido.
      */
     function renderAdventures(adventures) {
-        adventuresGrid.innerHTML = ''; // Limpa a grade antes de adicionar novos cards
+        adventuresGrid.innerHTML = '';
         if (adventures.length === 0) {
             adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada.</p>';
         }
@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.classList.add('adventure-card');
             const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
+            
+            // A ÚNICA MUDANÇA ESTÁ AQUI DENTRO, NA LINHA DO ALERTA DE GATILHO
             card.innerHTML = `
                 <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image">
                 <div class="adventure-card-content">
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>Tipo:</strong> ${adventure.tipo_jogo}</p>
                     <p><strong>Nível:</strong> ${adventure.nivel}</p>
                     <p><strong>Vagas:</strong> ${adventure.vagas}</p>
-                    <p><strong>Alerta de Gatilho:</strong> ${adventure.alerta_gatilho}</p>
+                    <p><strong>⚠️ Alerta de Gatilho:</strong> ${adventure.alerta_gatilho}</p>
                     <br>
                     <p>${adventure.descricao}</p>
                 </div>
@@ -60,8 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erro ao buscar aventuras:', error);
             return;
         }
-        allAdventures = data; // Salva os dados na variável global
-        renderAdventures(allAdventures); // Chama a função de renderização
+        allAdventures = data;
+        renderAdventures(allAdventures);
     }
 
     /**
@@ -92,21 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. EVENT LISTENERS (OUVINTES DE EVENTOS)
-    
+    // 3. EVENT LISTENERS
+
     /**
      * Listener para o campo de pesquisa. Filtra as aventuras em tempo real.
      */
     searchBar.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase(); // Pega o texto digitado em minúsculas
+        const searchTerm = e.target.value.toLowerCase();
         const filteredAdventures = allAdventures.filter(adventure => {
-            // Verifica se o texto de busca existe no título, sistema ou nome do mestre
             const includesTitle = adventure.titulo.toLowerCase().includes(searchTerm);
             const includesSystem = adventure.sistema_rpg.toLowerCase().includes(searchTerm);
             const includesMaster = adventure.nome_mestre.toLowerCase().includes(searchTerm);
             return includesTitle || includesSystem || includesMaster;
         });
-        renderAdventures(filteredAdventures); // Renderiza apenas as aventuras filtradas
+        renderAdventures(filteredAdventures);
     });
 
     /**
@@ -154,9 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. INICIALIZAÇÃO DA PÁGINA
 
-    /**
-     * Listener principal do Supabase.
-     */
     supabaseClient.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
         updateUI(currentUser);
