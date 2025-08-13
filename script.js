@@ -1,4 +1,4 @@
-// Arquivo: script.js (Código Completo com Ícone no Alerta de Gatilho)
+// Arquivo: script.js (Código Completo com Posição do Ícone Corrigida)
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>Tipo:</strong> ${adventure.tipo_jogo}</p>
                     <p><strong>Nível:</strong> ${adventure.nivel}</p>
                     <p><strong>Vagas:</strong> ${adventure.vagas}</p>
-                    <p><strong>⚠️ Alerta de Gatilho:</strong> ${adventure.alerta_gatilho}</p>
+                    <p><strong>Alerta de Gatilho ⚠️:</strong> ${adventure.alerta_gatilho}</p>
                     <br>
                     <p>${adventure.descricao}</p>
                 </div>
