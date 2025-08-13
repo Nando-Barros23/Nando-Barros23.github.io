@@ -36,5 +36,21 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .radio-group { display: flex; gap: 1.5rem; align-items: center; }
 .radio-group label { margin-bottom: 0; font-weight: normal; font-family: var(--fonte-corpo); color: var(--cor-texto-principal); }
 .radio-group input { width: auto; }
-.btn-primario { cursor: pointer; width: 100%; border: none; border-radius: 4px; padding: 0.8rem 1.2rem; font-size: 1.1rem; font-weight: bold; font-family: var(--fonte-label); transition: background-color 0.2s; background-color: var(--cor-primaria); color: #fff; }
+.btn-primario { cursor: pointer; width: 100%; border: none; border-radius: 4px; padding: 0.8rem 1.2rem; font-size: 1.1rem; font-weight: bold; font-family: var(--fonte-label); transition: background-color 0.2s; background-color: var(--cor-primaria); color: #fff; text-decoration: none; text-align: center; }
 .btn-primario:hover { background-color: #b85b30; }
+
+/* --- CÓDIGO PARA ALINHAR OS BOTÕES DO CABEÇALHO --- */
+#user-area {
+  display: flex; /* Ativa o modo Flexbox */
+  align-items: stretch; /* Faz os itens esticarem para ter a mesma altura */
+  gap: 1rem; /* Mantém o espaçamento que você já tinha */
+}
+
+#user-area a,
+#user-area button {
+  display: flex; /* Faz os próprios botões se comportarem como flex containers */
+  align-items: center; /* Centraliza o texto dentro deles */
+  /* height: 100%; Retirado para um melhor alinhamento com padding */
+  padding-top: 0.8rem; /* Garante padding consistente */
+  padding-bottom: 0.8rem; /* Garante padding consistente */
+}
