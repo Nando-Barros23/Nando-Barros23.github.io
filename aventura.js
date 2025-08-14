@@ -51,36 +51,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function renderActionButtons() {
         if (!currentUser || !adventureData) return;
-        const actionArea = document.getElementById('action-buttons-area');
+        
+        const titleContainer = document.getElementById('title-container');
+        const playerActionArea = document.getElementById('action-buttons-area');
+        
+        // Limpa áreas de botões antes de renderizar
+        playerActionArea.innerHTML = '';
+        const existingDeleteBtn = document.getElementById('delete-adventure-btn');
+        if(existingDeleteBtn) existingDeleteBtn.remove();
         
         if (currentUser.id === adventureData.user_id) {
-            actionArea.innerHTML = `<button id="delete-adventure-btn" class="btn-primario btn-delete-adventure">Deletar Aventura</button>`;
-            document.getElementById('delete-adventure-btn').addEventListener('click', handleDeleteAdventure);
+            // É o mestre da aventura: Adiciona o botão de deletar ao lado do título.
+            const deleteButton = document.createElement('button');
+            deleteButton.id = 'delete-adventure-btn';
+            deleteButton.className = 'btn-icon-delete';
+            deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Ícone da lixeira
+            deleteButton.title = 'Deletar Aventura'; // Dica ao passar o mouse
+            titleContainer.appendChild(deleteButton);
+            deleteButton.addEventListener('click', handleDeleteAdventure);
         } else {
+            // É um jogador: Adiciona o botão de inscrição na sua própria área.
             const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
             if (subscription) {
-                actionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
+                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
             } else {
-                actionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
             }
             document.getElementById('subscribe-btn').addEventListener('click', handleSubscription);
         }
     }
     
-    // ==================================================================
-    // FUNÇÃO DE COMENTÁRIOS COMPLETAMENTE REFEITA PARA SER MAIS ROBUSTA
-    // ==================================================================
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
-        commentsList.innerHTML = '<p>Carregando comentários...</p>'; // Estado de carregamento
+        commentsList.innerHTML = '<p>Carregando comentários...</p>';
 
-        // Passo 1: Buscar todos os comentários da aventura
-        const { data: comments, error: commentsError } = await supabaseClient
-            .from('comentarios')
-            .select('*')
-            .eq('aventura_id', adventureId)
-            .order('created_at', { ascending: true });
-
+        const { data: comments, error: commentsError } = await supabaseClient.from('comentarios').select('*').eq('aventura_id', adventureId).order('created_at', { ascending: true });
         if (commentsError) {
             console.error("Erro ao buscar comentários:", commentsError);
             commentsList.innerHTML = '<p style="color: red;">Não foi possível carregar os comentários.</p>';
@@ -92,40 +97,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Passo 2: Extrair os IDs únicos dos autores dos comentários
         const userIds = [...new Set(comments.map(comment => comment.user_id))];
+        const { data: profiles, error: profilesError } = await supabaseClient.from('profiles').select('id, username').in('id', userIds);
+        if (profilesError) { console.error("Erro ao buscar perfis:", profilesError); }
 
-        // Passo 3: Buscar os perfis (nomes de usuário) para esses IDs
-        const { data: profiles, error: profilesError } = await supabaseClient
-            .from('profiles')
-            .select('id, username')
-            .in('id', userIds);
-        
-        if (profilesError) {
-            console.error("Erro ao buscar perfis:", profilesError);
-            // Mesmo com erro, podemos continuar e mostrar 'Usuário' como nome
-        }
-
-        // Passo 4: Criar um "mapa" para fácil acesso: userId -> username
         const profileMap = new Map();
-        if (profiles) {
-            profiles.forEach(profile => {
-                profileMap.set(profile.id, profile.username);
-            });
-        }
+        if (profiles) { profiles.forEach(profile => { profileMap.set(profile.id, profile.username); }); }
         
-        // Passo 5: Renderizar os comentários, agora com os nomes corretos
         commentsList.innerHTML = '';
         comments.forEach(comment => {
             const commentEl = document.createElement('div');
             commentEl.className = 'comment';
-            const authorName = profileMap.get(comment.user_id) || 'Usuário'; // Pega o nome do mapa ou usa um padrão
+            const authorName = profileMap.get(comment.user_id) || 'Usuário';
             const canDelete = currentUser && (currentUser.id === comment.user_id || currentUser.id === adventureData.user_id);
             
             commentEl.innerHTML = `
                 <div class="comment-header">
                     <span class="comment-author">${authorName}</span>
-                    ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}">Deletar</button>` : ''}
+                    ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}" title="Deletar Comentário"><i class="fas fa-trash-alt"></i></button>` : ''}
                 </div>
                 <p class="comment-content">${comment.content}</p>
             `;
@@ -133,7 +122,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         document.querySelectorAll('.comment-delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteComment));
     }
-
 
     function renderCommentForm() {
         const container = document.getElementById('comment-form-container');
@@ -178,7 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     async function handleDeleteComment(e) {
-        const commentId = e.target.dataset.commentId;
+        // e.currentTarget para garantir que pegamos o botão, mesmo que o clique seja no ícone dentro dele
+        const commentId = e.currentTarget.dataset.commentId;
         if (!confirm('Tem certeza que deseja deletar este comentário?')) return;
         
         const { error } = await supabaseClient.from('comentarios').delete().eq('id', commentId);
