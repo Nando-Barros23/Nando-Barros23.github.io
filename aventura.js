@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             actionArea.innerHTML = `<button id="delete-adventure-btn" class="btn-primario btn-delete-adventure">Deletar Aventura</button>`;
             document.getElementById('delete-adventure-btn').addEventListener('click', handleDeleteAdventure);
         } else {
-            const { data: subscription, error } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
+            const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
             if (subscription) {
                 actionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
             } else {
@@ -67,40 +67,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    // ==================================================================
+    // FUNÇÃO DE COMENTÁRIOS COMPLETAMENTE REFEITA PARA SER MAIS ROBUSTA
+    // ==================================================================
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
-        
-        // MUDANÇA AQUI: Trocado para 'profiles!left(username)' para garantir que todos os comentários apareçam.
-        const { data: comments, error } = await supabaseClient
+        commentsList.innerHTML = '<p>Carregando comentários...</p>'; // Estado de carregamento
+
+        // Passo 1: Buscar todos os comentários da aventura
+        const { data: comments, error: commentsError } = await supabaseClient
             .from('comentarios')
-            .select('*, profile:profiles!left(username)') // LINHA CORRIGIDA
+            .select('*')
             .eq('aventura_id', adventureId)
             .order('created_at', { ascending: true });
-        
-        if(error) { console.error("Erro ao buscar comentários:", error); return; }
 
-        commentsList.innerHTML = '';
-        if (comments.length > 0) {
-            comments.forEach(comment => {
-                const commentEl = document.createElement('div');
-                commentEl.className = 'comment';
-                const authorName = comment.profile?.username || 'Usuário'; // Se não tiver perfil, mostra 'Usuário'
-                const canDelete = currentUser && (currentUser.id === comment.user_id || currentUser.id === adventureData.user_id);
-                
-                commentEl.innerHTML = `
-                    <div class="comment-header">
-                        <span class="comment-author">${authorName}</span>
-                        ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}">Deletar</button>` : ''}
-                    </div>
-                    <p class="comment-content">${comment.content}</p>
-                `;
-                commentsList.appendChild(commentEl);
-            });
-            document.querySelectorAll('.comment-delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteComment));
-        } else {
-            commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
+        if (commentsError) {
+            console.error("Erro ao buscar comentários:", commentsError);
+            commentsList.innerHTML = '<p style="color: red;">Não foi possível carregar os comentários.</p>';
+            return;
         }
+
+        if (comments.length === 0) {
+            commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
+            return;
+        }
+
+        // Passo 2: Extrair os IDs únicos dos autores dos comentários
+        const userIds = [...new Set(comments.map(comment => comment.user_id))];
+
+        // Passo 3: Buscar os perfis (nomes de usuário) para esses IDs
+        const { data: profiles, error: profilesError } = await supabaseClient
+            .from('profiles')
+            .select('id, username')
+            .in('id', userIds);
+        
+        if (profilesError) {
+            console.error("Erro ao buscar perfis:", profilesError);
+            // Mesmo com erro, podemos continuar e mostrar 'Usuário' como nome
+        }
+
+        // Passo 4: Criar um "mapa" para fácil acesso: userId -> username
+        const profileMap = new Map();
+        if (profiles) {
+            profiles.forEach(profile => {
+                profileMap.set(profile.id, profile.username);
+            });
+        }
+        
+        // Passo 5: Renderizar os comentários, agora com os nomes corretos
+        commentsList.innerHTML = '';
+        comments.forEach(comment => {
+            const commentEl = document.createElement('div');
+            commentEl.className = 'comment';
+            const authorName = profileMap.get(comment.user_id) || 'Usuário'; // Pega o nome do mapa ou usa um padrão
+            const canDelete = currentUser && (currentUser.id === comment.user_id || currentUser.id === adventureData.user_id);
+            
+            commentEl.innerHTML = `
+                <div class="comment-header">
+                    <span class="comment-author">${authorName}</span>
+                    ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}">Deletar</button>` : ''}
+                </div>
+                <p class="comment-content">${comment.content}</p>
+            `;
+            commentsList.appendChild(commentEl);
+        });
+        document.querySelectorAll('.comment-delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteComment));
     }
+
 
     function renderCommentForm() {
         const container = document.getElementById('comment-form-container');
@@ -136,9 +169,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!content.trim()) return;
 
         const { error } = await supabaseClient.from('comentarios').insert({ user_id: currentUser.id, aventura_id: adventureId, content: content });
-        if (error) { showToast('Erro ao enviar comentário.', 'error'); } else {
+        if (error) {
+            showToast('Erro ao enviar comentário.', 'error');
+        } else {
             document.getElementById('comment-text').value = '';
-            renderComments(); // Atualiza a lista de comentários
+            renderComments();
         }
     }
     
@@ -183,20 +218,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         adventureData = await fetchAdventureDetails();
         if (adventureData) {
             displayAdventureDetails(adventureData);
-            renderActionButtons();
-            renderComments();
+            await renderActionButtons();
+            await renderComments();
             renderCommentForm();
         }
     } else {
         document.getElementById('adventure-detail-main').innerHTML = '<h2>Nenhuma aventura especificada.</h2>';
     }
     
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-        // Quando o estado do login muda, atualizamos toda a UI da página de detalhes
-        updateHeaderUI(session?.user).then(() => {
-            renderActionButtons();
-            renderComments();
+    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+        await updateHeaderUI(session?.user);
+        if (adventureData) {
+            await renderActionButtons();
+            await renderComments();
             renderCommentForm();
-        });
+        }
     });
 });
