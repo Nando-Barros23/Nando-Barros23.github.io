@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Lembre-se de usar sua chave correta aqui
+    // Lembre-se de colar sua chave anon publica correta aqui!
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; 
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Variáveis globais
@@ -45,31 +46,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==================================================================
-    // NOVA ABORDAGEM: DELEGAÇÃO DE EVENTOS
-    // O "ouvinte" fica no container principal, que nunca é destruído.
+    // DELEGAÇÃO DE EVENTOS
     // ==================================================================
     mainContainer.addEventListener('submit', (e) => {
-        // Verifica se o evento de submit veio do formulário de comentário
         if (e.target && e.target.id === 'comment-form') {
             handleNewComment(e);
         }
     });
     
     mainContainer.addEventListener('click', (e) => {
-        // Verifica se o clique foi em um botão de deletar comentário
-        if (e.target && e.target.closest('.comment-delete-btn')) {
-            handleDeleteComment(e);
+        const targetButton = e.target.closest('button');
+        if (!targetButton) return;
+
+        if (targetButton.matches('.comment-delete-btn')) {
+            handleDeleteComment(targetButton);
         }
-        // Verifica se o clique foi no botão de deletar aventura
-        if (e.target && e.target.closest('#delete-adventure-btn')) {
+        if (targetButton.matches('#delete-adventure-btn')) {
              handleDeleteAdventure();
         }
-        // Verifica se o clique foi no botão de inscrição
-        if (e.target && e.target.closest('#subscribe-btn')) {
+        if (targetButton.matches('#subscribe-btn')) {
             handleSubscription();
         }
     });
-
 
     // Inicia a página
     initializePage();
@@ -101,16 +99,89 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
+    // FUNÇÃO QUE ESTAVA FALTANDO
     function displayAdventureDetails(data) {
-        // ... (código sem alterações)
+        document.title = `${data.titulo} - Dados & Calangos`;
+        document.getElementById('adventure-title').textContent = data.titulo;
+        document.getElementById('adventure-image').src = data.image_url || 'https://i.imgur.com/Q3j5eH0.png';
+        document.getElementById('master-name').textContent = data.nome_mestre;
+        document.getElementById('system-name').textContent = data.sistema_rpg;
+        document.getElementById('game-type').textContent = data.tipo_jogo;
+        document.getElementById('level').textContent = data.nivel;
+        document.getElementById('slots').textContent = data.vagas;
+        document.getElementById('trigger-warning').textContent = data.alerta_gatilho;
+        document.getElementById('adventure-description').textContent = data.descricao;
     }
 
+    // FUNÇÃO QUE ESTAVA FALTANDO
     async function renderActionButtons() {
-        // ... (código sem alterações)
+        const titleContainer = document.getElementById('title-container');
+        const playerActionArea = document.getElementById('action-buttons-area');
+        if (!playerActionArea || !titleContainer) return;
+
+        playerActionArea.innerHTML = '';
+        const existingDeleteBtn = document.getElementById('delete-adventure-btn');
+        if (existingDeleteBtn) existingDeleteBtn.remove();
+        
+        if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
+            const deleteButton = document.createElement('button');
+            deleteButton.id = 'delete-adventure-btn';
+            deleteButton.className = 'btn-icon-delete';
+            deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteButton.title = 'Deletar Aventura';
+            titleContainer.appendChild(deleteButton);
+        } else if (currentUser && adventureData) {
+            const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
+            if (subscription) {
+                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
+            } else {
+                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+            }
+        }
     }
-    
+
+    // FUNÇÃO QUE ESTAVA FALTANDO
     async function renderComments() {
-        // ... (código sem alterações)
+        const commentsList = document.getElementById('comments-list');
+        if (!commentsList) return;
+        commentsList.innerHTML = '<p>Carregando comentários...</p>';
+
+        const { data: comments, error: commentsError } = await supabaseClient.from('comentarios').select('*').eq('aventura_id', adventureId).order('created_at', { ascending: true });
+        if (commentsError) {
+            console.error("Erro ao buscar comentários:", commentsError);
+            commentsList.innerHTML = '<p style="color: red;">Não foi possível carregar os comentários.</p>';
+            return;
+        }
+        if (comments.length === 0) {
+            commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
+            return;
+        }
+        const userIds = [...new Set(comments.map(comment => comment.user_id))];
+        const { data: profiles, error: profilesError } = await supabaseClient.from('profiles').select('id, username, avatar_url').in('id', userIds);
+        if (profilesError) { console.error("Erro ao buscar perfis:", profilesError); }
+
+        const profileMap = new Map();
+        if (profiles) { profiles.forEach(profile => { profileMap.set(profile.id, profile); }); }
+
+        commentsList.innerHTML = '';
+        comments.forEach(comment => {
+            const commentEl = document.createElement('div');
+            commentEl.className = 'comment';
+            const authorProfile = profileMap.get(comment.user_id);
+            const authorName = authorProfile?.username || 'Usuário';
+            const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
+            const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.user_id));
+            commentEl.innerHTML = `
+                <div class="comment-avatar"><img src="${authorAvatar}" alt="Avatar de ${authorName}"></div>
+                <div class="comment-body">
+                    <div class="comment-header">
+                        <span class="comment-author">${authorName}</span>
+                        ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}" title="Deletar Comentário"><i class="fas fa-trash-alt"></i></button>` : ''}
+                    </div>
+                    <p class="comment-content">${comment.content}</p>
+                </div>`;
+            commentsList.appendChild(commentEl);
+        });
     }
 
     function renderCommentForm() {
@@ -123,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button type="submit" class="btn-primario">Comentar</button>
                 </form>
             `;
-            // REMOVIDO: O event listener não é mais adicionado aqui.
         } else {
             container.innerHTML = '<p>Você precisa estar <a href="login.html">logado</a> para comentar.</p>';
         }
@@ -142,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleNewComment(e) {
-        e.preventDefault(); // Agora isso vai funcionar de forma confiável!
+        e.preventDefault();
         const content = document.getElementById('comment-text').value;
         if (!content.trim()) return;
         
@@ -159,8 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formButton.disabled = false;
     }
     
-    async function handleDeleteComment(e) {
-        const button = e.target.closest('.comment-delete-btn');
+    async function handleDeleteComment(button) {
         const commentId = button.dataset.commentId;
         if (!confirm('Tem certeza que deseja deletar este comentário?')) return;
         
@@ -192,6 +261,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-// O conteúdo das funções omitidas (displayAdventureDetails, etc.) não mudou,
-// mas está incluído no bloco de código completo acima para garantir que funcione.
