@@ -60,24 +60,25 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .btn-icon-delete { background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; flex-shrink: 0; }
 .btn-icon-delete:hover { background-color: #c82333; }
 
-/* --- NOVOS ESTILOS PARA COMENTÁRIOS COM AVATAR --- */
+/* --- ESTILOS PARA COMENTÁRIOS COM AVATAR --- */
 .comment {
-    background-color: var(--cor-fundo);
-    padding: 1rem;
-    border-radius: 4px;
+    /* MUDANÇA AQUI: Fundo transparente e borda inferior para separar */
+    background-color: transparent;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--cor-borda);
     margin-bottom: 1rem;
-    display: flex; /* Ativa o Flexbox para alinhar o avatar */
-    gap: 1rem; /* Espaço entre o avatar e o conteúdo */
-    align-items: flex-start; /* Alinha o avatar no topo */
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
 }
 .comment-avatar img {
     width: 40px;
     height: 40px;
-    border-radius: 50%; /* Deixa a imagem redonda */
-    object-fit: cover; /* Evita que a imagem distorça */
+    border-radius: 50%;
+    object-fit: cover;
 }
 .comment-body {
-    flex-grow: 1; /* Faz o corpo do comentário ocupar o resto do espaço */
+    flex-grow: 1;
 }
 .comment-header {
     display: flex;
