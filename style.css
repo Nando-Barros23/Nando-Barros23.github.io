@@ -38,19 +38,13 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .radio-group input { width: auto; }
 .btn-primario { cursor: pointer; border: none; border-radius: 4px; padding: 0.8rem 1.2rem; font-size: 1.1rem; font-weight: bold; font-family: var(--fonte-label); transition: background-color 0.2s; background-color: var(--cor-primaria); color: #fff; text-decoration: none; text-align: center; }
 .btn-primario:hover { background-color: #b85b30; }
-
-/* ESTILOS DE TOAST E ALINHAMENTO */
 #user-area { display: flex; align-items: center; gap: 1rem; }
 #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
 .toast { padding: 15px 20px; border-radius: 8px; color: #fff; font-family: var(--fonte-corpo); font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transform: translateX(100%); transition: all 0.4s ease; }
 .toast.show { opacity: 1; transform: translateX(0); }
 .toast.success { background-color: #28a745; }
 .toast.error { background-color: #dc3545; }
-
-/* ESTILOS DOS CARDS CLICÁVEIS */
 .adventure-card-link { text-decoration: none; color: inherit; display: block; }
-
-/* NOVOS ESTILOS PARA a pagina aventura.html */
 .btn-inscricao { background-color: #28a745; margin-top: 2rem; width: auto; }
 .btn-inscricao.inscrito { background-color: #ffc107; color: #212529; }
 .btn-delete-adventure { background-color: #dc3545; margin-top: 2rem; width: auto; }
@@ -62,3 +56,9 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 #comment-form textarea { width: 100%; }
 #comment-form button { width: auto; }
 #action-buttons-area { display: flex; justify-content: flex-start; }
+
+/* --- NOVO ESTILO PARA O PLACEHOLDER DO COMENTÁRIO --- */
+#comment-text::placeholder {
+  font-family: var(--fonte-label);
+  color: #999;
+}
