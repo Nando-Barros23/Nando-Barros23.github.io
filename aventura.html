@@ -8,22 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        .adventure-detail-container { max-width: 900px; margin: 2rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; }
-        .adventure-detail-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
-        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .detail-item p { margin: 0; }
-        .btn-inscricao { background-color: #28a745; margin-top: 2rem; }
-        .btn-inscricao.inscrito { background-color: #ffc107; color: #212529; }
-        .btn-delete-adventure { background-color: #dc3545; margin-left: 1rem; }
-        .comments-section, .subscription-section { margin-top: 2rem; }
-        .comment { background-color: var(--cor-fundo); padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
-        .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-        .comment-author { font-weight: bold; }
-        .comment-delete-btn { background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.9rem; }
-        #comment-form textarea { width: 100%; }
-        #comment-form button { width: auto; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -33,7 +18,10 @@
     </header>
 
     <main id="adventure-detail-main" class="adventure-detail-container">
-        <h2 id="adventure-title">Carregando aventura...</h2>
+        <div id="title-container">
+            <h2 id="adventure-title">Carregando aventura...</h2>
+            </div>
+
         <img src="https://i.imgur.com/Q3j5eH0.png" alt="Imagem da Aventura" id="adventure-image" class="adventure-detail-image">
         
         <div class="detail-grid">
