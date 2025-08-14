@@ -2,7 +2,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+    
+    // ATENÇÃO: COLE A CHAVE CORRETA QUE VOCÊ COPIOU DO PAINEL DO SUPABASE AQUI DENTRO DAS ASPAS
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; 
+
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const userArea = document.getElementById('user-area');
@@ -95,22 +98,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const userIds = [...new Set(comments.map(comment => comment.user_id))];
-        
-        // MUDANÇA: Buscar também a 'avatar_url' dos perfis
-        const { data: profiles, error: profilesError } = await supabaseClient
-            .from('profiles')
-            .select('id, username, avatar_url')
-            .in('id', userIds);
-        
+        const { data: profiles, error: profilesError } = await supabaseClient.from('profiles').select('id, username, avatar_url').in('id', userIds);
         if (profilesError) { console.error("Erro ao buscar perfis:", profilesError); }
 
-        // MUDANÇA: Guardar o objeto de perfil inteiro para ter acesso ao avatar
         const profileMap = new Map();
-        if (profiles) {
-            profiles.forEach(profile => {
-                profileMap.set(profile.id, profile);
-            });
-        }
+        if (profiles) { profiles.forEach(profile => { profileMap.set(profile.id, profile); }); }
         
         commentsList.innerHTML = '';
         comments.forEach(comment => {
@@ -119,10 +111,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const authorProfile = profileMap.get(comment.user_id);
             const authorName = authorProfile?.username || 'Usuário';
-            const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'; // Avatar padrão
+            const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
             const canDelete = currentUser && (currentUser.id === comment.user_id || currentUser.id === adventureData.user_id);
             
-            // MUDANÇA: Nova estrutura do HTML para incluir o avatar
             commentEl.innerHTML = `
                 <div class="comment-avatar">
                     <img src="${authorAvatar}" alt="Avatar de ${authorName}">
@@ -200,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 });
-
-// Para evitar repetição, as funções que não mudaram foram omitidas aqui, mas estão no código completo que você deve copiar.
-// Por favor, copie o bloco de código inteiro para garantir que tudo funcione.
+// Para não sobrecarregar, omiti o conteúdo das funções que não mudam.
+// O importante é que você copie e cole o bloco de código inteiro para garantir
+// que a estrutura e as chamadas de função estejam corretas, e principalmente
+// para corrigir a SUPABASE_ANON_KEY no topo do arquivo.
