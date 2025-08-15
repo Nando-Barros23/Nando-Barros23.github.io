@@ -1,10 +1,7 @@
-// Arquivo: script.js (Completo com links para a página de detalhes)
-
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. INICIALIZAÇÃO E VARIÁVEIS
+document.addEventListener('DOMContentLoaded', async () => {
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- CONFIRME SUA CHAVE AQUI
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const adventuresGrid = document.getElementById('adventures-grid');
@@ -16,20 +13,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUser = null;
     let allAdventures = [];
 
-    // 2. FUNÇÕES PRINCIPAIS
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => { toast.classList.add('show'); }, 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000);
+    }
 
     function renderAdventures(adventures) {
         adventuresGrid.innerHTML = '';
         if (adventures.length === 0) {
-            adventuresGrid.innerHTML = searchBar.value 
+            adventuresGrid.innerHTML = searchBar.value
                 ? '<p>Nenhuma aventura encontrada com este termo.</p>'
                 : '<p>Ainda não há nenhuma aventura publicada. Seja o primeiro!</p>';
         }
         adventures.forEach(adventure => {
-            // MUDANÇA AQUI: O card agora é envolvido por uma tag <a>
             const cardLink = document.createElement('a');
-            cardLink.href = `aventura.html?id=${adventure.id}`; // O link passa o ID da aventura
-            cardLink.classList.add('adventure-card-link'); // Classe para estilização
+            cardLink.href = `aventura.html?id=${adventure.id}`;
+            cardLink.classList.add('adventure-card-link');
 
             const card = document.createElement('div');
             card.classList.add('adventure-card');
@@ -40,21 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h4>${adventure.titulo}</h4>
                     <p><strong>Mestre:</strong> ${adventure.nome_mestre}</p>
                     <p><strong>Sistema:</strong> ${adventure.sistema_rpg}</p>
-                    <p><strong>Tipo:</strong> ${adventure.tipo_jogo}</p>
-                    <p><strong>Nível:</strong> ${adventure.nivel}</p>
-                    <p><strong>Vagas:</strong> ${adventure.vagas}</p>
                     <p><strong>Alerta de Gatilho ⚠️:</strong> ${adventure.alerta_gatilho}</p>
-                    <br>
-                    <p>${adventure.descricao}</p>
                 </div>
             `;
-            
-            cardLink.appendChild(card); // O card é colocado dentro do link
-            adventuresGrid.appendChild(cardLink); // O link é adicionado à grade
+            cardLink.appendChild(card);
+            adventuresGrid.appendChild(cardLink);
         });
     }
 
     async function loadAdventures() {
+        adventuresGrid.innerHTML = '<p>Carregando aventuras...</p>';
         const { data, error } = await supabaseClient.from('aventuras').select('*').order('created_at', { ascending: false });
         if (error) {
             console.error('Erro ao buscar aventuras:', error);
@@ -69,13 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             const { data: profile, error } = await supabaseClient.from('profiles').select('username, role').eq('id', user.id).single();
             if (error && error.code !== 'PGRST116') { console.error("Erro ao buscar perfil:", error); }
+            
             const displayName = profile?.username || user.email.split('@')[0];
             userArea.innerHTML = `
                 <a href="profile.html" class="btn-primario">Olá, ${displayName}</a>
                 <button id="logout-button" class="btn-primario">Sair</button>
             `;
             document.getElementById('logout-button').addEventListener('click', () => { supabaseClient.auth.signOut(); });
-            if (profile && profile.role === 'master') {
+            
+            if (profile && profile.role && profile.role.trim().toLowerCase() === 'master') {
                 publishSection.style.display = 'block';
             } else {
                 publishSection.style.display = 'none';
@@ -85,17 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
             publishSection.style.display = 'none';
         }
     }
-
-    // 3. EVENT LISTENERS
     
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
-        const filteredAdventures = allAdventures.filter(adventure => {
-            const includesTitle = adventure.titulo.toLowerCase().includes(searchTerm);
-            const includesSystem = adventure.sistema_rpg.toLowerCase().includes(searchTerm);
-            const includesMaster = adventure.nome_mestre.toLowerCase().includes(searchTerm);
-            return includesTitle || includesSystem || includesMaster;
-        });
+        const filteredAdventures = allAdventures.filter(adventure => 
+            adventure.titulo.toLowerCase().includes(searchTerm) ||
+            adventure.sistema_rpg.toLowerCase().includes(searchTerm) ||
+            adventure.nome_mestre.toLowerCase().includes(searchTerm)
+        );
         renderAdventures(filteredAdventures);
     });
 
@@ -137,20 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
-
-    // 4. INICIALIZAÇÃO DA PÁGINA
-    function showToast(message, type = 'success') {
-        const toastContainer = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
-        setTimeout(() => { toast.classList.add('show'); }, 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => toast.remove());
-        }, 3000);
-    }
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
