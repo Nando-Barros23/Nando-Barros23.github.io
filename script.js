@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. INICIALIZAÇÃO E VARIÁVEIS
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- CONFIRME SUA CHAVE AQUI
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser = null;
     let allAdventures = [];
 
+    // 2. FUNÇÕES PRINCIPAIS
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
         if (!toastContainer) return;
@@ -91,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    // 3. EVENT LISTENERS
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredAdventures = allAdventures.filter(adventure => 
@@ -140,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
+    // 4. INICIALIZAÇÃO
     supabaseClient.auth.onAuthStateChange((event, session) => {
         currentUser = session?.user || null;
         updateUI(currentUser);
