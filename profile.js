@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Lembre-se de usar sua chave
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Lembre-se de usar sua chave correta
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Seletores de Elementos
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             usernameInput.value = data.username;
             if (data.avatar_url) { avatarImg.src = data.avatar_url; }
             
-            // CORREÇÃO AQUI: Verificação mais robusta, ignorando espaços e maiúsculas/minúsculas.
+            // CORREÇÃO: Verificação robusta, ignorando espaços e maiúsculas/minúsculas.
             if (data.role && data.role.trim().toLowerCase() === 'master') {
                 masterApplicationSection.style.display = 'none';
                 myAdventuresSection.style.display = 'block';
@@ -129,6 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data, error } = await supabaseClient.from('master_applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1);
         if(error) {
             console.error("Erro ao checar candidatura: ", error);
+            // Se a tabela não existir, renderiza o formulário
+            if (error.code === '42P01') {
+                renderMasterApplicationForm(user);
+            }
             return;
         }
         const statusTranslations = { pending: 'Pendente', approved: 'Aprovada', rejected: 'Rejeitada' };
@@ -214,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage('Avatar atualizado!');
         }
     });
-
 
     // 4. INICIALIZAÇÃO
     supabaseClient.auth.onAuthStateChange(async (_event, session) => {
