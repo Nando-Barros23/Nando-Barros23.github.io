@@ -2,7 +2,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- CONFIRME SUA CHAVE AQUI
+    
+    // ==================================================================
+    // ATENÇÃO: COLE SUA CHAVE DE API CORRETA AQUI DENTRO DAS ASPAS!
+    // ==================================================================
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; 
+    
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Seletores de Elementos
@@ -35,6 +40,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     async function loadProfileData(user) {
+        // Atualiza o cabeçalho primeiro
+        const { data: profileForHeader } = await supabaseClient.from('profiles').select('username').eq('id', user.id).single();
+        const displayName = profileForHeader?.username || user.email.split('@')[0];
+        userArea.innerHTML = `
+            <a href="index.html" class="btn-primario" style="text-decoration: none; width: auto; padding: 0.5rem 1rem;">Página Principal</a> 
+            <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
+        `;
+        document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
+
+        // Busca o resto dos dados do perfil para preencher a página
         const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
         if (error && error.code !== 'PGRST116') { 
             console.error('Erro ao buscar perfil:', error); 
@@ -212,15 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     supabaseClient.auth.onAuthStateChange(async (_event, session) => {
         currentUser = session?.user;
         if (currentUser) {
-            const { data: profile } = await supabaseClient.from('profiles').select('username').eq('id', currentUser.id).single();
-            const displayName = profile?.username || currentUser.email.split('@')[0];
-            userArea.innerHTML = `
-                <a href="index.html" class="btn-primario" style="text-decoration: none; width: auto; padding: 0.5rem 1rem;">Página Principal</a> 
-                <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
-            `;
-            document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
-            
-            loadProfileData(currentUser);
+            await loadProfileData(currentUser);
         } else {
             window.location.href = 'login.html';
         }
