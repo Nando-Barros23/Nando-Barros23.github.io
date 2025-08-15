@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Lembre-se de usar sua chave correta
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- CONFIRME SUA CHAVE AQUI
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Seletores de Elementos
@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
             usernameInput.value = data.username;
             if (data.avatar_url) { avatarImg.src = data.avatar_url; }
             
-            // CORREÇÃO: Verificação robusta, ignorando espaços e maiúsculas/minúsculas.
             if (data.role && data.role.trim().toLowerCase() === 'master') {
                 masterApplicationSection.style.display = 'none';
                 myAdventuresSection.style.display = 'block';
@@ -129,10 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data, error } = await supabaseClient.from('master_applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1);
         if(error) {
             console.error("Erro ao checar candidatura: ", error);
-            // Se a tabela não existir, renderiza o formulário
-            if (error.code === '42P01') {
-                renderMasterApplicationForm(user);
-            }
+            if (error.code === '42P01') { renderMasterApplicationForm(user); }
             return;
         }
         const statusTranslations = { pending: 'Pendente', approved: 'Aprovada', rejected: 'Rejeitada' };
@@ -170,9 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const experience = document.getElementById('experience').value;
             const reason = document.getElementById('reason').value;
             const { error } = await supabaseClient.from('master_applications').insert({ user_id: user.id, experience: experience, reason: reason });
-            if (error) {
-                showMessage("Erro ao enviar candidatura.", true);
-            } else {
+            if (error) { showMessage("Erro ao enviar candidatura.", true); } else {
                 showMessage("Candidatura enviada com sucesso!");
                 checkMasterApplicationStatus(user);
             }
@@ -180,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 3. EVENT LISTENERS
-    
     myAdventuresList.addEventListener('click', (e) => {
         const header = e.target.closest('.my-adventure-header');
         if (header) {
@@ -193,9 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const newUsername = usernameInput.value;
         const { error } = await supabaseClient.from('profiles').update({ username: newUsername, updated_at: new Date() }).eq('id', currentUser.id);
-        if (error) {
-            showMessage('Erro ao atualizar o perfil: ' + error.message, true);
-        } else {
+        if (error) { showMessage('Erro ao atualizar o perfil: ' + error.message, true); } else {
             showMessage('Perfil atualizado com sucesso!');
             usernameDisplay.textContent = newUsername;
         }
@@ -211,9 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (uploadError) { showMessage('Erro ao enviar a imagem.', true); return; }
         const { data: { publicUrl } } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
         const { error: updateError } = await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-        if (updateError) {
-            showMessage('Erro ao salvar o avatar no perfil.', true);
-        } else {
+        if (updateError) { showMessage('Erro ao salvar o avatar no perfil.', true); } else {
             avatarImg.src = publicUrl;
             showMessage('Avatar atualizado!');
         }
