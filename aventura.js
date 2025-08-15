@@ -2,8 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    // Lembre-se de colar sua chave anon publica correta aqui!
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; 
+    const SUPABASE_ANON_KEY = 'SeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Lembre-se de usar sua chave correta
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Variáveis globais
@@ -15,6 +14,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const userArea = document.getElementById('user-area');
     const mainContainer = document.getElementById('adventure-detail-main');
 
+    // ==================================================================
+    // NOVA FUNÇÃO: Caixa de Confirmação Personalizada
+    // ==================================================================
+    function showCustomConfirm(message) {
+        // Retorna uma "promessa" que será resolvida quando o usuário clicar em um botão
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('custom-confirm-overlay');
+            const messageEl = document.getElementById('confirm-message');
+            const btnYes = document.getElementById('confirm-btn-yes');
+            const btnNo = document.getElementById('confirm-btn-no');
+
+            messageEl.textContent = message;
+            overlay.classList.remove('hidden');
+
+            const close = (value) => {
+                overlay.classList.add('hidden');
+                // Remove os event listeners antigos para evitar múltiplos cliques
+                btnYes.onclick = null;
+                btnNo.onclick = null;
+                resolve(value); // Resolve a promessa com true (sim) ou false (cancelar)
+            };
+
+            btnYes.onclick = () => close(true);
+            btnNo.onclick = () => close(false);
+        });
+    }
 
     // ==================================================================
     // FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO
@@ -38,16 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Listener de mudança de autenticação
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         if (currentUser?.id !== session?.user?.id) {
             initializePage();
         }
     });
 
-    // ==================================================================
-    // DELEGAÇÃO DE EVENTOS
-    // ==================================================================
     mainContainer.addEventListener('submit', (e) => {
         if (e.target && e.target.id === 'comment-form') {
             handleNewComment(e);
@@ -69,9 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Inicia a página
     initializePage();
-
 
     // ==================================================================
     // Funções auxiliares (Handlers e Renderizadores)
@@ -99,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    // FUNÇÃO QUE ESTAVA FALTANDO
     function displayAdventureDetails(data) {
         document.title = `${data.titulo} - Dados & Calangos`;
         document.getElementById('adventure-title').textContent = data.titulo;
@@ -113,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('adventure-description').textContent = data.descricao;
     }
 
-    // FUNÇÃO QUE ESTAVA FALTANDO
     async function renderActionButtons() {
         const titleContainer = document.getElementById('title-container');
         const playerActionArea = document.getElementById('action-buttons-area');
@@ -140,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // FUNÇÃO QUE ESTAVA FALTANDO
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
@@ -231,14 +247,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function handleDeleteComment(button) {
         const commentId = button.dataset.commentId;
-        if (!confirm('Tem certeza que deseja deletar este comentário?')) return;
+        
+        // MUDANÇA: Usando a nova caixa de confirmação
+        const confirmed = await showCustomConfirm('Tem certeza que deseja deletar este comentário?');
+        if (!confirmed) return;
         
         const { error } = await supabaseClient.from('comentarios').delete().eq('id', commentId);
         if (error) { showToast('Erro ao deletar comentário.', 'error'); } else { showToast('Comentário deletado.'); renderComments(); }
     }
 
     async function handleDeleteAdventure() {
-        if (!confirm('Você tem certeza que deseja DELETAR esta aventura? Esta ação é irreversível.')) return;
+        // MUDANÇA: Usando a nova caixa de confirmação
+        const confirmed = await showCustomConfirm('Você tem certeza que deseja DELETAR esta aventura? Esta ação é irreversível.');
+        if (!confirmed) return;
         
         const { error } = await supabaseClient.from('aventuras').delete().eq('id', adventureId);
         if (error) { showToast('Erro ao deletar a aventura.', 'error'); } else {
