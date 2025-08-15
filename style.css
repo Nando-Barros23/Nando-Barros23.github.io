@@ -72,6 +72,12 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 #confirm-message { font-size: 1.2rem; font-family: var(--fonte-corpo); margin-bottom: 1.5rem; color: var(--cor-texto-principal); }
 .confirm-buttons { display: flex; justify-content: center; gap: 1rem; }
 .confirm-buttons button { width: 120px; }
+.profile-container { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 900px; margin: 2rem auto; }
+@media (min-width: 768px) { .profile-container { grid-template-columns: 1fr 2fr; } }
+.profile-sidebar, .profile-main { background: var(--cor-fundo-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--cor-borda); }
+.avatar-container { text-align: center; }
+.avatar-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cor-primaria); margin-bottom: 1rem; }
+#message-area { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem; border-radius: 8px; display: none; z-index: 1000; }
 .my-adventure-item { background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; margin-bottom: 1rem; }
 .my-adventure-header { padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: var(--fonte-label); font-weight: bold; }
 .my-adventure-header:hover { background-color: #e9e9e9; }
@@ -79,9 +85,3 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .subscribers-list { padding: 0 1rem 1rem 1rem; border-top: 1px solid var(--cor-borda); display: none; }
 .subscriber-item { display: flex; align-items: center; gap: 10px; padding: 0.5rem 0; font-family: var(--fonte-corpo); }
 .subscriber-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
-.profile-container { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 900px; margin: 2rem auto; }
-@media (min-width: 768px) { .profile-container { grid-template-columns: 1fr 2fr; } }
-.profile-sidebar, .profile-main { background: var(--cor-fundo-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--cor-borda); }
-.avatar-container { text-align: center; }
-.avatar-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cor-primaria); margin-bottom: 1rem; }
-#message-area { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem; border-radius: 8px; display: none; z-index: 1000; }
