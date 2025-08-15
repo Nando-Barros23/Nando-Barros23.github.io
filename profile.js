@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // CORREÇÃO: A conexão com o Supabase foi movida para DENTRO deste bloco.
+    // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // Lembre-se de usar sua chave
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Seletores de Elementos
     const userArea = document.getElementById('user-area');
     const usernameDisplay = document.getElementById('username-display');
     const emailDisplay = document.getElementById('email-display');
@@ -16,52 +17,112 @@ document.addEventListener('DOMContentLoaded', () => {
     const usernameInput = document.getElementById('username-input');
     const messageArea = document.getElementById('message-area');
     const masterApplicationContent = document.getElementById('master-application-content');
+    const masterApplicationSection = document.getElementById('master-application-section');
+    const myAdventuresSection = document.getElementById('my-adventures-section');
+    const myAdventuresList = document.getElementById('my-adventures-list');
+
     let currentUser = null;
 
-    const handleAuthStateChange = async (event, session) => {
-        const user = session?.user;
-        if (user) {
-            currentUser = user;
-            userArea.innerHTML = `
-                <a href="index.html" class="btn-primario" style="text-decoration: none; width: auto; padding: 0.5rem 1rem; font-size: 1rem; line-height: 1.2;">Página Principal</a> 
-                <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
-            `;
-            document.getElementById('logout-button').addEventListener('click', async () => {
-                await supabaseClient.auth.signOut();
-            });
-            loadProfileData(user);
-        } else {
-            window.location.href = 'login.html';
-        }
-    };
-
+    // 2. FUNÇÕES PRINCIPAIS
+    
+    function showMessage(message, isError = false) {
+        if (!messageArea) return;
+        messageArea.textContent = message;
+        messageArea.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
+        messageArea.style.color = isError ? '#721c24' : '#155724';
+        messageArea.style.display = 'block';
+        setTimeout(() => { messageArea.style.display = 'none'; }, 3000);
+    }
+    
     async function loadProfileData(user) {
         const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-        if (error && error.code !== 'PGRST116') {
-            console.error('Erro ao buscar perfil:', error);
-            return;
+        if (error && error.code !== 'PGRST116') { 
+            console.error('Erro ao buscar perfil:', error); 
+            return; 
         }
+        
         if (data) {
             usernameDisplay.textContent = data.username || 'Sem nome de usuário';
             emailDisplay.textContent = user.email;
             roleDisplay.textContent = data.role;
             usernameInput.value = data.username;
             if (data.avatar_url) { avatarImg.src = data.avatar_url; }
-            if(data.role === 'player') {
-                document.getElementById('master-application-section').style.display = 'block';
-                checkMasterApplicationStatus(user);
+            
+            // CORREÇÃO AQUI: Verificação mais robusta, ignorando espaços e maiúsculas/minúsculas.
+            if (data.role && data.role.trim().toLowerCase() === 'master') {
+                masterApplicationSection.style.display = 'none';
+                myAdventuresSection.style.display = 'block';
+                loadMyAdventures(user);
             } else {
-                document.getElementById('master-application-section').style.display = 'none';
+                masterApplicationSection.style.display = 'block';
+                myAdventuresSection.style.display = 'none';
+                checkMasterApplicationStatus(user);
             }
         }
     }
 
-    function showMessage(message, isError = false) {
-        messageArea.textContent = message;
-        messageArea.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
-        messageArea.style.color = isError ? '#721c24' : '#155724';
-        messageArea.style.display = 'block';
-        setTimeout(() => { messageArea.style.display = 'none'; }, 3000);
+    async function loadMyAdventures(user) {
+        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('user_id', user.id).order('created_at', { ascending: false });
+        if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
+
+        myAdventuresList.innerHTML = '';
+        if (adventures.length === 0) {
+            myAdventuresList.innerHTML = '<p>Você ainda não publicou nenhuma aventura.</p>';
+            return;
+        }
+
+        adventures.forEach(adventure => {
+            const item = document.createElement('div');
+            item.className = 'my-adventure-item';
+            item.innerHTML = `
+                <div class="my-adventure-header" data-adventure-id="${adventure.id}">
+                    <span>${adventure.titulo}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="subscribers-list" id="subscribers-${adventure.id}"></div>
+            `;
+            myAdventuresList.appendChild(item);
+        });
+    }
+    
+    async function toggleSubscribers(adventureId, headerElement) {
+        const listDiv = document.getElementById(`subscribers-${adventureId}`);
+        const icon = headerElement.querySelector('i');
+
+        if (listDiv.style.display === 'block') {
+            listDiv.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+            return;
+        }
+
+        listDiv.innerHTML = '<p>Carregando inscritos...</p>';
+        listDiv.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+
+        const { data: subscribers, error } = await supabaseClient.from('inscricoes').select('profiles (id, username, avatar_url)').eq('aventura_id', adventureId);
+        if (error) {
+            listDiv.innerHTML = '<p style="color: red;">Erro ao carregar inscritos.</p>';
+            return;
+        }
+        
+        if (subscribers.length === 0) {
+            listDiv.innerHTML = '<p>Ainda não há jogadores inscritos.</p>';
+            return;
+        }
+
+        listDiv.innerHTML = '';
+        subscribers.forEach(sub => {
+            const profile = sub.profiles;
+            if (!profile) return;
+            const avatarUrl = profile.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
+            const subscriberEl = document.createElement('div');
+            subscriberEl.className = 'subscriber-item';
+            subscriberEl.innerHTML = `
+                <img src="${avatarUrl}" alt="Avatar">
+                <span>${profile.username || 'Usuário sem nome'}</span>
+            `;
+            listDiv.appendChild(subscriberEl);
+        });
     }
 
     async function checkMasterApplicationStatus(user) {
@@ -113,6 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // 3. EVENT LISTENERS
+    
+    myAdventuresList.addEventListener('click', (e) => {
+        const header = e.target.closest('.my-adventure-header');
+        if (header) {
+            const adventureId = header.dataset.adventureId;
+            toggleSubscribers(adventureId, header);
+        }
+    });
 
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -133,10 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!file || !currentUser) return;
         const filePath = `${currentUser.id}/${Date.now()}`;
         const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(filePath, file);
-        if (uploadError) {
-            showMessage('Erro ao enviar a imagem.', true);
-            return;
-        }
+        if (uploadError) { showMessage('Erro ao enviar a imagem.', true); return; }
         const { data: { publicUrl } } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
         const { error: updateError } = await supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
         if (updateError) {
@@ -147,5 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    supabaseClient.auth.onAuthStateChange(handleAuthStateChange);
+
+    // 4. INICIALIZAÇÃO
+    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+        currentUser = session?.user;
+        if (currentUser) {
+            const { data: profile } = await supabaseClient.from('profiles').select('username').eq('id', currentUser.id).single();
+            const displayName = profile?.username || currentUser.email.split('@')[0];
+            userArea.innerHTML = `
+                <a href="index.html" class="btn-primario" style="text-decoration: none; width: auto; padding: 0.5rem 1rem;">Página Principal</a> 
+                <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
+            `;
+            document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
+            
+            loadProfileData(currentUser);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
 });
