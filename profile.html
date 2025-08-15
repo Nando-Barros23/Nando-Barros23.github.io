@@ -8,14 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        .profile-container { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 900px; margin: 2rem auto; }
-        @media (min-width: 768px) { .profile-container { grid-template-columns: 1fr 2fr; } }
-        .profile-sidebar, .profile-main { background: var(--cor-fundo-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--cor-borda); }
-        .avatar-container { text-align: center; }
-        .avatar-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cor-primaria); margin-bottom: 1rem; }
-        #message-area { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem; border-radius: 8px; display: none; z-index: 1000; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -44,14 +37,22 @@
                 </div>
                 <button type="submit" class="btn-primario">Salvar Alterações</button>
             </form>
-            <div id="master-application-section">
+
+            <div id="master-application-section" style="display: none;">
                 <hr style="margin: 2rem 0;">
                 <h2>Tornar-se um Mestre</h2>
                 <div id="master-application-content"></div>
             </div>
+
+            <div id="my-adventures-section" style="display: none;">
+                <hr style="margin: 2rem 0;">
+                <h2>Minhas Aventuras Publicadas</h2>
+                <div id="my-adventures-list">
+                    </div>
+            </div>
         </main>
     </div>
-    <div id="message-area"></div>
+    <div id="toast-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="profile.js"></script>
 </body>
