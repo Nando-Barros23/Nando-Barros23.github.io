@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- CONFIRME SUA CHAVE AQUI
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const adventuresGrid = document.getElementById('adventures-grid');
@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userArea = document.getElementById('user-area');
     const publishSection = document.querySelector('.painel-lateral');
     const searchBar = document.getElementById('search-bar');
-
     let currentUser = null;
     let allAdventures = [];
 
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cardLink = document.createElement('a');
             cardLink.href = `aventura.html?id=${adventure.id}`;
             cardLink.classList.add('adventure-card-link');
-
             const card = document.createElement('div');
             card.classList.add('adventure-card');
             const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
@@ -72,9 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function updateUI(user) {
         if (user) {
-            const { data: profile, error } = await supabaseClient.from('profiles').select('username, role').eq('id', user.id).single();
-            if (error && error.code !== 'PGRST116') { console.error("Erro ao buscar perfil:", error); }
-            
+            const { data: profile } = await supabaseClient.from('profiles').select('username, role').eq('id', user.id).single();
             const displayName = profile?.username || user.email.split('@')[0];
             userArea.innerHTML = `
                 <a href="profile.html" class="btn-primario">Olá, ${displayName}</a>
@@ -93,7 +89,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // 3. EVENT LISTENERS
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredAdventures = allAdventures.filter(adventure => 
@@ -143,8 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
-    // 4. INICIALIZAÇÃO
-    supabaseClient.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
         currentUser = session?.user || null;
         updateUI(currentUser);
     });
