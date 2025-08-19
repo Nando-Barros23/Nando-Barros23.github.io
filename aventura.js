@@ -5,64 +5,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Variáveis globais
     let currentUser = null;
     let adventureData = null;
     const adventureId = new URLSearchParams(window.location.search).get('id');
-
-    // Seletores de Elementos
     const userArea = document.getElementById('user-area');
     const mainContainer = document.getElementById('adventure-detail-main');
 
-    // ==================================================================
-    // FUNÇÃO DA CAIXA DE CONFIRMAÇÃO PERSONALIZADA
-    // ==================================================================
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        currentUser = session?.user;
+        updateHeaderUI(currentUser);
+        if (!adventureId) {
+            mainContainer.innerHTML = '<h2>Nenhuma aventura especificada.</h2>';
+            return;
+        }
+        adventureData = await fetchAdventureDetails();
+        if (adventureData) {
+            displayAdventureDetails(adventureData);
+            renderActionButtons();
+            renderComments();
+            // A chamada para renderizar o formulário estava faltando, agora está aqui:
+            renderCommentForm();
+        }
+    }
+    
     function showCustomConfirm(message) {
         return new Promise((resolve) => {
             const overlay = document.getElementById('custom-confirm-overlay');
             const messageEl = document.getElementById('confirm-message');
             const btnYes = document.getElementById('confirm-btn-yes');
             const btnNo = document.getElementById('confirm-btn-no');
-
             messageEl.textContent = message;
             overlay.classList.remove('hidden');
-
             const close = (value) => {
                 overlay.classList.add('hidden');
                 btnYes.onclick = null;
                 btnNo.onclick = null;
                 resolve(value);
             };
-
             btnYes.onclick = () => close(true);
             btnNo.onclick = () => close(false);
         });
     }
 
-    // ==================================================================
-    // FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO
-    // ==================================================================
-    async function initializePage() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        currentUser = session?.user;
-        updateHeaderUI(currentUser);
-
-        if (!adventureId) {
-            mainContainer.innerHTML = '<h2>Nenhuma aventura especificada.</h2>';
-            return;
-        }
-        adventureData = await fetchAdventureDetails();
-
-        if (adventureData) {
-            displayAdventureDetails(adventureData);
-            renderActionButtons();
-            renderComments();
-            renderCommentForm();
-        }
-    }
-
     supabaseClient.auth.onAuthStateChange((_event, session) => {
-        if (currentUser?.id !== session?.user?.id) {
+        const newUser = session?.user;
+        if (currentUser?.id !== newUser?.id) {
+            currentUser = newUser;
             initializePage();
         }
     });
@@ -86,9 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initializePage();
 
-    // ==================================================================
-    // Funções auxiliares (Handlers e Renderizadores)
-    // ==================================================================
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
         if (!toastContainer) return;
@@ -168,9 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // ==================================================================
-    // FUNÇÃO DE COMENTÁRIOS CORRIGIDA E ROBUSTA
-    // ==================================================================
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
@@ -182,12 +165,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             commentsList.innerHTML = '<p style="color: red;">Não foi possível carregar os comentários.</p>';
             return;
         }
-
         if (comments.length === 0) {
             commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
             return;
         }
-
         const userIds = [...new Set(comments.map(comment => comment.user_id))];
         const { data: profiles, error: profilesError } = await supabaseClient.from('profiles').select('id, username, avatar_url').in('id', userIds);
         if (profilesError) { console.error("Erro ao buscar perfis:", profilesError); }
@@ -220,10 +201,78 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function renderCommentForm() { /* ... (código existente sem alterações) ... */ }
-    async function handleSubscription() { /* ... (código existente sem alterações) ... */ }
-    async function handleNewComment(e) { /* ... (código existente sem alterações) ... */ }
-    async function handleDeleteComment(button) { /* ... (código existente sem alterações) ... */ }
-    async function handleDeleteAdventure() { /* ... (código existente sem alterações) ... */ }
-    async function updateHeaderUI(user) { /* ... (código existente sem alterações) ... */ }
+    function renderCommentForm() {
+        const container = document.getElementById('comment-form-container');
+        if (!container) return;
+        if (currentUser) {
+            container.innerHTML = `
+                <form id="comment-form">
+                    <textarea id="comment-text" placeholder="Escreva seu comentário..." required rows="3"></textarea>
+                    <button type="submit" class="btn-primario">Comentar</button>
+                </form>
+            `;
+        } else {
+            container.innerHTML = '<p>Você precisa estar <a href="login.html">logado</a> para comentar.</p>';
+        }
+    }
+
+    async function handleSubscription() {
+        const btn = document.getElementById('subscribe-btn');
+        const isSubscribed = btn.classList.contains('inscrito');
+        if (isSubscribed) {
+            const { error } = await supabaseClient.from('inscricoes').delete().match({ user_id: currentUser.id, aventura_id: adventureId });
+            if (error) { showToast('Erro ao cancelar inscrição.', 'error'); } else { showToast('Inscrição cancelada.'); renderActionButtons(); }
+        } else {
+            const { error } = await supabaseClient.from('inscricoes').insert({ user_id: currentUser.id, aventura_id: adventureId });
+            if (error) { showToast('Erro ao se inscrever.', 'error'); } else { showToast('Inscrição realizada com sucesso!', 'success'); renderActionButtons(); }
+        }
+    }
+
+    async function handleNewComment(e) {
+        e.preventDefault();
+        const content = document.getElementById('comment-text').value;
+        if (!content.trim()) return;
+        const formButton = e.target.querySelector('button');
+        formButton.disabled = true;
+        const { error } = await supabaseClient.from('comentarios').insert({ user_id: currentUser.id, aventura_id: adventureId, content: content });
+        if (error) {
+            showToast('Erro ao enviar comentário.', 'error');
+        } else {
+            document.getElementById('comment-text').value = '';
+            renderComments();
+        }
+        formButton.disabled = false;
+    }
+    
+    async function handleDeleteComment(button) {
+        const commentId = button.dataset.commentId;
+        const confirmed = await showCustomConfirm('Tem certeza que deseja deletar este comentário?');
+        if (!confirmed) return;
+        const { error } = await supabaseClient.from('comentarios').delete().eq('id', commentId);
+        if (error) { showToast('Erro ao deletar comentário.', 'error'); } else { showToast('Comentário deletado.'); renderComments(); }
+    }
+
+    async function handleDeleteAdventure() {
+        const confirmed = await showCustomConfirm('Você tem certeza que deseja DELETAR esta aventura? Esta ação é irreversível.');
+        if (!confirmed) return;
+        const { error } = await supabaseClient.from('aventuras').delete().eq('id', adventureId);
+        if (error) { showToast('Erro ao deletar a aventura.', 'error'); } else {
+            showToast('Aventura deletada com sucesso!');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    }
+    
+    async function updateHeaderUI(user) {
+        if (user) {
+            const { data: profile } = await supabaseClient.from('profiles').select('username').eq('id', user.id).single();
+            const displayName = profile?.username || user.email.split('@')[0];
+            userArea.innerHTML = `
+                <a href="profile.html" class="btn-primario">Olá, ${displayName}</a>
+                <button id="logout-button" class="btn-primario">Sair</button>
+            `;
+            document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
+        } else {
+            userArea.innerHTML = `<a href="login.html" class="btn-primario">Login / Cadastrar</a>`;
+        }
+    }
 });
