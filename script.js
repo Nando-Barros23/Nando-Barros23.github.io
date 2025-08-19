@@ -13,6 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser = null;
     let allAdventures = [];
 
+    // INICIALIZA O EDITOR DE MARKDOWN NA CAIXA DE DESCRIÇÃO
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('descricao'),
+        toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "preview"],
+        placeholder: "Use Markdown para formatar sua aventura...\n# Título Principal\n## Subtítulo\n**Texto em negrito**",
+        spellChecker: false,
+        status: false,
+    });
+
     // 2. FUNÇÕES PRINCIPAIS
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
@@ -108,6 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const formButton = adventureForm.querySelector('button');
         formButton.disabled = true;
         formButton.textContent = 'Publicando...';
+        
         const imageFile = document.getElementById('adventure-image').files[0];
         let imageUrl = null;
         if (imageFile) {
@@ -122,10 +132,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data: publicUrlData } = supabaseClient.storage.from('adventure-images').getPublicUrl(filePath);
             imageUrl = publicUrlData.publicUrl;
         }
+        
         const formData = new FormData(adventureForm);
         const newAdventure = {
-            titulo: formData.get('titulo'), sistema_rpg: formData.get('sistema_rpg'), nome_mestre: formData.get('nome_mestre'), vagas: parseInt(formData.get('vagas')), descricao: formData.get('descricao'), alerta_gatilho: formData.get('alerta_gatilho'), tipo_jogo: formData.get('tipo_jogo'), nivel: formData.get('nivel'), user_id: currentUser.id, image_url: imageUrl
+            titulo: formData.get('titulo'),
+            sistema_rpg: formData.get('sistema_rpg'),
+            nome_mestre: formData.get('nome_mestre'),
+            vagas: parseInt(formData.get('vagas')),
+            descricao: easyMDE.value(), // Pega o valor do editor de Markdown
+            alerta_gatilho: formData.get('alerta_gatilho'),
+            tipo_jogo: formData.get('tipo_jogo'),
+            nivel: formData.get('nivel'),
+            user_id: currentUser.id,
+            image_url: imageUrl
         };
+        
         const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
         if (error) {
             console.error('Erro ao inserir aventura:', error);
@@ -133,6 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             showToast('Aventura publicada com sucesso!', 'success');
             adventureForm.reset();
+            easyMDE.value(""); // Limpa o editor de Markdown
             loadAdventures();
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
