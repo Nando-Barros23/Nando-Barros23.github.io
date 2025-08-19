@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Aventura - Dados & Calangos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
+        <h1>Dados & Calangos</h1>
+        <div id="user-area"></div>
+    </header>
+    <div class="edit-container">
+        <h3>Editar Aventura</h3>
+        <form id="adventure-form">
+            <div class="form-grupo">
+                <label for="titulo">Título da Aventura</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            <div class="form-grupo">
+                <label for="sistema_rpg">Sistema de RPG</label>
+                <input type="text" id="sistema_rpg" name="sistema_rpg" required>
+            </div>
+            <div class="form-grupo">
+                <label for="nome_mestre">Seu nome de Mestre</label>
+                <input type="text" id="nome_mestre" name="nome_mestre" required>
+            </div>
+            <div class="form-grupo">
+                <label>Tipo de Jogo</label>
+                <div class="radio-group">
+                    <input type="radio" id="tipo_oneshot" name="tipo_jogo" value="One Shot">
+                    <label for="tipo_oneshot">One Shot</label>
+                    <input type="radio" id="tipo_campanha" name="tipo_jogo" value="Campanha">
+                    <label for="tipo_campanha">Campanha</label>
+                </div>
+            </div>
+            <div class="form-grupo">
+                <label for="nivel">Nível dos Personagens</label>
+                <input type="text" id="nivel" name="nivel" required>
+            </div>
+            <div class="form-grupo">
+                <label for="vagas">Número de Vagas</label>
+                <input type="number" id="vagas" name="vagas" min="1" required>
+            </div>
+             <div class="form-grupo">
+                <label for="alerta_gatilho">Alerta de Gatilho</label>
+                <input type="text" id="alerta_gatilho" name="alerta_gatilho" required>
+            </div>
+            <div class="form-grupo">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn-primario">Salvar Alterações</button>
+        </form>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="editar-aventura.js"></script>
+</body>
+</html>
