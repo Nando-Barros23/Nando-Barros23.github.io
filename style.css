@@ -48,6 +48,7 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .adventure-detail-container { max-width: 900px; margin: 2rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border-radius: 8px; }
 .adventure-detail-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
 .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+.detail-item p { margin: 0; }
 .btn-inscricao { background-color: #28a745; margin-top: 2rem; width: auto; }
 .btn-inscricao.inscrito { background-color: #ffc107; color: #212529; }
 .comments-section, .subscription-section { margin-top: 2rem; }
@@ -85,3 +86,46 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .subscribers-list { padding: 0 1rem 1rem 1rem; border-top: 1px solid var(--cor-borda); display: none; }
 .subscriber-item { display: flex; align-items: center; gap: 10px; padding: 0.5rem 0; font-family: var(--fonte-corpo); }
 .subscriber-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+
+/* --- NOVOS ESTILOS PARA MARKDOWN E EDITOR --- */
+/* Estilos para o editor EasyMDE */
+.EasyMDEContainer .CodeMirror {
+    border-color: var(--cor-borda);
+    background-color: #fff;
+    border-radius: 4px;
+    font-family: var(--fonte-corpo);
+}
+.editor-toolbar {
+    border-radius: 4px 4px 0 0;
+    border-color: var(--cor-borda);
+}
+.editor-toolbar a.active, .editor-toolbar a:hover {
+    background: var(--cor-fundo-card);
+    border-color: var(--cor-borda);
+}
+
+/* Estilos para o conteúdo renderizado na página de detalhes */
+#adventure-description h1,
+#adventure-description h2,
+#adventure-description h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-primaria);
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--cor-borda);
+}
+#adventure-description p {
+    margin-bottom: 1rem;
+}
+#adventure-description ul, #adventure-description ol {
+    padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+#adventure-description blockquote {
+    border-left: 4px solid var(--cor-borda);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--cor-texto-secundario);
+    font-style: italic;
+}
