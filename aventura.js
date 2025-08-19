@@ -1,34 +1,22 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Variáveis globais
     let currentUser = null;
     let adventureData = null;
     const adventureId = new URLSearchParams(window.location.search).get('id');
+
+    // Seletores de Elementos
     const userArea = document.getElementById('user-area');
     const mainContainer = document.getElementById('adventure-detail-main');
-    
-    async function initializePage() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        currentUser = session?.user;
-        updateHeaderUI(currentUser);
 
-        if (!adventureId) {
-            mainContainer.innerHTML = '<h2>Nenhuma aventura especificada.</h2>';
-            return;
-        }
-        adventureData = await fetchAdventureDetails();
-
-        if (adventureData) {
-            displayAdventureDetails(adventureData);
-            renderActionButtons();
-            renderComments();
-            renderCommentForm();
-        }
-    }
-
+    // ==================================================================
+    // FUNÇÃO DA CAIXA DE CONFIRMAÇÃO PERSONALIZADA
+    // ==================================================================
     function showCustomConfirm(message) {
         return new Promise((resolve) => {
             const overlay = document.getElementById('custom-confirm-overlay');
@@ -51,6 +39,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // ==================================================================
+    // FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO
+    // ==================================================================
+    async function initializePage() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        currentUser = session?.user;
+        updateHeaderUI(currentUser);
+
+        if (!adventureId) {
+            mainContainer.innerHTML = '<h2>Nenhuma aventura especificada.</h2>';
+            return;
+        }
+        adventureData = await fetchAdventureDetails();
+
+        if (adventureData) {
+            displayAdventureDetails(adventureData);
+            renderActionButtons();
+            renderComments();
+            renderCommentForm();
+        }
+    }
+
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         if (currentUser?.id !== session?.user?.id) {
             initializePage();
@@ -64,22 +74,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     mainContainer.addEventListener('click', (e) => {
-        const targetButton = e.target.closest('button, a'); // Agora também ouve cliques em links
+        const targetButton = e.target.closest('button, a');
         if (!targetButton) return;
-
-        if (targetButton.matches('.comment-delete-btn')) {
-            handleDeleteComment(targetButton);
-        }
-        if (targetButton.matches('#delete-adventure-btn')) {
-             handleDeleteAdventure();
-        }
-        if (targetButton.matches('#subscribe-btn')) {
-            handleSubscription();
+        if (targetButton.matches('.comment-delete-btn')) { handleDeleteComment(targetButton); }
+        if (targetButton.matches('#delete-adventure-btn')) { handleDeleteAdventure(); }
+        if (targetButton.matches('#subscribe-btn')) { handleSubscription(); }
+        if (targetButton.matches('#edit-adventure-btn')) {
+            window.location.href = `editar-aventura.html?id=${adventureId}`;
         }
     });
 
     initializePage();
 
+    // ==================================================================
+    // Funções auxiliares (Handlers e Renderizadores)
+    // ==================================================================
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
         if (!toastContainer) return;
@@ -134,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             masterActionsWrapper.className = 'master-actions';
             
             const editButton = document.createElement('a');
+            editButton.id = 'edit-adventure-btn';
             editButton.href = `editar-aventura.html?id=${adventureData.id}`;
             editButton.className = 'btn-icon-edit master-action';
             editButton.innerHTML = '<i class="fas fa-pencil-alt"></i>';
@@ -148,7 +158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             masterActionsWrapper.appendChild(editButton);
             masterActionsWrapper.appendChild(deleteButton);
             titleContainer.appendChild(masterActionsWrapper);
-
         } else if (currentUser && adventureData) {
             const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
             if (subscription) {
@@ -159,30 +168,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // ==================================================================
+    // FUNÇÃO DE COMENTÁRIOS CORRIGIDA E ROBUSTA
+    // ==================================================================
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
         commentsList.innerHTML = '<p>Carregando comentários...</p>';
 
-        const { data: comments, error: commentsError } = await supabaseClient.from('comentarios').select('*, profile:profiles!left(username, avatar_url)').eq('aventura_id', adventureId).order('created_at', { ascending: true });
-        
-        if (commentsError) { 
+        const { data: comments, error: commentsError } = await supabaseClient.from('comentarios').select('*').eq('aventura_id', adventureId).order('created_at', { ascending: true });
+        if (commentsError) {
             console.error("Erro ao buscar comentários:", commentsError);
-            commentsList.innerHTML = '<p style="color:red;">Não foi possível carregar os comentários.</p>';
+            commentsList.innerHTML = '<p style="color: red;">Não foi possível carregar os comentários.</p>';
             return;
         }
-        
-        commentsList.innerHTML = '';
+
         if (comments.length === 0) {
             commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
             return;
         }
 
+        const userIds = [...new Set(comments.map(comment => comment.user_id))];
+        const { data: profiles, error: profilesError } = await supabaseClient.from('profiles').select('id, username, avatar_url').in('id', userIds);
+        if (profilesError) { console.error("Erro ao buscar perfis:", profilesError); }
+
+        const profileMap = new Map();
+        if (profiles) {
+            profiles.forEach(profile => {
+                profileMap.set(profile.id, profile);
+            });
+        }
+        
+        commentsList.innerHTML = '';
         comments.forEach(comment => {
             const commentEl = document.createElement('div');
             commentEl.className = 'comment';
-            const authorName = comment.profile?.username || 'Usuário';
-            const authorAvatar = comment.profile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
+            const authorProfile = profileMap.get(comment.user_id);
+            const authorName = authorProfile?.username || 'Usuário';
+            const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
             const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.user_id));
             commentEl.innerHTML = `
                 <div class="comment-avatar"><img src="${authorAvatar}" alt="Avatar de ${authorName}"></div>
