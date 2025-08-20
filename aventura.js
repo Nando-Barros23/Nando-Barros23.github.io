@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             displayAdventureDetails(adventureData);
             renderActionButtons();
             renderComments();
-            // A chamada para renderizar o formulário estava faltando, agora está aqui:
             renderCommentForm();
         }
     }
@@ -108,6 +107,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('level').textContent = data.nivel;
         document.getElementById('slots').textContent = data.vagas;
         document.getElementById('trigger-warning').textContent = data.alerta_gatilho;
+        
+        // MUDANÇA AQUI: Adiciona a lógica para exibir a modalidade e localização
+        document.getElementById('modality').textContent = data.modalidade || 'Não especificado';
+        const locationContainer = document.getElementById('location-display-container');
+        if (data.modalidade === 'Presencial' && data.localizacao) {
+            document.getElementById('location').textContent = data.localizacao;
+            locationContainer.style.display = 'block';
+        } else {
+            locationContainer.style.display = 'none';
+        }
+
         const descriptionElement = document.getElementById('adventure-description');
         if (data.descricao && window.marked) {
             descriptionElement.innerHTML = marked.parse(data.descricao);
