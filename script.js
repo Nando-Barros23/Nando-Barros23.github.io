@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("VERSÃO FINAL DO SCRIPT.JS CARREGADA - 19/08"); // Nosso marcador de verificação
     // 1. INICIALIZAÇÃO E VARIÁVEIS
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- COLE SUA CHAVE CORRETA AQUI
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const adventuresGrid = document.getElementById('adventures-grid');
@@ -13,11 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchBar = document.getElementById('search-bar');
     let currentUser = null;
     let allAdventures = [];
-
-    const onlineRadio = document.getElementById('modalidade_online');
-    const presencialRadio = document.getElementById('modalidade_presencial');
-    const locationContainer = document.getElementById('location-input-container');
-    const locationInput = document.getElementById('localizacao');
 
     const easyMDE = new EasyMDE({
         element: document.getElementById('descricao'),
@@ -104,82 +98,95 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // 3. EVENT LISTENERS
-    onlineRadio.addEventListener('change', () => {
-        if (onlineRadio.checked) {
-            locationContainer.style.display = 'none';
-            locationInput.value = '';
-        }
-    });
-    presencialRadio.addEventListener('change', () => {
-        if (presencialRadio.checked) {
-            locationContainer.style.display = 'block';
-        }
-    });
     
-    searchBar.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const filteredAdventures = allAdventures.filter(adventure => 
-            adventure.titulo.toLowerCase().includes(searchTerm) ||
-            adventure.sistema_rpg.toLowerCase().includes(searchTerm) ||
-            adventure.nome_mestre.toLowerCase().includes(searchTerm)
-        );
-        renderAdventures(filteredAdventures);
-    });
+    // Adicionado para garantir que os seletores existam antes de adicionar os listeners
+    if (adventureForm) {
+        const onlineRadio = document.getElementById('modalidade_online');
+        const presencialRadio = document.getElementById('modalidade_presencial');
+        const locationContainer = document.getElementById('location-input-container');
+        const locationInput = document.getElementById('localizacao');
 
-    adventureForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (!currentUser) {
-            showToast('Você precisa estar logado para publicar.', 'error');
-            return;
+        if(onlineRadio && presencialRadio && locationContainer && locationInput) {
+            onlineRadio.addEventListener('change', () => {
+                if (onlineRadio.checked) {
+                    locationContainer.style.display = 'none';
+                    locationInput.value = '';
+                }
+            });
+            presencialRadio.addEventListener('change', () => {
+                if (presencialRadio.checked) {
+                    locationContainer.style.display = 'block';
+                }
+            });
         }
-        const formButton = adventureForm.querySelector('button');
-        formButton.disabled = true;
-        formButton.textContent = 'Publicando...';
-        
-        const imageFile = document.getElementById('adventure-image').files[0];
-        let imageUrl = null;
-        if (imageFile) {
-            const filePath = `${currentUser.id}/${Date.now()}-${imageFile.name}`;
-            const { error: uploadError } = await supabaseClient.storage.from('adventure-images').upload(filePath, imageFile);
-            if (uploadError) {
-                console.error('Erro no upload:', uploadError);
-                showToast('Houve um erro ao enviar a imagem.', 'error');
-                formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
+
+        adventureForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!currentUser) {
+                showToast('Você precisa estar logado para publicar.', 'error');
                 return;
             }
-            const { data: publicUrlData } = supabaseClient.storage.from('adventure-images').getPublicUrl(filePath);
-            imageUrl = publicUrlData.publicUrl;
-        }
-        
-        const formData = new FormData(adventureForm);
-        const newAdventure = {
-            titulo: formData.get('titulo'),
-            sistema_rpg: formData.get('sistema_rpg'),
-            nome_mestre: formData.get('nome_mestre'),
-            modalidade: formData.get('modalidade'),
-            localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
-            vagas: parseInt(formData.get('vagas')),
-            descricao: easyMDE.value(),
-            alerta_gatilho: formData.get('alerta_gatilho'),
-            tipo_jogo: formData.get('tipo_jogo'),
-            nivel: formData.get('nivel'),
-            user_id: currentUser.id,
-            image_url: imageUrl
-        };
-        
-        const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
-        if (error) {
-            console.error('Erro ao inserir aventura:', error);
-            showToast('Ocorreu um erro ao publicar sua aventura.', 'error');
-        } else {
-            showToast('Aventura publicada com sucesso!', 'success');
-            adventureForm.reset();
-            easyMDE.value("");
-            locationContainer.style.display = 'none';
-            loadAdventures();
-        }
-        formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
-    });
+            const formButton = adventureForm.querySelector('button');
+            formButton.disabled = true;
+            formButton.textContent = 'Publicando...';
+            
+            const imageFile = document.getElementById('adventure-image').files[0];
+            let imageUrl = null;
+            if (imageFile) {
+                const filePath = `${currentUser.id}/${Date.now()}-${imageFile.name}`;
+                const { error: uploadError } = await supabaseClient.storage.from('adventure-images').upload(filePath, imageFile);
+                if (uploadError) {
+                    console.error('Erro no upload:', uploadError);
+                    showToast('Houve um erro ao enviar a imagem.', 'error');
+                    formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
+                    return;
+                }
+                const { data: publicUrlData } = supabaseClient.storage.from('adventure-images').getPublicUrl(filePath);
+                imageUrl = publicUrlData.publicUrl;
+            }
+            
+            const formData = new FormData(adventureForm);
+            const newAdventure = {
+                titulo: formData.get('titulo'),
+                sistema_rpg: formData.get('sistema_rpg'),
+                nome_mestre: formData.get('nome_mestre'),
+                modalidade: formData.get('modalidade'),
+                localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
+                vagas: parseInt(formData.get('vagas')),
+                descricao: easyMDE.value(),
+                alerta_gatilho: formData.get('alerta_gatilho'),
+                tipo_jogo: formData.get('tipo_jogo'),
+                nivel: formData.get('nivel'),
+                user_id: currentUser.id,
+                image_url: imageUrl
+            };
+            
+            const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
+            if (error) {
+                console.error('Erro ao inserir aventura:', error);
+                showToast('Ocorreu um erro ao publicar sua aventura.', 'error');
+            } else {
+                showToast('Aventura publicada com sucesso!', 'success');
+                adventureForm.reset();
+                easyMDE.value("");
+                if(locationContainer) locationContainer.style.display = 'none';
+                loadAdventures();
+            }
+            formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
+        });
+    }
+    
+    if (searchBar) {
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredAdventures = allAdventures.filter(adventure => 
+                adventure.titulo.toLowerCase().includes(searchTerm) ||
+                adventure.sistema_rpg.toLowerCase().includes(searchTerm) ||
+                adventure.nome_mestre.toLowerCase().includes(searchTerm)
+            );
+            renderAdventures(filteredAdventures);
+        });
+    }
 
     // 4. INICIALIZAÇÃO
     supabaseClient.auth.onAuthStateChange((_event, session) => {
