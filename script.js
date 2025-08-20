@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser = null;
     let allAdventures = [];
 
+    // NOVO: Seletores para os campos de modalidade
+    const onlineRadio = document.getElementById('modalidade_online');
+    const presencialRadio = document.getElementById('modalidade_presencial');
+    const locationContainer = document.getElementById('location-input-container');
+    const locationInput = document.getElementById('localizacao');
+
     // INICIALIZA O EDITOR DE MARKDOWN NA CAIXA DE DESCRIÇÃO
     const easyMDE = new EasyMDE({
         element: document.getElementById('descricao'),
@@ -98,6 +104,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    // 3. EVENT LISTENERS
+
+    // NOVO: Listeners para os botões de rádio da modalidade
+    onlineRadio.addEventListener('change', () => {
+        if (onlineRadio.checked) {
+            locationContainer.style.display = 'none';
+            locationInput.value = ''; // Limpa o campo ao esconder
+        }
+    });
+    presencialRadio.addEventListener('change', () => {
+        if (presencialRadio.checked) {
+            locationContainer.style.display = 'block';
+        }
+    });
+    
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredAdventures = allAdventures.filter(adventure => 
@@ -138,8 +159,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             titulo: formData.get('titulo'),
             sistema_rpg: formData.get('sistema_rpg'),
             nome_mestre: formData.get('nome_mestre'),
+            // NOVO: Adiciona os novos campos ao objeto a ser salvo
+            modalidade: formData.get('modalidade'),
+            localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
             vagas: parseInt(formData.get('vagas')),
-            descricao: easyMDE.value(), // Pega o valor do editor de Markdown
+            descricao: easyMDE.value(),
             alerta_gatilho: formData.get('alerta_gatilho'),
             tipo_jogo: formData.get('tipo_jogo'),
             nivel: formData.get('nivel'),
@@ -154,12 +178,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             showToast('Aventura publicada com sucesso!', 'success');
             adventureForm.reset();
-            easyMDE.value(""); // Limpa o editor de Markdown
+            easyMDE.value("");
+            locationContainer.style.display = 'none'; // Esconde o campo de localização após o reset
             loadAdventures();
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
+    // 4. INICIALIZAÇÃO
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         currentUser = session?.user || null;
         updateUI(currentUser);
