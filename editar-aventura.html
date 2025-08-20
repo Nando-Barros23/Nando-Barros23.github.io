@@ -34,6 +34,20 @@
                 <label for="nome_mestre">Seu nome de Mestre</label>
                 <input type="text" id="nome_mestre" name="nome_mestre" required>
             </div>
+
+            <div class="form-grupo">
+                <label>Modalidade</label>
+                <div class="radio-group">
+                    <input type="radio" id="modalidade_online" name="modalidade" value="Online">
+                    <label for="modalidade_online">Online</label>
+                    <input type="radio" id="modalidade_presencial" name="modalidade" value="Presencial">
+                    <label for="modalidade_presencial">Presencial</label>
+                </div>
+            </div>
+            <div class="form-grupo" id="location-input-container" style="display: none;">
+                <label for="localizacao">Localização (Cidade/Estado ou Endereço)</label>
+                <input type="text" id="localizacao" name="localizacao">
+            </div>
             <div class="form-grupo">
                 <label>Tipo de Jogo</label>
                 <div class="radio-group">
