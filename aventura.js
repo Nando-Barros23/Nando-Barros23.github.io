@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('slots').textContent = data.vagas;
         document.getElementById('trigger-warning').textContent = data.alerta_gatilho;
         
-        // MUDANÇA AQUI: Adiciona a lógica para exibir a modalidade e localização
         document.getElementById('modality').textContent = data.modalidade || 'Não especificado';
         const locationContainer = document.getElementById('location-display-container');
         if (data.modalidade === 'Presencial' && data.localizacao) {
