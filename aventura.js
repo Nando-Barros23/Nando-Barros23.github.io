@@ -103,12 +103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('adventure-image').src = data.image_url || 'https://i.imgur.com/Q3j5eH0.png';
         document.getElementById('master-name').textContent = data.nome_mestre;
         document.getElementById('system-name').textContent = data.sistema_rpg;
+        document.getElementById('modality').textContent = data.modalidade || 'Não especificado';
         document.getElementById('game-type').textContent = data.tipo_jogo;
         document.getElementById('level').textContent = data.nivel;
         document.getElementById('slots').textContent = data.vagas;
         document.getElementById('trigger-warning').textContent = data.alerta_gatilho;
         
-        document.getElementById('modality').textContent = data.modalidade || 'Não especificado';
         const locationContainer = document.getElementById('location-display-container');
         if (data.modalidade === 'Presencial' && data.localizacao) {
             document.getElementById('location').textContent = data.localizacao;
