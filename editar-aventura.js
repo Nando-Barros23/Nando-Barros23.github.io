@@ -2,47 +2,88 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; // <-- COLE SUA CHAVE AQUI
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const adventureForm = document.getElementById('adventure-form');
     const adventureId = new URLSearchParams(window.location.search).get('id');
+    const userArea = document.getElementById('user-area');
     let currentUser = null;
 
-    // Inicializa o editor de Markdown
-    const easyMDE = new EasyMDE({ element: document.getElementById('descricao') });
+    // NOVOS SELETORES
+    const onlineRadio = document.getElementById('modalidade_online');
+    const presencialRadio = document.getElementById('modalidade_presencial');
+    const locationContainer = document.getElementById('location-input-container');
+    const locationInput = document.getElementById('localizacao');
 
-    // Função para mostrar notificações
-    function showToast(message, type = 'success') { /* ... (código da função showToast) ... */ }
+    const easyMDE = new EasyMDE({ 
+        element: document.getElementById('descricao'),
+        toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "preview"],
+        spellChecker: false,
+        status: false,
+    });
+    
+    // NOVOS EVENT LISTENERS PARA OS RADIOS
+    onlineRadio.addEventListener('change', () => {
+        if (onlineRadio.checked) {
+            locationContainer.style.display = 'none';
+            locationInput.value = '';
+        }
+    });
+    presencialRadio.addEventListener('change', () => {
+        if (presencialRadio.checked) {
+            locationContainer.style.display = 'block';
+        }
+    });
 
-    // Função para preencher o formulário com dados existentes
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000);
+    }
+
     async function populateForm() {
         const { data, error } = await supabaseClient.from('aventuras').select('*').eq('id', adventureId).single();
 
-        if (error || !data) {
-            console.error('Erro ao buscar aventura para edição:', error);
+        if (error || !data || (currentUser && data.user_id !== currentUser.id)) {
+            console.error('Erro ao buscar aventura para edição ou sem permissão:', error);
             document.querySelector('.edit-container').innerHTML = '<h2>Aventura não encontrada ou você não tem permissão para editá-la.</h2>';
             return;
         }
 
-        // Preenche os campos do formulário
         document.getElementById('titulo').value = data.titulo;
         document.getElementById('sistema_rpg').value = data.sistema_rpg;
         document.getElementById('nome_mestre').value = data.nome_mestre;
         document.getElementById('nivel').value = data.nivel;
         document.getElementById('vagas').value = data.vagas;
         document.getElementById('alerta_gatilho').value = data.alerta_gatilho;
-        easyMDE.value(data.descricao); // Preenche o editor de Markdown
+        easyMDE.value(data.descricao);
         
-        // Marca o radio button correto
         if (data.tipo_jogo === 'Campanha') {
             document.getElementById('tipo_campanha').checked = true;
         } else {
             document.getElementById('tipo_oneshot').checked = true;
         }
+
+        // LÓGICA ATUALIZADA PARA PREENCHER OS NOVOS CAMPOS
+        if (data.modalidade === 'Presencial') {
+            presencialRadio.checked = true;
+            locationContainer.style.display = 'block';
+            locationInput.value = data.localizacao || '';
+        } else {
+            onlineRadio.checked = true;
+            locationContainer.style.display = 'none';
+        }
     }
 
-    // Listener para o envio do formulário
     adventureForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formButton = adventureForm.querySelector('button');
@@ -59,6 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             alerta_gatilho: formData.get('alerta_gatilho'),
             tipo_jogo: formData.get('tipo_jogo'),
             nivel: formData.get('nivel'),
+            // LÓGICA ATUALIZADA PARA SALVAR OS NOVOS CAMPOS
+            modalidade: formData.get('modalidade'),
+            localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
         };
 
         const { error } = await supabaseClient.from('aventuras').update(updatedAdventure).eq('id', adventureId);
@@ -69,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             showToast('Aventura atualizada com sucesso!', 'success');
             setTimeout(() => {
-                window.location.href = `aventura.html?id=${adventureId}`; // Volta para a página de detalhes
+                window.location.href = `aventura.html?id=${adventureId}`;
             }, 1500);
         }
 
@@ -80,9 +124,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicialização da página
     const { data: { session } } = await supabaseClient.auth.getSession();
     currentUser = session?.user;
-    if (currentUser && adventureId) {
-        populateForm();
+    if (currentUser) {
+        const { data: profile } = await supabaseClient.from('profiles').select('username').eq('id', currentUser.id).single();
+        const displayName = profile?.username || currentUser.email.split('@')[0];
+        userArea.innerHTML = `
+            <a href="profile.html" class="btn-primario">Olá, ${displayName}</a>
+            <button id="logout-button" class="btn-primario">Sair</button>
+        `;
+        document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
     } else {
         window.location.href = 'index.html';
+    }
+    
+    if (adventureId) {
+        populateForm();
+    } else {
+        document.querySelector('.edit-container').innerHTML = '<h2>Nenhuma aventura especificada para edição.</h2>';
     }
 });
