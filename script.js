@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("VERSÃO FINAL DO SCRIPT.JS CARREGADA - 19/08"); // Nosso marcador de verificação
     // 1. INICIALIZAÇÃO E VARIÁVEIS
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
