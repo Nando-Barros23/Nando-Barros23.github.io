@@ -13,13 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser = null;
     let allAdventures = [];
 
-    // NOVO: Seletores para os campos de modalidade
     const onlineRadio = document.getElementById('modalidade_online');
     const presencialRadio = document.getElementById('modalidade_presencial');
     const locationContainer = document.getElementById('location-input-container');
     const locationInput = document.getElementById('localizacao');
 
-    // INICIALIZA O EDITOR DE MARKDOWN NA CAIXA DE DESCRIÇÃO
     const easyMDE = new EasyMDE({
         element: document.getElementById('descricao'),
         toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "preview"],
@@ -105,12 +103,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // 3. EVENT LISTENERS
-
-    // NOVO: Listeners para os botões de rádio da modalidade
     onlineRadio.addEventListener('change', () => {
         if (onlineRadio.checked) {
             locationContainer.style.display = 'none';
-            locationInput.value = ''; // Limpa o campo ao esconder
+            locationInput.value = '';
         }
     });
     presencialRadio.addEventListener('change', () => {
@@ -159,7 +155,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             titulo: formData.get('titulo'),
             sistema_rpg: formData.get('sistema_rpg'),
             nome_mestre: formData.get('nome_mestre'),
-            // NOVO: Adiciona os novos campos ao objeto a ser salvo
             modalidade: formData.get('modalidade'),
             localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
             vagas: parseInt(formData.get('vagas')),
@@ -179,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('Aventura publicada com sucesso!', 'success');
             adventureForm.reset();
             easyMDE.value("");
-            locationContainer.style.display = 'none'; // Esconde o campo de localização após o reset
+            locationContainer.style.display = 'none';
             loadAdventures();
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
