@@ -13,7 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser = null;
     let allAdventures = [];
 
-    // INICIALIZA O EDITOR DE MARKDOWN NA CAIXA DE DESCRIÇÃO
+    const onlineRadio = document.getElementById('modalidade_online');
+    const presencialRadio = document.getElementById('modalidade_presencial');
+    const locationContainer = document.getElementById('location-input-container');
+    const locationInput = document.getElementById('localizacao');
+
     const easyMDE = new EasyMDE({
         element: document.getElementById('descricao'),
         toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "preview"],
@@ -98,6 +102,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    // 3. EVENT LISTENERS
+    onlineRadio.addEventListener('change', () => {
+        if (onlineRadio.checked) {
+            locationContainer.style.display = 'none';
+            locationInput.value = '';
+        }
+    });
+    presencialRadio.addEventListener('change', () => {
+        if (presencialRadio.checked) {
+            locationContainer.style.display = 'block';
+        }
+    });
+    
     searchBar.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredAdventures = allAdventures.filter(adventure => 
@@ -138,12 +155,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             titulo: formData.get('titulo'),
             sistema_rpg: formData.get('sistema_rpg'),
             nome_mestre: formData.get('nome_mestre'),
+            modalidade: formData.get('modalidade'),
+            localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
             vagas: parseInt(formData.get('vagas')),
             descricao: easyMDE.value(),
             alerta_gatilho: formData.get('alerta_gatilho'),
             tipo_jogo: formData.get('tipo_jogo'),
             nivel: formData.get('nivel'),
-            // CORREÇÃO APLICADA AQUI
             usuario_id: currentUser.id,
             image_url: imageUrl
         };
@@ -156,11 +174,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('Aventura publicada com sucesso!', 'success');
             adventureForm.reset();
             easyMDE.value("");
+            locationContainer.style.display = 'none';
             loadAdventures();
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
+    // 4. INICIALIZAÇÃO
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         currentUser = session?.user || null;
         updateUI(currentUser);
