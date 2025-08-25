@@ -2,118 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Seletores de Elementos
-    const userArea = document.getElementById('user-area');
-    const usernameDisplay = document.getElementById('username-display');
-    const emailDisplay = document.getElementById('email-display');
-    const roleDisplay = document.getElementById('role-display');
-    const avatarImg = document.getElementById('avatar-img');
-    const btnChangeAvatar = document.getElementById('btn-change-avatar');
-    const avatarUpload = document.getElementById('avatar-upload');
-    const profileForm = document.getElementById('profile-form');
-    const usernameInput = document.getElementById('username-input');
-    const messageArea = document.getElementById('message-area');
-    const masterApplicationContent = document.getElementById('master-application-content');
-    const masterApplicationSection = document.getElementById('master-application-section');
-    const myAdventuresSection = document.getElementById('my-adventures-section');
-    const myAdventuresList = document.getElementById('my-adventures-list');
-
-    let currentUser = null;
-
-    // Função Principal de Inicialização da Página
-    async function initializeProfilePage() {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        currentUser = session?.user;
-
-        if (currentUser) {
-            await loadProfileData(currentUser);
-        } else {
-            window.location.href = 'login.html';
-        }
-    }
-
-    // Listener para mudanças de login (ex: logout)
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-        if (!session) {
-            window.location.href = 'login.html';
-        }
-    });
-
-    // 2. FUNÇÕES PRINCIPAIS
-    
-    function showMessage(message, isError = false) { /* ... (código existente sem alterações) ... */ }
-    
-    async function loadProfileData(user) {
-        // Atualiza o cabeçalho
-        const { data: profileForHeader } = await supabaseClient.from('profiles').select('username').eq('id', user.id).single();
-        const displayName = profileForHeader?.username || user.email.split('@')[0];
-        userArea.innerHTML = `
-            <a href="index.html" class="btn-primario" style="text-decoration: none; width: auto; padding: 0.5rem 1rem;">Página Principal</a> 
-            <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
-        `;
-        document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
-
-        // Busca o resto dos dados do perfil para preencher a página
-        const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-        if (error && error.code !== 'PGRST116') { 
-            console.error('Erro ao buscar perfil:', error); 
-            return; 
-        }
-        
-        if (data) {
-            usernameDisplay.textContent = data.username || 'Sem nome de usuário';
-            emailDisplay.textContent = user.email;
-            roleDisplay.textContent = data.role;
-            usernameInput.value = data.username;
-            if (data.avatar_url) { avatarImg.src = data.avatar_url; }
-            
-            if (data.role && data.role.trim().toLowerCase() === 'master') {
-                masterApplicationSection.style.display = 'none';
-                myAdventuresSection.style.display = 'block';
-                loadMyAdventures(user);
-            } else {
-                masterApplicationSection.style.display = 'block';
-                myAdventuresSection.style.display = 'none';
-                checkMasterApplicationStatus(user);
-            }
-        }
-    }
-
-    async function loadMyAdventures(user) { /* ... (código existente sem alterações) ... */ }
-    
-    async function toggleSubscribers(adventureId, headerElement) { /* ... (código existente sem alterações) ... */ }
-
-    async function checkMasterApplicationStatus(user) { /* ... (código existente sem alterações) ... */ }
-
-    function renderMasterApplicationForm(user) { /* ... (código existente sem alterações) ... */ }
-    
-    // 3. EVENT LISTENERS
-    
-    myAdventuresList.addEventListener('click', (e) => {
-        const header = e.target.closest('.my-adventure-header');
-        if (header) {
-            const adventureId = header.dataset.adventureId;
-            toggleSubscribers(adventureId, header);
-        }
-    });
-
-    profileForm.addEventListener('submit', async (e) => { /* ... (código existente sem alterações) ... */ });
-    btnChangeAvatar.addEventListener('click', () => { avatarUpload.click(); });
-    avatarUpload.addEventListener('change', async (e) => { /* ... (código existente sem alterações) ... */ });
-
-    // 4. INICIALIZAÇÃO
-    initializeProfilePage();
-});
-
-// Para garantir que o código completo seja usado, aqui está o arquivo inteiro
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. INICIALIZAÇÃO
-    const { createClient } = supabase;
-    const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Seletores de Elementos
@@ -151,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!session) {
             window.location.href = 'login.html';
         } else if (currentUser && session.user.id !== currentUser.id) {
-            // Se o usuário mudou, recarrega a página de perfil.
             initializeProfilePage();
         }
     });
@@ -200,7 +88,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadMyAdventures(user) {
-        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('user_id', user.id).order('created_at', { ascending: false });
+        // CORREÇÃO APLICADA AQUI
+        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('usuario_id', user.id).order('created_at', { ascending: false });
         if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
 
         myAdventuresList.innerHTML = '';
