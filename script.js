@@ -171,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             alerta_gatilho: formData.get('alerta_gatilho'),
             tipo_jogo: formData.get('tipo_jogo'),
             nivel: formData.get('nivel'),
+            // CORREÇÃO APLICADA AQUI
             usuario_id: currentUser.id,
             image_url: imageUrl
         };
