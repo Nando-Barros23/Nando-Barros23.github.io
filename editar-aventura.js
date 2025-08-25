@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function populateForm() {
         const { data, error } = await supabaseClient.from('aventuras').select('*').eq('id', adventureId).single();
 
-        if (error || !data || (currentUser && data.user_id !== currentUser.id)) {
+        // CORREÇÃO APLICADA AQUI
+        if (error || !data || (currentUser && data.usuario_id !== currentUser.id)) {
             console.error('Erro ao buscar aventura para edição ou sem permissão:', error);
             document.querySelector('.edit-container').innerHTML = '<h2>Aventura não encontrada ou você não tem permissão para editá-la.</h2>';
             return;
@@ -73,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('tipo_oneshot').checked = true;
         }
 
-        // LÓGICA ATUALIZADA PARA PREENCHER OS NOVOS CAMPOS
         if (data.modalidade === 'Presencial') {
             presencialRadio.checked = true;
             locationContainer.style.display = 'block';
@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             alerta_gatilho: formData.get('alerta_gatilho'),
             tipo_jogo: formData.get('tipo_jogo'),
             nivel: formData.get('nivel'),
-            // LÓGICA ATUALIZADA PARA SALVAR OS NOVOS CAMPOS
             modalidade: formData.get('modalidade'),
             localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
         };
