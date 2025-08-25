@@ -139,11 +139,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             sistema_rpg: formData.get('sistema_rpg'),
             nome_mestre: formData.get('nome_mestre'),
             vagas: parseInt(formData.get('vagas')),
-            descricao: easyMDE.value(), // Pega o valor do editor de Markdown
+            descricao: easyMDE.value(),
             alerta_gatilho: formData.get('alerta_gatilho'),
             tipo_jogo: formData.get('tipo_jogo'),
             nivel: formData.get('nivel'),
-            user_id: currentUser.id,
+            // CORREÇÃO APLICADA AQUI
+            usuario_id: currentUser.id,
             image_url: imageUrl
         };
         
@@ -154,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             showToast('Aventura publicada com sucesso!', 'success');
             adventureForm.reset();
-            easyMDE.value(""); // Limpa o editor de Markdown
+            easyMDE.value("");
             loadAdventures();
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
