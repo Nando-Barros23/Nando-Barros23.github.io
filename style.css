@@ -29,8 +29,7 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .adventure-card h4 { font-family: var(--fonte-label); font-size: 1.25rem; color: var(--cor-texto-principal); margin-bottom: 1rem; }
 .adventure-card p { color: var(--cor-texto-secundario); margin-bottom: 0.5rem; font-size: 0.95rem; }
 .adventure-card strong { color: var(--cor-texto-principal); font-weight: 700; }
-.painel-lateral, .edit-container { background-color: var(--cor-fundo-painel); padding: 1.6rem; border-radius: 8px; border: 1px solid var(--cor-borda); }
-.edit-container { max-width: 900px; margin: 2rem auto; }
+.painel-lateral { background-color: var(--cor-fundo-painel); padding: 1.6rem; border-radius: 8px; border: 1px solid var(--cor-borda); position: sticky; top: 2rem; }
 .form-grupo { margin-bottom: 1.2rem; }
 .form-grupo label { display: block; margin-bottom: 0.5rem; font-family: var(--fonte-label); font-weight: 700; color: var(--cor-primaria); }
 .form-grupo input, .form-grupo textarea, .form-grupo select { width: 100%; padding: 0.8rem; background-color: #fff; border: 1px solid var(--cor-borda); border-radius: 4px; color: var(--cor-texto-principal); font-size: 1rem; font-family: var(--fonte-corpo); }
@@ -62,6 +61,7 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 #comment-form button { width: auto; }
 #action-buttons-area { display: flex; justify-content: flex-start; }
 #comment-text::placeholder { font-family: var(--fonte-label); color: #999; }
+#title-container { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .btn-icon-delete { background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; flex-shrink: 0; }
 .btn-icon-delete:hover { background-color: #c82333; }
 .comment-delete-btn { background: none; border: none; color: var(--cor-texto-secundario); cursor: pointer; font-size: 1rem; padding: 0.2rem; }
@@ -86,13 +86,10 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .subscribers-list { padding: 0 1rem 1rem 1rem; border-top: 1px solid var(--cor-borda); display: none; }
 .subscriber-item { display: flex; align-items: center; gap: 10px; padding: 0.5rem 0; font-family: var(--fonte-corpo); }
 .subscriber-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
-#title-container { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-#title-container h2 { flex-grow: 1; }
 .master-actions { display: flex; gap: 0.5rem; }
 .btn-icon-edit { background-color: var(--cor-texto-secundario); color: white; border-radius: 50%; width: 40px; height: 40px; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; text-decoration: none; flex-shrink: 0; }
 .btn-icon-edit:hover { background-color: #4a444f; }
-
-/* Estilos do Editor de Markdown */
+.edit-container { max-width: 900px; margin: 2rem auto; padding: 2rem; background-color: var(--cor-fundo-painel); border-radius: 8px; }
 .EasyMDEContainer .CodeMirror { border-color: var(--cor-borda); background-color: #fff; border-radius: 4px; font-family: var(--fonte-corpo); }
 .editor-toolbar { border-radius: 4px 4px 0 0; border-color: var(--cor-borda); }
 .editor-toolbar a.active, .editor-toolbar a:hover { background: var(--cor-fundo-card); border-color: var(--cor-borda); }
