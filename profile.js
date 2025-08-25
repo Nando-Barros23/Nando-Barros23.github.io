@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ'; 
+
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Seletores de Elementos
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let currentUser = null;
 
+    // Função Principal de Inicialização da Página
     async function initializeProfilePage() {
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
@@ -36,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadProfileData(currentUser);
     }
     
+    // Listener para mudanças de login (ex: logout)
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         if (!session) {
             window.location.href = 'login.html';
@@ -44,8 +47,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // 2. FUNÇÕES PRINCIPAIS
+    
     function showMessage(message, isError = false) {
-        if (!messageArea) return;
+        // Esta função não estava no seu arquivo, adicionei de volta
+        if (!messageArea) {
+            console.log(message);
+            return;
+        }
         messageArea.textContent = message;
         messageArea.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
         messageArea.style.color = isError ? '#721c24' : '#155724';
@@ -88,8 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadMyAdventures(user) {
-        // CORREÇÃO APLICADA AQUI
-        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('usuario_id', user.id).order('created_at', { ascending: false });
+        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('user_id', user.id).order('created_at', { ascending: false });
         if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
 
         myAdventuresList.innerHTML = '';
@@ -201,6 +209,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
+    // 3. EVENT LISTENERS
+    
     myAdventuresList.addEventListener('click', (e) => {
         const header = e.target.closest('.my-adventure-header');
         if (header) {
@@ -235,5 +245,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // 4. INICIALIZAÇÃO
     initializeProfilePage();
 });
