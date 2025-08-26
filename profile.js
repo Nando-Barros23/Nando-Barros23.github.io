@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Seletores de Elementos
     const userArea = document.getElementById('user-area');
     const usernameDisplay = document.getElementById('username-display');
     const emailDisplay = document.getElementById('email-display');
@@ -20,18 +18,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const masterApplicationSection = document.getElementById('master-application-section');
     const myAdventuresSection = document.getElementById('my-adventures-section');
     const myAdventuresList = document.getElementById('my-adventures-list');
-
     let currentUser = null;
 
     async function initializeProfilePage() {
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-        
         if (sessionError || !session) {
             console.error('Erro ao buscar sessão ou sessão não encontrada:', sessionError);
             window.location.href = 'login.html';
             return;
         }
-
         currentUser = session.user;
         await loadProfileData(currentUser);
     }
@@ -88,7 +83,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadMyAdventures(user) {
-        // CORREÇÃO APLICADA AQUI
         const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('usuario_id', user.id).order('created_at', { ascending: false });
         if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
 
