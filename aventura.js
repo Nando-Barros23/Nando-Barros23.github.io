@@ -67,9 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (targetButton.matches('.comment-delete-btn')) { handleDeleteComment(targetButton); }
         if (targetButton.matches('#delete-adventure-btn')) { handleDeleteAdventure(); }
         if (targetButton.matches('#subscribe-btn')) { handleSubscription(); }
-        if (targetButton.matches('#edit-adventure-btn')) {
-            window.location.href = `editar-aventura.html?id=${adventureId}`;
-        }
     });
 
     initializePage();
@@ -103,10 +100,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('adventure-image').src = data.image_url || 'https://i.imgur.com/Q3j5eH0.png';
         document.getElementById('master-name').textContent = data.nome_mestre;
         document.getElementById('system-name').textContent = data.sistema_rpg;
+        document.getElementById('modality').textContent = data.modalidade || 'Não especificado';
         document.getElementById('game-type').textContent = data.tipo_jogo;
         document.getElementById('level').textContent = data.nivel;
         document.getElementById('slots').textContent = data.vagas;
         document.getElementById('trigger-warning').textContent = data.alerta_gatilho;
+        
+        const locationContainer = document.getElementById('location-display-container');
+        if (data.modalidade === 'Presencial' && data.localizacao) {
+            document.getElementById('location').textContent = data.localizacao;
+            locationContainer.style.display = 'block';
+        } else {
+            locationContainer.style.display = 'none';
+        }
+
         const descriptionElement = document.getElementById('adventure-description');
         if (data.descricao && window.marked) {
             descriptionElement.innerHTML = marked.parse(data.descricao);
@@ -123,7 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         playerActionArea.innerHTML = '';
         titleContainer.querySelectorAll('.master-action').forEach(el => el.remove());
         
-        // CORREÇÃO APLICADA AQUI
         if (currentUser && adventureData && currentUser.id === adventureData.usuario_id) {
             const masterActionsWrapper = document.createElement('div');
             masterActionsWrapper.className = 'master-actions';
@@ -187,10 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const authorProfile = profileMap.get(comment.user_id);
             const authorName = authorProfile?.username || 'Usuário';
             const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
-            
-            // CORREÇÃO APLICADA AQUI
             const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.usuario_id));
-            
             commentEl.innerHTML = `
                 <div class="comment-avatar"><img src="${authorAvatar}" alt="Avatar de ${authorName}"></div>
                 <div class="comment-body">
