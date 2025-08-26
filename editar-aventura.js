@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. INICIALIZAÇÃO
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userArea = document.getElementById('user-area');
     let currentUser = null;
 
-    // NOVOS SELETORES
     const onlineRadio = document.getElementById('modalidade_online');
     const presencialRadio = document.getElementById('modalidade_presencial');
     const locationContainer = document.getElementById('location-input-container');
@@ -23,7 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         status: false,
     });
     
-    // NOVOS EVENT LISTENERS PARA OS RADIOS
     onlineRadio.addEventListener('change', () => {
         if (onlineRadio.checked) {
             locationContainer.style.display = 'none';
@@ -53,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function populateForm() {
         const { data, error } = await supabaseClient.from('aventuras').select('*').eq('id', adventureId).single();
 
-        // CORREÇÃO APLICADA AQUI
+        // NOTA: A CORREÇÃO ESTÁ AQUI.
         if (error || !data || (currentUser && data.usuario_id !== currentUser.id)) {
             console.error('Erro ao buscar aventura para edição ou sem permissão:', error);
             document.querySelector('.edit-container').innerHTML = '<h2>Aventura não encontrada ou você não tem permissão para editá-la.</h2>';
@@ -120,7 +117,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         formButton.textContent = 'Salvar Alterações';
     });
     
-    // Inicialização da página
     const { data: { session } } = await supabaseClient.auth.getSession();
     currentUser = session?.user;
     if (currentUser) {
