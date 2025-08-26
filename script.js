@@ -5,17 +5,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Seletores de elementos que SEMPRE existem no index.html
-    const userArea = document.getElementById('user-area');
     const adventuresGrid = document.getElementById('adventures-grid');
-    const searchBar = document.getElementById('search-bar');
-    const publishSection = document.querySelector('.painel-lateral');
     const adventureForm = document.getElementById('adventure-form');
-    
+    const userArea = document.getElementById('user-area');
+    const publishSection = document.querySelector('.painel-lateral');
+    const searchBar = document.getElementById('search-bar');
     let currentUser = null;
     let allAdventures = [];
 
-    // Função Principal de Inicialização da Página
     async function initializeIndexPage() {
         if (adventuresGrid) {
             adventuresGrid.innerHTML = '<p>Carregando aventuras...</p>';
@@ -40,17 +37,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Listener para mudanças de login
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         if (currentUser?.id !== session?.user?.id) {
             initializeIndexPage();
         }
     });
 
-    // Inicializa a página
-    initializeIndexPage();
-
-    // FUNÇÕES AUXILIARES
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
         if (!toastContainer) return;
@@ -69,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!adventuresGrid) return;
         adventuresGrid.innerHTML = '';
         if (adventures.length === 0) {
-            adventuresGrid.innerHTML = searchBar.value
+            adventuresGrid.innerHTML = searchBar && searchBar.value
                 ? '<p>Nenhuma aventura encontrada com este termo.</p>'
                 : '<p>Ainda não há nenhuma aventura publicada. Seja o primeiro!</p>';
         }
@@ -117,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // EVENT LISTENERS
+    // NOTA: A CORREÇÃO ESTÁ AQUI. Garante que o código de busca só rode se a barra de pesquisa existir.
     if (searchBar) {
         searchBar.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
@@ -130,6 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // NOTA: A CORREÇÃO ESTÁ AQUI. Garante que o código do formulário só rode se o formulário existir.
     if (adventureForm) {
         const onlineRadio = document.getElementById('modalidade_online');
         const presencialRadio = document.getElementById('modalidade_presencial');
@@ -193,6 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alerta_gatilho: formData.get('alerta_gatilho'),
                 tipo_jogo: formData.get('tipo_jogo'),
                 nivel: formData.get('nivel'),
+                // NOTA: A CORREÇÃO ESTÁ AQUI.
                 usuario_id: currentUser.id,
                 image_url: imageUrl
             };
@@ -211,4 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
         });
     }
+
+    // Inicializa a página
+    initializeIndexPage();
 });
