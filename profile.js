@@ -84,8 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadMyAdventures(user) {
-        // NOTA: A CORREÇÃO ESTÁ AQUI.
-        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('usuario_id', user.id).order('created_at', { ascending: false });
+        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('user_id', user.id).order('created_at', { ascending: false });
         if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
 
         myAdventuresList.innerHTML = '';
