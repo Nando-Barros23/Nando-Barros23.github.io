@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     adventureForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (easyMDE.value().trim() === '') {
+            showToast('O campo "Descrição" é obrigatório.', 'error');
+            return; // Impede o envio se a descrição estiver vazia
+        }
+
         const formButton = adventureForm.querySelector('button');
         formButton.disabled = true;
         formButton.textContent = 'Salvando...';
