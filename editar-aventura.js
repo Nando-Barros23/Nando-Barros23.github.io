@@ -49,9 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function populateForm() {
         const { data, error } = await supabaseClient.from('aventuras').select('*').eq('id', adventureId).single();
-
-        // NOTA: A CORREÇÃO ESTÁ AQUI.
-        if (error || !data || (currentUser && data.usuario_id !== currentUser.id)) {
+        if (error || !data || (currentUser && data.user_id !== currentUser.id)) {
             console.error('Erro ao buscar aventura para edição ou sem permissão:', error);
             document.querySelector('.edit-container').innerHTML = '<h2>Aventura não encontrada ou você não tem permissão para editá-la.</h2>';
             return;
