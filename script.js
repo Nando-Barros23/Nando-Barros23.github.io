@@ -186,8 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alerta_gatilho: formData.get('alerta_gatilho'),
                 tipo_jogo: formData.get('tipo_jogo'),
                 nivel: formData.get('nivel'),
-                // NOTA: A CORREÇÃO ESTÁ AQUI.
-                usuario_id: currentUser.id,
+                user_id: currentUser.id,
                 image_url: imageUrl
             };
             
