@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         titleContainer.querySelectorAll('.master-action').forEach(el => el.remove());
         
         // NOTA: A CORREÇÃO ESTÁ AQUI.
-        if (currentUser && adventureData && currentUser.id === adventureData.usuario_id) {
+        if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
             const masterActionsWrapper = document.createElement('div');
             masterActionsWrapper.className = 'master-actions';
             
@@ -194,9 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const authorProfile = profileMap.get(comment.user_id);
             const authorName = authorProfile?.username || 'Usuário';
             const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
-            
-            // NOTA: A CORREÇÃO ESTÁ AQUI.
-            const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.usuario_id));
+            const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.user_id));
             
             commentEl.innerHTML = `
                 <div class="comment-avatar"><img src="${authorAvatar}" alt="Avatar de ${authorName}"></div>
