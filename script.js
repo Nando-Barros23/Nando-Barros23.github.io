@@ -109,7 +109,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // NOTA: A CORREÇÃO ESTÁ AQUI. Garante que o código de busca só rode se a barra de pesquisa existir.
     if (searchBar) {
         searchBar.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
@@ -122,7 +121,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // NOTA: A CORREÇÃO ESTÁ AQUI. Garante que o código do formulário só rode se o formulário existir.
     if (adventureForm) {
         const onlineRadio = document.getElementById('modalidade_online');
         const presencialRadio = document.getElementById('modalidade_presencial');
@@ -155,6 +153,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showToast('Você precisa estar logado para publicar.', 'error');
                 return;
             }
+            if (easyMDE.value().trim() === '') {
+                showToast('O campo "Descrição" é obrigatório.', 'error');
+                return; 
+            }
+
             const formButton = adventureForm.querySelector('button');
             formButton.disabled = true;
             formButton.textContent = 'Publicando...';
@@ -199,12 +202,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 adventureForm.reset();
                 easyMDE.value("");
                 locationContainer.style.display = 'none';
+                onlineRadio.checked = true;
                 initializeIndexPage();
             }
             formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
         });
     }
 
-    // Inicializa a página
     initializeIndexPage();
 });
