@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const adventureId = new URLSearchParams(window.location.search).get('id');
     const mainContainer = document.getElementById('adventure-detail-main');
-    
+    const userArea = document.getElementById('user-area');
+
+    // Função principal que orquestra o carregamento da página
     async function initializePage() {
         try {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -23,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (adventureData) {
                 displayAdventureDetails(adventureData);
+                // CORREÇÃO: Passando os dados necessários para as funções
                 await renderActionButtons(currentUser, adventureData);
                 await renderComments(currentUser, adventureData);
                 renderCommentForm(currentUser);
@@ -33,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Busca os detalhes da aventura no Supabase
     async function fetchAdventureDetails() {
         const { data, error } = await supabaseClient.from('aventuras').select('*').eq('id', adventureId).single();
         if (error || !data) {
@@ -43,8 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return data;
     }
     
+    // Atualiza o cabeçalho com informações do usuário
     async function updateHeaderUI(user) {
-        const userArea = document.getElementById('user-area');
         if (user) {
             const { data: profile } = await supabaseClient.from('profiles').select('username').eq('id', user.id).single();
             const displayName = profile?.username || user.email.split('@')[0];
@@ -55,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Renderiza os botões de ação (Mestre: Editar/Arquivar/Deletar, Jogador: Inscrever/Cancelar)
     async function renderActionButtons(currentUser, adventureData) {
         const titleContainer = document.getElementById('title-container');
         const playerActionArea = document.getElementById('action-buttons-area');
@@ -87,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Preenche os detalhes da aventura na página
     function displayAdventureDetails(data) {
         document.title = `${data.titulo} - Dados & Calangos`;
         document.getElementById('adventure-title').textContent = data.titulo;
@@ -113,6 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    // Renderiza a lista de comentários
     async function renderComments(currentUser, adventureData) {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
@@ -131,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             commentEl.className = 'comment';
             const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.user_id));
             commentEl.innerHTML = `
-                <div class="comment-avatar"><img src="${comment.profiles?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'}" alt=""></div>
+                <div class="comment-avatar"><img src="${comment.profiles?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'}" alt="Avatar"></div>
                 <div class="comment-body">
                     <div class="comment-header">
                         <span>${comment.profiles?.username || 'Usuário'}</span>
@@ -143,6 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Renderiza o formulário para adicionar novos comentários
     function renderCommentForm(currentUser) {
         const container = document.getElementById('comment-form-container');
         if (!container) return;
@@ -153,7 +161,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function handleSubscription(currentUser, adventureData) {
+    // --- Funções de Handler (Lógica das Ações) ---
+
+    async function handleSubscription() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const currentUser = session?.user;
+        const adventureData = await fetchAdventureDetails();
+        if(!currentUser || !adventureData) return;
+
         const { data: existingSubscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
         if (existingSubscription) {
             await supabaseClient.from('inscricoes').delete().match({ user_id: currentUser.id, aventura_id: adventureId });
@@ -165,7 +180,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         await renderActionButtons(currentUser, adventureData);
     }
     
-    async function handleNewComment(currentUser, adventureData) {
+    async function handleNewComment(e) {
+        e.preventDefault();
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const currentUser = session?.user;
+        const adventureData = await fetchAdventureDetails();
+        if(!currentUser || !adventureData) return;
+
         const contentEl = document.getElementById('comment-text');
         const content = contentEl.value;
         if (!content.trim()) return;
@@ -179,7 +200,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         formButton.disabled = false;
     }
     
-    async function handleDeleteComment(button, currentUser, adventureData) {
+    async function handleDeleteComment(button) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const currentUser = session?.user;
+        const adventureData = await fetchAdventureDetails();
+        if(!currentUser || !adventureData) return;
+
         const commentId = button.dataset.commentId;
         const confirmed = await showCustomConfirm('Tem certeza que deseja deletar este comentário?');
         if (confirmed) {
@@ -187,33 +213,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             await renderComments(currentUser, adventureData);
         }
     }
+
+    async function handleArchiveAdventure() {
+        const confirmed = await showCustomConfirm('Tem a certeza de que quer ARQUIVAR esta aventura? Ela irá desaparecer do mural principal, mas continuará visível no seu perfil.');
+        if (confirmed) {
+            await supabaseClient.from('aventuras').update({ status: 'arquivada' }).eq('id', adventureId);
+            showToast('Aventura arquivada com sucesso!');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    }
     
+    async function handleDeleteAdventure() {
+        const confirmed = await showCustomConfirm('DELETAR PERMANENTEMENTE?\n\nEsta ação é irreversível e apagará todos os dados da aventura. Para apenas a esconder do mural, use a opção "Arquivar".');
+        if (confirmed) {
+            await supabaseClient.from('aventuras').delete().eq('id', adventureId);
+            showToast('Aventura deletada com sucesso!');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    }
+    
+    // --- Funções de Suporte 
     function showToast(message, type = 'success') { const toastContainer = document.getElementById('toast-container'); if (!toastContainer) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.textContent = message; toastContainer.appendChild(toast); setTimeout(() => { toast.classList.add('show'); }, 10); setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000); }
     function showCustomConfirm(message) { return new Promise((resolve) => { const overlay = document.getElementById('custom-confirm-overlay'); const messageEl = document.getElementById('confirm-message'); const btnYes = document.getElementById('confirm-btn-yes'); const btnNo = document.getElementById('confirm-btn-no'); messageEl.textContent = message; overlay.classList.remove('hidden'); const close = (value) => { overlay.classList.add('hidden'); btnYes.onclick = null; btnNo.onclick = null; resolve(value); }; btnYes.onclick = () => close(true); btnNo.onclick = () => close(false); }); }
-    async function handleArchiveAdventure() { const confirmed = await showCustomConfirm('Arquivar aventura?'); if (confirmed) { await supabaseClient.from('aventuras').update({ status: 'arquivada' }).eq('id', adventureId); window.location.href = 'index.html'; } }
-    async function handleDeleteAdventure() { const confirmed = await showCustomConfirm('DELETAR PERMANENTEMENTE?'); if (confirmed) { await supabaseClient.from('aventuras').delete().eq('id', adventureId); window.location.href = 'index.html'; } }
 
-    mainContainer.addEventListener('click', async (e) => {
+    // --- Listeners de Eventos ---
+    mainContainer.addEventListener('click', (e) => {
         const button = e.target.closest('button');
         if (!button) return;
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const user = session?.user;
-        const advData = await fetchAdventureDetails();
-        if (button.matches('.comment-delete-btn')) handleDeleteComment(button, user, advData);
-        if (button.matches('#subscribe-btn')) handleSubscription(user, advData);
+        if (button.matches('.comment-delete-btn')) handleDeleteComment(button);
+        if (button.matches('#subscribe-btn')) handleSubscription();
         if (button.matches('#archive-adventure-btn')) handleArchiveAdventure();
         if (button.matches('#delete-adventure-btn')) handleDeleteAdventure();
     });
 
-    mainContainer.addEventListener('submit', async (e) => {
+    mainContainer.addEventListener('submit', (e) => {
         if (e.target.matches('#comment-form')) {
-            e.preventDefault(); // Impede o recarregamento da página IMEDIATAMENTE
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const user = session?.user;
-            const advData = await fetchAdventureDetails();
-            if (user && advData) {
-                await handleNewComment(user, advData);
-            }
+            e.preventDefault();
+            handleNewComment(e);
         }
     });
 
