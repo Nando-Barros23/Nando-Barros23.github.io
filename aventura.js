@@ -11,6 +11,99 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userArea = document.getElementById('user-area');
     const mainContainer = document.getElementById('adventure-detail-main');
 
+    async function handleArchiveAdventure() {
+        const confirmed = await showCustomConfirm('Tem a certeza de que quer ARQUIVAR esta aventura? Ela irá desaparecer do mural principal, mas continuará visível no seu perfil.');
+        if (!confirmed) return;
+
+        const { error } = await supabaseClient
+            .from('aventuras')
+            .update({ status: 'arquivada' })
+            .eq('id', adventureId);
+
+        if (error) { 
+            showToast('Erro ao arquivar a aventura.', 'error'); 
+        } else {
+            showToast('Aventura arquivada com sucesso!');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    }
+
+    async function handleDeleteAdventure() {
+        const confirmed = await showCustomConfirm('DELETAR PERMANENTEMENTE?\n\nEsta ação é irreversível e apagará todos os dados da aventura. Para apenas a esconder do mural, use a opção "Arquivar".');
+        if (!confirmed) return;
+
+        const { error } = await supabaseClient.from('aventuras').delete().eq('id', adventureId);
+        if (error) { 
+            showToast('Erro ao deletar a aventura.', 'error'); 
+        } else {
+            showToast('Aventura deletada com sucesso!');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    }
+
+    mainContainer.addEventListener('click', (e) => {
+        const targetButton = e.target.closest('button, a');
+        if (!targetButton) return;
+        if (targetButton.matches('.comment-delete-btn')) { handleDeleteComment(targetButton); }
+        if (targetButton.matches('#archive-adventure-btn')) { handleArchiveAdventure(); } // ADICIONADO
+        if (targetButton.matches('#delete-adventure-btn')) { handleDeleteAdventure(); }
+        if (targetButton.matches('#subscribe-btn')) { handleSubscription(); }
+    });
+
+    async function renderActionButtons() {
+        const titleContainer = document.getElementById('title-container');
+        const playerActionArea = document.getElementById('action-buttons-area');
+        if (!playerActionArea || !titleContainer) return;
+
+        playerActionArea.innerHTML = '';
+        const existingMasterActions = titleContainer.querySelector('.master-actions');
+        if (existingMasterActions) existingMasterActions.remove();
+        
+        if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
+            const masterActionsWrapper = document.createElement('div');
+            masterActionsWrapper.className = 'master-actions';
+            
+            // 1. Botão Editar
+            const editButton = document.createElement('a');
+            editButton.href = `editar-aventura.html?id=${adventureData.id}`;
+            editButton.className = 'btn-icon-edit';
+            editButton.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+            editButton.title = 'Editar Aventura';
+            
+            // 2. Botão Arquivar
+            const archiveButton = document.createElement('button');
+            archiveButton.id = 'archive-adventure-btn';
+            archiveButton.className = 'btn-icon-edit'; // Reutilizando o estilo do botão de editar
+            archiveButton.style.backgroundColor = 'var(--cor-texto-secundario)'; // Cor diferente para distinguir
+            archiveButton.innerHTML = '<i class="fas fa-archive"></i>';
+            archiveButton.title = 'Arquivar Aventura';
+
+            // 3. Botão Deletar
+            const deleteButton = document.createElement('button');
+            deleteButton.id = 'delete-adventure-btn';
+            deleteButton.className = 'btn-icon-delete';
+            deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteButton.title = 'Deletar Aventura Permanentemente';
+            
+            masterActionsWrapper.appendChild(editButton);
+            masterActionsWrapper.appendChild(archiveButton);
+            masterActionsWrapper.appendChild(deleteButton);
+            titleContainer.appendChild(masterActionsWrapper);
+
+        } else if (currentUser && adventureData) {
+            const { count } = await supabaseClient.from('inscricoes').select('*', { count: 'exact', head: true }).eq('aventura_id', adventureId);
+            const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
+
+            if (subscription) {
+                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
+            } else if (count >= adventureData.vagas) {
+                playerActionArea.innerHTML = `<button class="btn-primario btn-inscricao" disabled>Vagas Esgotadas</button>`;
+            } else {
+                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+            }
+        }
+    }
+    
     async function initializePage() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         currentUser = session?.user;
@@ -22,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         adventureData = await fetchAdventureDetails();
         if (adventureData) {
             displayAdventureDetails(adventureData);
-            renderActionButtons();
+            await renderActionButtons(); // Adicionado await para garantir a renderização
             renderComments();
             renderCommentForm();
         }
@@ -47,11 +140,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
+    supabaseClient.auth.onAuthStateChange(async (_event, session) => {
         const newUser = session?.user;
         if (currentUser?.id !== newUser?.id) {
             currentUser = newUser;
-            initializePage();
+            await initializePage();
         }
     });
 
@@ -61,14 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
     
-    mainContainer.addEventListener('click', (e) => {
-        const targetButton = e.target.closest('button, a');
-        if (!targetButton) return;
-        if (targetButton.matches('.comment-delete-btn')) { handleDeleteComment(targetButton); }
-        if (targetButton.matches('#delete-adventure-btn')) { handleDeleteAdventure(); }
-        if (targetButton.matches('#subscribe-btn')) { handleSubscription(); }
-    });
-
     initializePage();
 
     function showToast(message, type = 'success') {
@@ -121,52 +206,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             descriptionElement.textContent = data.descricao || 'Nenhuma descrição fornecida.';
         }
     }
-
-    async function renderActionButtons() {
-        const titleContainer = document.getElementById('title-container');
-        const playerActionArea = document.getElementById('action-buttons-area');
-        if (!playerActionArea || !titleContainer) return;
-
-        playerActionArea.innerHTML = '';
-        titleContainer.querySelectorAll('.master-action').forEach(el => el.remove());
-        
-        // NOTA: A CORREÇÃO ESTÁ AQUI.
-        if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
-            const masterActionsWrapper = document.createElement('div');
-            masterActionsWrapper.className = 'master-actions';
-            
-            const editButton = document.createElement('a');
-            editButton.id = 'edit-adventure-btn';
-            editButton.href = `editar-aventura.html?id=${adventureData.id}`;
-            editButton.className = 'btn-icon-edit master-action';
-            editButton.innerHTML = '<i class="fas fa-pencil-alt"></i>';
-            editButton.title = 'Editar Aventura';
-            
-            const deleteButton = document.createElement('button');
-            deleteButton.id = 'delete-adventure-btn';
-            deleteButton.className = 'btn-icon-delete master-action';
-            deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
-            deleteButton.title = 'Deletar Aventura';
-            
-            masterActionsWrapper.appendChild(editButton);
-            masterActionsWrapper.appendChild(deleteButton);
-            titleContainer.appendChild(masterActionsWrapper);
-        } else if (currentUser && adventureData) {
-            const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
-            if (subscription) {
-                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
-            } else {
-                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
-            }
-        }
-    }
-
+    
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
         commentsList.innerHTML = '<p>Carregando comentários...</p>';
 
-        const { data: comments, error: commentsError } = await supabaseClient.from('comentarios').select('*').eq('aventura_id', adventureId).order('created_at', { ascending: true });
+        const { data: comments, error: commentsError } = await supabaseClient.from('comentarios').select('*, profiles (id, username, avatar_url)').eq('aventura_id', adventureId).order('created_at', { ascending: true });
         if (commentsError) {
             console.error("Erro ao buscar comentários:", commentsError);
             commentsList.innerHTML = '<p style="color: red;">Não foi possível carregar os comentários.</p>';
@@ -176,22 +222,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
             return;
         }
-        const userIds = [...new Set(comments.map(comment => comment.user_id))];
-        const { data: profiles, error: profilesError } = await supabaseClient.from('profiles').select('id, username, avatar_url').in('id', userIds);
-        if (profilesError) { console.error("Erro ao buscar perfis:", profilesError); }
-
-        const profileMap = new Map();
-        if (profiles) {
-            profiles.forEach(profile => {
-                profileMap.set(profile.id, profile);
-            });
-        }
         
         commentsList.innerHTML = '';
         comments.forEach(comment => {
             const commentEl = document.createElement('div');
             commentEl.className = 'comment';
-            const authorProfile = profileMap.get(comment.user_id);
+            const authorProfile = comment.profiles;
             const authorName = authorProfile?.username || 'Usuário';
             const authorAvatar = authorProfile?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
             const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.user_id));
@@ -226,13 +262,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleSubscription() {
         const btn = document.getElementById('subscribe-btn');
+        if (!btn) return;
         const isSubscribed = btn.classList.contains('inscrito');
         if (isSubscribed) {
             const { error } = await supabaseClient.from('inscricoes').delete().match({ user_id: currentUser.id, aventura_id: adventureId });
-            if (error) { showToast('Erro ao cancelar inscrição.', 'error'); } else { showToast('Inscrição cancelada.'); renderActionButtons(); }
+            if (error) { showToast('Erro ao cancelar inscrição.', 'error'); } else { showToast('Inscrição cancelada.'); await renderActionButtons(); }
         } else {
             const { error } = await supabaseClient.from('inscricoes').insert({ user_id: currentUser.id, aventura_id: adventureId });
-            if (error) { showToast('Erro ao se inscrever.', 'error'); } else { showToast('Inscrição realizada com sucesso!', 'success'); renderActionButtons(); }
+            if (error) { showToast('Erro ao se inscrever.', 'error'); } else { showToast('Inscrição realizada com sucesso!', 'success'); await renderActionButtons(); }
         }
     }
 
@@ -258,16 +295,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!confirmed) return;
         const { error } = await supabaseClient.from('comentarios').delete().eq('id', commentId);
         if (error) { showToast('Erro ao deletar comentário.', 'error'); } else { showToast('Comentário deletado.'); renderComments(); }
-    }
-
-    async function handleDeleteAdventure() {
-        const confirmed = await showCustomConfirm('Você tem certeza que deseja DELETAR esta aventura? Esta ação é irreversível.');
-        if (!confirmed) return;
-        const { error } = await supabaseClient.from('aventuras').delete().eq('id', adventureId);
-        if (error) { showToast('Erro ao deletar a aventura.', 'error'); } else {
-            showToast('Aventura deletada com sucesso!');
-            setTimeout(() => window.location.href = 'index.html', 1500);
-        }
     }
     
     async function updateHeaderUI(user) {
