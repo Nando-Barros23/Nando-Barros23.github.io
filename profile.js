@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. INICIALIZAÇÃO
+    // 1. INICIALIZAÇÃO 
     const { createClient } = supabase;
     const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
@@ -101,38 +101,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span>${adventure.titulo}</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="subscribers-list" id="subscribers-${adventure.id}"></div>
+                <div class="subscribers-list" id="subscribers-${adventure.id}" style="display: none;"></div>
             `;
             myAdventuresList.appendChild(item);
         });
     }
-    
-    async function toggleSubscribers(adventureId, headerElement) {
-        const listDiv = document.getElementById(`subscribers-${adventureId}`);
-        const icon = headerElement.querySelector('i');
-
-        if (listDiv.style.display === 'block') {
-            listDiv.style.display = 'none';
-            icon.style.transform = 'rotate(0deg)';
-            return;
-        }
-
-        listDiv.innerHTML = '<p>Carregando inscritos...</p>';
-        listDiv.style.display = 'block';
-        icon.style.transform = 'rotate(180deg)';
-
-        const { data: subscribers, error } = await supabaseClient.from('inscricoes').select('profiles (id, username, avatar_url)').eq('aventura_id', adventureId);
-        if (error) {
-            listDiv.innerHTML = '<p style="color: red;">Erro ao carregar inscritos.</p>';
-            return;
-        }
-        
+    function renderSubscribersList(subscribers, listDiv) {
         if (subscribers.length === 0) {
-            listDiv.innerHTML = '<p>Ainda não há jogadores inscritos.</p>';
+            listDiv.innerHTML = '<p>Nenhum jogador encontrado.</p>';
             return;
         }
 
-        listDiv.innerHTML = '';
+        listDiv.innerHTML = ''; 
         subscribers.forEach(sub => {
             const profile = sub.profiles;
             if (!profile) return;
@@ -146,7 +126,67 @@ document.addEventListener('DOMContentLoaded', async () => {
             listDiv.appendChild(subscriberEl);
         });
     }
+    async function toggleSubscribers(adventureId, headerElement) {
+        const listDiv = document.getElementById(`subscribers-${adventureId}`);
+        const icon = headerElement.querySelector('i');
 
+        if (listDiv.style.display === 'block') {
+            listDiv.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+            return;
+        }
+        listDiv.innerHTML = `
+            <form class="subscriber-search-form" data-adventure-id="${adventureId}" style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                <input type="search" placeholder="Pesquisar por nome..." style="flex-grow: 1; padding: 0.5rem;">
+                <button type="submit" class="btn-primario" style="padding: 0.5rem 1rem;">Buscar</button>
+            </form>
+            <div class="subscriber-items-container">
+                <p>Carregando inscritos...</p>
+            </div>
+        `;
+        listDiv.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+        const { data: subscribers, error } = await supabaseClient
+            .from('inscricoes')
+            .select('profiles (id, username, avatar_url)')
+            .eq('aventura_id', adventureId)
+            .limit(20);
+
+        const itemsContainer = listDiv.querySelector('.subscriber-items-container');
+        if (error) {
+            itemsContainer.innerHTML = '<p style="color: red;">Erro ao carregar inscritos.</p>';
+            return;
+        }
+        
+        renderSubscribersList(subscribers, itemsContainer);
+    }
+    async function handleSearchSubscribers(adventureId, searchTerm) {
+        const listDiv = document.getElementById(`subscribers-${adventureId}`);
+        const itemsContainer = listDiv.querySelector('.subscriber-items-container');
+        itemsContainer.innerHTML = `<p>Pesquisando por "${searchTerm}"...</p>`;
+
+        // Cria a consulta base
+        let query = supabaseClient
+            .from('inscricoes')
+            .select('profiles (id, username, avatar_url)')
+            .eq('aventura_id', adventureId);
+
+        if (searchTerm) {
+            query = query.ilike('profiles.username', `%${searchTerm}%`);
+        } else {
+            // Se a pesquisa for vazia, volta a carregar os 20 primeiros
+            query = query.limit(20);
+        }
+        
+        const { data: subscribers, error } = await query;
+        
+        if (error) {
+            itemsContainer.innerHTML = '<p style="color: red;">Erro ao realizar a pesquisa.</p>';
+            return;
+        }
+        
+        renderSubscribersList(subscribers, itemsContainer);
+    }
     async function checkMasterApplicationStatus(user) {
         const { data, error } = await supabaseClient.from('master_applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1);
         if(error) {
@@ -195,7 +235,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-    
     myAdventuresList.addEventListener('click', (e) => {
         const header = e.target.closest('.my-adventure-header');
         if (header) {
@@ -204,6 +243,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    myAdventuresList.addEventListener('submit', (e) => {
+        // Verifica se o evento de submissão veio do nosso formulário de pesquisa
+        if (e.target.matches('.subscriber-search-form')) {
+            e.preventDefault(); // Impede o recarregamento da página
+            const adventureId = e.target.dataset.adventureId;
+            const searchTerm = e.target.querySelector('input[type="search"]').value.trim();
+            handleSearchSubscribers(adventureId, searchTerm);
+        }
+    });
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const newUsername = usernameInput.value;
