@@ -21,6 +21,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const myAdventuresList = document.getElementById('my-adventures-list');
     let currentUser = null;
 
+    async function loadMyAdventures(user) {
+        const { data: adventures, error } = await supabaseClient
+            .from('aventuras')
+            .select('id, titulo, status') // ADICIONADO 'status'
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+            
+        if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
+
+        myAdventuresList.innerHTML = '';
+        if (adventures.length === 0) {
+            myAdventuresList.innerHTML = '<p>Você ainda não publicou nenhuma aventura.</p>';
+            return;
+        }
+
+        adventures.forEach(adventure => {
+            const item = document.createElement('div');
+            item.className = 'my-adventure-item';
+            const statusTag = adventure.status === 'arquivada' 
+                ? '<span style="font-size: 0.8rem; color: #888; margin-left: 10px; font-weight: normal;">[Arquivada]</span>' 
+                : '';
+
+            item.innerHTML = `
+                <div class="my-adventure-header" data-adventure-id="${adventure.id}">
+                    <span>${adventure.titulo} ${statusTag}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="subscribers-list" id="subscribers-${adventure.id}" style="display: none;"></div>
+            `;
+            myAdventuresList.appendChild(item);
+        });
+    }
+    
     async function initializeProfilePage() {
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         if (sessionError || !session) {
@@ -83,29 +116,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function loadMyAdventures(user) {
-        const { data: adventures, error } = await supabaseClient.from('aventuras').select('id, titulo').eq('user_id', user.id).order('created_at', { ascending: false });
-        if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
-
-        myAdventuresList.innerHTML = '';
-        if (adventures.length === 0) {
-            myAdventuresList.innerHTML = '<p>Você ainda não publicou nenhuma aventura.</p>';
-            return;
-        }
-
-        adventures.forEach(adventure => {
-            const item = document.createElement('div');
-            item.className = 'my-adventure-item';
-            item.innerHTML = `
-                <div class="my-adventure-header" data-adventure-id="${adventure.id}">
-                    <span>${adventure.titulo}</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="subscribers-list" id="subscribers-${adventure.id}" style="display: none;"></div>
-            `;
-            myAdventuresList.appendChild(item);
-        });
-    }
     function renderSubscribersList(subscribers, listDiv) {
         if (subscribers.length === 0) {
             listDiv.innerHTML = '<p>Nenhum jogador encontrado.</p>';
@@ -165,7 +175,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const itemsContainer = listDiv.querySelector('.subscriber-items-container');
         itemsContainer.innerHTML = `<p>Pesquisando por "${searchTerm}"...</p>`;
 
-        // Cria a consulta base
         let query = supabaseClient
             .from('inscricoes')
             .select('profiles (id, username, avatar_url)')
@@ -174,7 +183,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (searchTerm) {
             query = query.ilike('profiles.username', `%${searchTerm}%`);
         } else {
-            // Se a pesquisa for vazia, volta a carregar os 20 primeiros
             query = query.limit(20);
         }
         
@@ -244,9 +252,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     myAdventuresList.addEventListener('submit', (e) => {
-        // Verifica se o evento de submissão veio do nosso formulário de pesquisa
         if (e.target.matches('.subscriber-search-form')) {
-            e.preventDefault(); // Impede o recarregamento da página
+            e.preventDefault();
             const adventureId = e.target.dataset.adventureId;
             const searchTerm = e.target.querySelector('input[type="search"]').value.trim();
             handleSearchSubscribers(adventureId, searchTerm);
