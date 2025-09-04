@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const [sessionResponse, adventuresResponse] = await Promise.all([
             supabaseClient.auth.getSession(),
-            supabaseClient.from('aventuras').select('*').order('created_at', { ascending: false })
-        ]);
+            supabaseClient.from('aventuras').select('*').eq('status', 'ativa').order('created_at', { ascending: false })
+]);
 
         currentUser = sessionResponse.data.session?.user || null;
         await updateUI(currentUser);
