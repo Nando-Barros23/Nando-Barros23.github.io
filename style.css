@@ -64,7 +64,7 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 #comment-text::placeholder { font-family: var(--fonte-label); color: #999; }
 #title-container { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 #title-container h2 { flex-grow: 1; }
-.master-actions { display: flex; gap: 0.5rem; }
+.master-actions { display: flex; gap: 0.75rem; flex-shrink: 0; } /* ESPAÇAMENTO AUMENTADO */
 .btn-icon-delete { background-color: #dc3545; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; flex-shrink: 0; }
 .btn-icon-delete:hover { background-color: #c82333; }
 .btn-icon-edit { background-color: var(--cor-texto-secundario); color: white; border-radius: 50%; width: 40px; height: 40px; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; text-decoration: none; flex-shrink: 0; }
@@ -98,3 +98,23 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 #adventure-description p { margin-bottom: 1rem; }
 #adventure-description ul, #adventure-description ol { padding-left: 2rem; margin-bottom: 1rem; }
 #adventure-description blockquote { border-left: 4px solid var(--cor-borda); padding-left: 1rem; margin: 1rem 0; color: var(--cor-texto-secundario); font-style: italic; }
+
+
+.btn-icon-archive {
+    background-color: #7a7a7a; 
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+.btn-icon-archive:hover {
+    background-color: #636363;
+}
