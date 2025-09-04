@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const myAdventuresList = document.getElementById('my-adventures-list');
     let currentUser = null;
 
+    
     async function loadMyAdventures(user) {
+
         const { data: adventures, error } = await supabaseClient
             .from('aventuras')
             .select('id, titulo, status') // ADICIONADO 'status'
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         adventures.forEach(adventure => {
             const item = document.createElement('div');
             item.className = 'my-adventure-item';
+
             const statusTag = adventure.status === 'arquivada' 
                 ? '<span style="font-size: 0.8rem; color: #888; margin-left: 10px; font-weight: normal;">[Arquivada]</span>' 
                 : '';
@@ -53,7 +56,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             myAdventuresList.appendChild(item);
         });
     }
-    
     async function initializeProfilePage() {
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         if (sessionError || !session) {
