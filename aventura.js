@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (adventureData) {
                 displayAdventureDetails(adventureData);
-                // CORREÇÃO: Passando os dados necessários para as funções
                 await renderActionButtons(currentUser, adventureData);
                 await renderComments(currentUser, adventureData);
                 renderCommentForm(currentUser);
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // CORREÇÃO: A função agora recebe os parâmetros 'currentUser' e 'adventureData'
     async function renderActionButtons(currentUser, adventureData) {
         const titleContainer = document.getElementById('title-container');
         const playerActionArea = document.getElementById('action-buttons-area');
@@ -115,7 +113,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // CORREÇÃO: A função agora recebe os parâmetros 'currentUser' e 'adventureData'
     async function renderComments(currentUser, adventureData) {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
@@ -146,7 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // CORREÇÃO: A função agora recebe o parâmetro 'currentUser'
     function renderCommentForm(currentUser) {
         const container = document.getElementById('comment-form-container');
         if (!container) return;
@@ -157,9 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function handleSubscription(currentUser) {
-        const btn = document.getElementById('subscribe-btn');
-        if (!btn) return;
+    async function handleSubscription(currentUser, adventureData) {
         const { data: existingSubscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
         if (existingSubscription) {
             await supabaseClient.from('inscricoes').delete().match({ user_id: currentUser.id, aventura_id: adventureId });
@@ -168,36 +162,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             await supabaseClient.from('inscricoes').insert({ user_id: currentUser.id, aventura_id: adventureId });
             showToast('Inscrição realizada!', 'success');
         }
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const updatedUser = session?.user;
-        const updatedAdventureData = await fetchAdventureDetails();
-        renderActionButtons(updatedUser, updatedAdventureData);
+        await renderActionButtons(currentUser, adventureData);
     }
     
-    async function handleNewComment(e, currentUser) {
-        e.preventDefault();
-        const content = document.getElementById('comment-text').value;
+    async function handleNewComment(currentUser, adventureData) {
+        const contentEl = document.getElementById('comment-text');
+        const content = contentEl.value;
         if (!content.trim()) return;
-        const formButton = e.target.querySelector('button');
+        const formButton = document.querySelector('#comment-form button');
         formButton.disabled = true;
+        
         await supabaseClient.from('comentarios').insert({ user_id: currentUser.id, aventura_id: adventureId, content: content });
-        document.getElementById('comment-text').value = '';
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const updatedUser = session?.user;
-        const updatedAdventureData = await fetchAdventureDetails();
-        renderComments(updatedUser, updatedAdventureData);
+        
+        contentEl.value = '';
+        await renderComments(currentUser, adventureData);
         formButton.disabled = false;
     }
     
     async function handleDeleteComment(button, currentUser, adventureData) {
         const commentId = button.dataset.commentId;
-        if (confirm('Tem certeza?')) {
+        const confirmed = await showCustomConfirm('Tem certeza que deseja deletar este comentário?');
+        if (confirmed) {
             await supabaseClient.from('comentarios').delete().eq('id', commentId);
-            renderComments(currentUser, adventureData);
+            await renderComments(currentUser, adventureData);
         }
     }
     
-    // --- O resto do ficheiro com as funções de suporte e listeners de eventos ---
     function showToast(message, type = 'success') { const toastContainer = document.getElementById('toast-container'); if (!toastContainer) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.textContent = message; toastContainer.appendChild(toast); setTimeout(() => { toast.classList.add('show'); }, 10); setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000); }
     function showCustomConfirm(message) { return new Promise((resolve) => { const overlay = document.getElementById('custom-confirm-overlay'); const messageEl = document.getElementById('confirm-message'); const btnYes = document.getElementById('confirm-btn-yes'); const btnNo = document.getElementById('confirm-btn-no'); messageEl.textContent = message; overlay.classList.remove('hidden'); const close = (value) => { overlay.classList.add('hidden'); btnYes.onclick = null; btnNo.onclick = null; resolve(value); }; btnYes.onclick = () => close(true); btnNo.onclick = () => close(false); }); }
     async function handleArchiveAdventure() { const confirmed = await showCustomConfirm('Arquivar aventura?'); if (confirmed) { await supabaseClient.from('aventuras').update({ status: 'arquivada' }).eq('id', adventureId); window.location.href = 'index.html'; } }
@@ -210,24 +200,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const user = session?.user;
         const advData = await fetchAdventureDetails();
         if (button.matches('.comment-delete-btn')) handleDeleteComment(button, user, advData);
-        if (button.matches('#subscribe-btn')) handleSubscription(user);
+        if (button.matches('#subscribe-btn')) handleSubscription(user, advData);
         if (button.matches('#archive-adventure-btn')) handleArchiveAdventure();
         if (button.matches('#delete-adventure-btn')) handleDeleteAdventure();
     });
 
     mainContainer.addEventListener('submit', async (e) => {
         if (e.target.matches('#comment-form')) {
+            e.preventDefault(); // Impede o recarregamento da página IMEDIATAMENTE
             const { data: { session } } = await supabaseClient.auth.getSession();
             const user = session?.user;
-            handleNewComment(e, user);
+            const advData = await fetchAdventureDetails();
+            if (user && advData) {
+                await handleNewComment(user, advData);
+            }
         }
     });
 
     supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-        const newUser = session?.user;
-        const oldUserId = document.body.dataset.currentUser;
-        if (oldUserId !== newUser?.id) {
-            document.body.dataset.currentUser = newUser?.id || '';
+        const { data: currentSessionData } = await supabaseClient.auth.getSession();
+        const currentUserId = currentSessionData.session?.user?.id;
+        const newUserId = session?.user?.id;
+        if (currentUserId !== newUserId) {
             initializePage();
         }
     });
