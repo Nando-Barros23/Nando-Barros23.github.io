@@ -73,8 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 2. Botão Arquivar
             const archiveButton = document.createElement('button');
             archiveButton.id = 'archive-adventure-btn';
-            archiveButton.className = 'btn-icon-edit'; // Reutilizando o estilo do botão de editar
-            archiveButton.style.backgroundColor = 'var(--cor-texto-secundario)'; // Cor diferente para distinguir
+            archiveButton.className = 'btn-icon-archive'; 
             archiveButton.innerHTML = '<i class="fas fa-archive"></i>';
             archiveButton.title = 'Arquivar Aventura';
 
