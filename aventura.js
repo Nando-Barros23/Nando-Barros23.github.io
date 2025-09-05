@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Variáveis globais que serão usadas por várias funções
     let currentUser = null;
     let adventureData = null;
     const adventureId = new URLSearchParams(window.location.search).get('id');
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function initializePage() {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        currentUser = session?.user; // Define a variável global
+        currentUser = session?.user;
         updateHeaderUI(currentUser);
 
         if (!adventureId) {
@@ -22,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        adventureData = await fetchAdventureDetails(); // Define a variável global
+        adventureData = await fetchAdventureDetails();
 
         if (adventureData) {
             displayAdventureDetails(adventureData);
@@ -52,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+
     async function renderActionButtons() {
         const titleContainer = document.getElementById('title-container');
         const playerActionArea = document.getElementById('action-buttons-area');
@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         playerActionArea.innerHTML = '';
         const existingMasterActions = titleContainer.querySelector('.master-actions');
         if (existingMasterActions) existingMasterActions.remove();
+        
         
         if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
             const masterActionsWrapper = document.createElement('div');
@@ -70,20 +71,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <button id="delete-adventure-btn" class="btn-icon-delete" title="Deletar Aventura Permanentemente"><i class="fas fa-trash-alt"></i></button>
             `;
             titleContainer.appendChild(masterActionsWrapper);
-        } else if (currentUser && adventureData) {
-            const { count } = await supabaseClient.from('inscricoes').select('*', { count: 'exact', head: true }).eq('aventura_id', adventureId);
-            const { data: subscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
+        } 
+        
+        else if (currentUser && adventureData) {
+         
+            const { data: subscription } = await supabaseClient
+                .from('inscricoes')
+                .select('id, status') 
+                .eq('user_id', currentUser.id)
+                .eq('aventura_id', adventureId)
+                .single();
 
             if (subscription) {
-                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Inscrição</button>`;
-            } else if (count >= adventureData.vagas) {
-                playerActionArea.innerHTML = `<button class="btn-primario btn-inscricao" disabled>Vagas Esgotadas</button>`;
+                
+                switch (subscription.status) {
+                    case 'aprovado':
+                        playerActionArea.innerHTML = `
+                            <p style="color: green; font-weight: bold;">✅ Você foi aprovado para esta aventura!</p>
+                            <button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Sair da Mesa</button>
+                        `;
+                        break;
+                    case 'pendente':
+                        playerActionArea.innerHTML = `
+                            <p style="font-weight: bold;">⏳ Sua candidatura está pendente de aprovação.</p>
+                            <button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>
+                        `;
+                        break;
+                    case 'recusado':
+                        playerActionArea.innerHTML = `<p style="color: red; font-weight: bold;">❌ A sua candidatura não foi aceite pelo mestre.</p>`;
+                        break;
+                    default:
+                         playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`;
+                }
             } else {
-                playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+                
+                const { data: approvedSubs } = await supabaseClient.from('inscricoes').select('id').eq('aventura_id', adventureId).eq('status', 'aprovado');
+                const approvedCount = approvedSubs ? approvedSubs.length : 0;
+
+                if (approvedCount >= adventureData.vagas) {
+                    playerActionArea.innerHTML = `<button class="btn-primario btn-inscricao" disabled>Vagas Esgotadas</button>`;
+                } else {
+                    playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+                }
             }
         }
     }
 
+    
     function displayAdventureDetails(data) {
         document.title = `${data.titulo} - Dados & Calangos`;
         document.getElementById('adventure-title').textContent = data.titulo;
@@ -115,9 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!commentsList) return;
         commentsList.innerHTML = '<p>Carregando comentários...</p>';
         const { data: comments, error } = await supabaseClient.from('comentarios').select('*, profiles (id, username, avatar_url)').eq('aventura_id', adventureId).order('created_at', { ascending: true });
-        
         if (error) { console.error("Erro ao buscar comentários:", error); return; }
-        
         if (comments.length === 0) {
             commentsList.innerHTML = '<p>Ainda não há comentários. Seja o primeiro a comentar!</p>';
             return;
@@ -154,26 +186,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { data: existingSubscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
         if (existingSubscription) {
             await supabaseClient.from('inscricoes').delete().match({ user_id: currentUser.id, aventura_id: adventureId });
-            showToast('Inscrição cancelada.');
+            showToast('Candidatura cancelada.');
         } else {
             await supabaseClient.from('inscricoes').insert({ user_id: currentUser.id, aventura_id: adventureId });
-            showToast('Inscrição realizada!', 'success');
+            showToast('Candidatura enviada com sucesso!', 'success');
         }
         await renderActionButtons();
     }
     
     async function handleNewComment(e) {
-        
-        e.preventDefault(); // Impede o recarregamento da página
-        
+        e.preventDefault();
         const contentEl = document.getElementById('comment-text');
         const content = contentEl.value;
         if (!content.trim()) return;
         const formButton = document.querySelector('#comment-form button');
         formButton.disabled = true;
-        
         await supabaseClient.from('comentarios').insert({ user_id: currentUser.id, aventura_id: adventureId, content: content });
-        
         contentEl.value = '';
         await renderComments();
         formButton.disabled = false;
