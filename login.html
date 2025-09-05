@@ -15,8 +15,23 @@
     <link rel="manifest" href="/site.webmanifest">
     
     <style>
-        .login-container { max-width: 450px; margin: 4rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); }
-        .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: #4285F4; border-color: #4285F4; margin-bottom: 1.5rem; }
+       
+        .login-container { 
+            max-width: 450px; 
+            margin: 4rem auto; 
+            padding: 2rem; 
+            background-color: var(--cor-fundo-card); 
+            border: 1px solid var(--cor-borda); 
+            border-radius: 8px; 
+            box-shadow: var(--sombra);
+            text-align: center; 
+        }
+
+        #login-form, #register-form {
+            text-align: center;
+        }
+
+        .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: #4285F4; border-color: #4285F4; margin-bottom: 1.5rem; display: inline-flex; } /* Alterado para inline-flex */
         .google-btn:hover { background-color: #357ae8; }
         .separator { text-align: center; margin: 1.5rem 0; color: var(--cor-texto-secundario); font-family: var(--fonte-label); }
         #error-message, #success-message { text-align: center; padding: 0.8rem; margin-top: 1rem; border-radius: 4px; display: none; }
