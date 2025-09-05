@@ -22,11 +22,140 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentUser = null;
 
     
-    async function loadMyAdventures(user) {
+    async function toggleSubscribers(adventureId, headerElement) {
+        const listDiv = document.getElementById(`subscribers-${adventureId}`);
+        const icon = headerElement.querySelector('i');
 
+        if (listDiv.style.display === 'block') {
+            listDiv.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+            return;
+        }
+
+        listDiv.innerHTML = `
+            <form class="subscriber-search-form" data-adventure-id="${adventureId}" style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                <input type="search" placeholder="Pesquisar por nome..." style="flex-grow: 1; padding: 0.5rem;">
+                <button type="submit" class="btn-primario" style="padding: 0.5rem 1rem;">Buscar</button>
+            </form>
+            <div class="subscriber-items-container">
+                <p>Carregando candidatos...</p>
+            </div>
+        `;
+        listDiv.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+
+        const { data: subscribers, error } = await supabaseClient
+            .from('inscricoes')
+            .select('id, user_id, status, profiles (id, username, avatar_url)')
+            .eq('aventura_id', adventureId);
+            
+        if (error) {
+            listDiv.querySelector('.subscriber-items-container').innerHTML = '<p style="color: red;">Erro ao carregar inscritos.</p>';
+            console.error(error);
+            return;
+        }
+        
+        const pending = subscribers.filter(s => s.status === 'pendente');
+        const approved = subscribers.filter(s => s.status === 'aprovado');
+
+        const itemsContainer = listDiv.querySelector('.subscriber-items-container');
+        itemsContainer.innerHTML = `
+            <div class="subscriber-section">
+                <h4>Candidaturas Pendentes (${pending.length})</h4>
+                <div id="pending-list-${adventureId}"></div>
+            </div>
+            <div class="subscriber-section">
+                <h4>Jogadores Aprovados (${approved.length})</h4>
+                <div id="approved-list-${adventureId}"></div>
+            </div>
+        `;
+
+        renderApplicantList(pending, document.getElementById(`pending-list-${adventureId}`));
+        renderApplicantList(approved, document.getElementById(`approved-list-${adventureId}`));
+    }
+
+    
+    function renderApplicantList(list, container) {
+        if (list.length === 0) {
+            container.innerHTML = '<p>Nenhum jogador nesta categoria.</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        list.forEach(sub => {
+            const profile = sub.profiles;
+            if (!profile) return;
+            const avatarUrl = profile.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
+            
+            const applicantEl = document.createElement('div');
+            applicantEl.className = 'subscriber-item';
+            applicantEl.id = `inscricao-${sub.id}`;
+
+            let buttons = '';
+            if (sub.status === 'pendente') {
+                buttons = `
+                    <div class="applicant-actions">
+                        <button class="btn-applicant-action approve" data-inscricao-id="${sub.id}" data-action="aprovado">Aprovar</button>
+                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="recusado">Recusar</button>
+                    </div>
+                `;
+            } else if (sub.status === 'aprovado') {
+                buttons = `
+                    <div class="applicant-actions">
+                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="removido">Remover</button>
+                    </div>
+                `;
+            }
+
+            applicantEl.innerHTML = `
+                <img src="${avatarUrl}" alt="Avatar de ${profile.username}">
+                <span>${profile.username || 'Usuário sem nome'}</span>
+                ${buttons}
+            `;
+            container.appendChild(applicantEl);
+        });
+    }
+
+    
+    async function handleApplicationAction(inscricaoId, action, headerElement) {
+        let newStatus = action;
+        if (action === 'removido') newStatus = 'recusado';
+        
+        const { error } = await supabaseClient
+            .from('inscricoes')
+            .update({ status: newStatus })
+            .eq('id', inscricaoId);
+
+        if (error) {
+            alert('Erro ao processar a ação: ' + error.message);
+        } else {
+
+            const adventureId = headerElement.dataset.adventureId;
+            await toggleSubscribers(adventureId, headerElement); 
+            await toggleSubscribers(adventureId, headerElement); 
+        }
+    }
+
+    myAdventuresList.addEventListener('click', (e) => {
+        const header = e.target.closest('.my-adventure-header');
+        const actionButton = e.target.closest('.btn-applicant-action');
+
+        if (actionButton) {
+            const inscricaoId = actionButton.dataset.inscricaoId;
+            const action = actionButton.dataset.action;
+            const adventureHeader = actionButton.closest('.my-adventure-item').querySelector('.my-adventure-header');
+            handleApplicationAction(inscricaoId, action, adventureHeader);
+        } else if (header) {
+            const adventureId = header.dataset.adventureId;
+            toggleSubscribers(adventureId, header);
+        }
+    });
+    
+
+    async function loadMyAdventures(user) {
         const { data: adventures, error } = await supabaseClient
             .from('aventuras')
-            .select('id, titulo, status') // ADICIONADO 'status'
+            .select('id, titulo, status')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });
             
@@ -41,11 +170,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         adventures.forEach(adventure => {
             const item = document.createElement('div');
             item.className = 'my-adventure-item';
-
             const statusTag = adventure.status === 'arquivada' 
                 ? '<span style="font-size: 0.8rem; color: #888; margin-left: 10px; font-weight: normal;">[Arquivada]</span>' 
                 : '';
-
             item.innerHTML = `
                 <div class="my-adventure-header" data-adventure-id="${adventure.id}">
                     <span>${adventure.titulo} ${statusTag}</span>
@@ -56,10 +183,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             myAdventuresList.appendChild(item);
         });
     }
+
     async function initializeProfilePage() {
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         if (sessionError || !session) {
-            console.error('Erro ao buscar sessão ou sessão não encontrada:', sessionError);
+            console.error('Erro ao buscar sessão:', sessionError);
             window.location.href = 'login.html';
             return;
         }
@@ -92,20 +220,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             <button id="logout-button" class="btn-primario" style="width: auto; padding: 0.5rem 1rem;">Sair</button>
         `;
         document.getElementById('logout-button').addEventListener('click', () => supabaseClient.auth.signOut());
-
         const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
         if (error && error.code !== 'PGRST116') { 
             console.error('Erro ao buscar perfil:', error); 
             return; 
         }
-        
         if (data) {
             usernameDisplay.textContent = data.username || 'Sem nome de usuário';
             emailDisplay.textContent = user.email;
             roleDisplay.textContent = data.role;
             usernameInput.value = data.username;
             if (data.avatar_url) { avatarImg.src = data.avatar_url; }
-            
             if (data.role && data.role.trim().toLowerCase() === 'master') {
                 masterApplicationSection.style.display = 'none';
                 myAdventuresSection.style.display = 'block';
@@ -118,85 +243,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function renderSubscribersList(subscribers, listDiv) {
-        if (subscribers.length === 0) {
-            listDiv.innerHTML = '<p>Nenhum jogador encontrado.</p>';
-            return;
-        }
-
-        listDiv.innerHTML = ''; 
-        subscribers.forEach(sub => {
-            const profile = sub.profiles;
-            if (!profile) return;
-            const avatarUrl = profile.avatar_url || 'https://i.imgur.com/V4Rcl9o.png';
-            const subscriberEl = document.createElement('div');
-            subscriberEl.className = 'subscriber-item';
-            subscriberEl.innerHTML = `
-                <img src="${avatarUrl}" alt="Avatar">
-                <span>${profile.username || 'Usuário sem nome'}</span>
-            `;
-            listDiv.appendChild(subscriberEl);
-        });
-    }
-    async function toggleSubscribers(adventureId, headerElement) {
-        const listDiv = document.getElementById(`subscribers-${adventureId}`);
-        const icon = headerElement.querySelector('i');
-
-        if (listDiv.style.display === 'block') {
-            listDiv.style.display = 'none';
-            icon.style.transform = 'rotate(0deg)';
-            return;
-        }
-        listDiv.innerHTML = `
-            <form class="subscriber-search-form" data-adventure-id="${adventureId}" style="display: flex; gap: 10px; margin-bottom: 1rem;">
-                <input type="search" placeholder="Pesquisar por nome..." style="flex-grow: 1; padding: 0.5rem;">
-                <button type="submit" class="btn-primario" style="padding: 0.5rem 1rem;">Buscar</button>
-            </form>
-            <div class="subscriber-items-container">
-                <p>Carregando inscritos...</p>
-            </div>
-        `;
-        listDiv.style.display = 'block';
-        icon.style.transform = 'rotate(180deg)';
-        const { data: subscribers, error } = await supabaseClient
-            .from('inscricoes')
-            .select('profiles (id, username, avatar_url)')
-            .eq('aventura_id', adventureId)
-            .limit(20);
-
-        const itemsContainer = listDiv.querySelector('.subscriber-items-container');
-        if (error) {
-            itemsContainer.innerHTML = '<p style="color: red;">Erro ao carregar inscritos.</p>';
-            return;
-        }
-        
-        renderSubscribersList(subscribers, itemsContainer);
-    }
     async function handleSearchSubscribers(adventureId, searchTerm) {
         const listDiv = document.getElementById(`subscribers-${adventureId}`);
         const itemsContainer = listDiv.querySelector('.subscriber-items-container');
         itemsContainer.innerHTML = `<p>Pesquisando por "${searchTerm}"...</p>`;
-
         let query = supabaseClient
             .from('inscricoes')
-            .select('profiles (id, username, avatar_url)')
+            .select('id, user_id, status, profiles (id, username, avatar_url)')
             .eq('aventura_id', adventureId);
-
         if (searchTerm) {
             query = query.ilike('profiles.username', `%${searchTerm}%`);
-        } else {
-            query = query.limit(20);
         }
-        
         const { data: subscribers, error } = await query;
-        
         if (error) {
             itemsContainer.innerHTML = '<p style="color: red;">Erro ao realizar a pesquisa.</p>';
             return;
         }
-        
-        renderSubscribersList(subscribers, itemsContainer);
+        const pending = subscribers.filter(s => s.status === 'pendente');
+        const approved = subscribers.filter(s => s.status === 'aprovado');
+        renderApplicantList(pending, document.getElementById(`pending-list-${adventureId}`));
+        renderApplicantList(approved, document.getElementById(`approved-list-${adventureId}`));
     }
+
     async function checkMasterApplicationStatus(user) {
         const { data, error } = await supabaseClient.from('master_applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1);
         if(error) {
@@ -215,43 +283,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderMasterApplicationForm(user) {
-        masterApplicationContent.innerHTML = `
-            <p>Preencha o formulário abaixo para se candidatar.</p>
-            <form id="master-form">
-                <div class="form-grupo">
-                    <label>Quanto tempo de experiência você tem com RPG?</label>
-                    <select id="experience" name="experience" required>
-                        <option value="Menos de 1 ano">Menos de 1 ano</option>
-                        <option value="1 a 3 anos">1 a 3 anos</option>
-                        <option value="3 a 5 anos">3 a 5 anos</option>
-                        <option value="Mais de 5 anos">Mais de 5 anos</option>
-                    </select>
-                </div>
-                <div class="form-grupo">
-                    <label for="reason">Por que você quer ser um mestre na nossa comunidade?</label>
-                    <textarea id="reason" name="reason" rows="4" required></textarea>
-                </div>
-                <button type="submit" class="btn-primario">Enviar Candidatura</button>
-            </form>
-        `;
-        document.getElementById('master-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const experience = document.getElementById('experience').value;
-            const reason = document.getElementById('reason').value;
-            const { error } = await supabaseClient.from('master_applications').insert({ user_id: user.id, experience: experience, reason: reason });
-            if (error) { showMessage("Erro ao enviar candidatura.", true); } else {
-                showMessage("Candidatura enviada com sucesso!");
-                checkMasterApplicationStatus(user);
-            }
-        });
+        masterApplicationContent.innerHTML = `...`; 
+    
     }
-    myAdventuresList.addEventListener('click', (e) => {
-        const header = e.target.closest('.my-adventure-header');
-        if (header) {
-            const adventureId = header.dataset.adventureId;
-            toggleSubscribers(adventureId, header);
-        }
-    });
 
     myAdventuresList.addEventListener('submit', (e) => {
         if (e.target.matches('.subscriber-search-form')) {
@@ -261,6 +295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             handleSearchSubscribers(adventureId, searchTerm);
         }
     });
+
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const newUsername = usernameInput.value;
