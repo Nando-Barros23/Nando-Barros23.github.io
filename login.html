@@ -13,7 +13,6 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
-
     
     <style>
         .login-container { max-width: 450px; margin: 4rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); }
@@ -25,6 +24,7 @@
         #success-message { background-color: #d4edda; color: #155724; }
         .password-wrapper { position: relative; display: flex; align-items: center; }
         .password-toggle-icon { position: absolute; right: 10px; user-select: none; font-style: normal; }
+        .form-explanation { font-size: 0.85rem; color: var(--cor-texto-secundario); text-align: center; margin-top: 1.5rem; }
     </style>
 </head>
 <body>
@@ -80,9 +80,16 @@
             </div>
             <button type="submit" class="btn-primario">Cadastrar</button>
         </form>
+
+        <p class="form-explanation">Ao se cadastrar, você cria uma conta para publicar e se inscrever em aventuras, além de interagir com a comunidade. Seus dados são usados apenas para o funcionamento do site.</p>
+
         <div id="error-message"></div>
         <div id="success-message"></div>
     </div>
+
+    <footer class="site-footer">
+        <p>© 2025 Dados & Calangos | <a href="politica-de-privacidade.html">Política de Privacidade</a></p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="auth.js"></script>
