@@ -3,103 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dados & Calangos - Mural de Aventuras</title>
+    <title>Login - Dados & Calangos</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="icon" href="favicon.ico" sizes="any">
+
+    <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
     
-    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
-    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
-
+    <style>
+        .login-container { max-width: 450px; margin: 4rem auto; padding: 2rem; background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); }
+        .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: #4285F4; border-color: #4285F4; margin-bottom: 1.5rem; }
+        .google-btn:hover { background-color: #357ae8; }
+        .separator { text-align: center; margin: 1.5rem 0; color: var(--cor-texto-secundario); font-family: var(--fonte-label); }
+        #error-message, #success-message { text-align: center; padding: 0.8rem; margin-top: 1rem; border-radius: 4px; display: none; }
+        #error-message { background-color: #f8d7da; color: #721c24; }
+        #success-message { background-color: #d4edda; color: #155724; }
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        .password-toggle-icon { position: absolute; right: 10px; user-select: none; font-style: normal; }
+        .form-explanation { font-size: 0.85rem; color: var(--cor-texto-secundario); text-align: center; margin-top: 1.5rem; }
+    </style>
 </head>
 <body>
     <header>
         <a href="index.html"><img src="https://i.imgur.com/SzXWxJe.png" alt="Logo Dados & Calangos" class="logo"></a>
         <h1>Dados & Calangos</h1>
-        <div id="user-area"></div>
     </header>
-    <div class="container">
-        <main>
-            <h2>Chamados de Aventura</h2>
-            <div class="search-container" style="margin-bottom: 2rem;">
-              <input type="search" id="search-bar" placeholder="Pesquisar por título, sistema ou mestre..." style="width: 100%; padding: 0.8rem; font-size: 1rem; border: 1px solid var(--cor-borda); border-radius: 4px;">
+    <div class="login-container">
+        <button id="google-login-button" class="btn-primario google-btn">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
+            <span>Entrar com o Google</span>
+        </button>
+        <div class="separator">OU</div>
+        <h3>Acesse sua Conta</h3>
+        <form id="login-form">
+            <div class="form-grupo">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required>
             </div>
-            
-            <div id="adventures-grid">
-                <p id="loading-indicator">Carregando aventuras...</p>
+            <div class="form-grupo">
+                <label for="login-password">Senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" required>
+                    <i class="password-toggle-icon" data-target="login-password"></i>
+                </div>
             </div>
-        </main>
-        <aside class="painel-lateral">
-            <h3>Publique sua Aventura</h3>
-            <form id="adventure-form">
-                <div class="form-grupo">
-                    <label for="titulo">Título da Aventura</label>
-                    <input type="text" id="titulo" name="titulo" required>
+            <button type="submit" class="btn-primario">Entrar</button>
+        </form>
+        <div class="separator"></div>
+        <h3>Não tem uma conta? Cadastre-se</h3>
+        <form id="register-form">
+            <div class="form-grupo">
+                <label for="register-username">Nome de Usuário</label>
+                <input type="text" id="register-username" required>
+            </div>
+            <div class="form-grupo">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required>
+            </div>
+            <div class="form-grupo">
+                <label for="register-password">Senha (mín. 1 número e 1 caractere especial)</label>
+                <div class="password-wrapper">
+                    <input type="password" id="register-password" required>
+                     <i class="password-toggle-icon" data-target="register-password"></i>
                 </div>
-                <div class="form-grupo">
-                    <label for="adventure-image">Imagem da Aventura (Opcional)</label>
-                    <input type="file" id="adventure-image" name="adventure-image" accept="image/png, image/jpeg">
+            </div>
+            <div class="form-grupo">
+                <label for="confirm-password">Confirmar Senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" required>
+                    <i class="password-toggle-icon" data-target="confirm-password"></i>
                 </div>
-                <div class="form-grupo">
-                    <label for="sistema_rpg">Sistema de RPG</label>
-                    <input type="text" id="sistema_rpg" name="sistema_rpg" placeholder="D&D 5e, Tormenta20..." required>
-                </div>
-                <div class="form-grupo">
-                    <label for="nome_mestre">Seu nome de Mestre</label>
-                    <input type="text" id="nome_mestre" name="nome_mestre" required>
-                </div>
-                <div class="form-grupo">
-                    <label>Modalidade</label>
-                    <div class="radio-group">
-                        <input type="radio" id="modalidade_online" name="modalidade" value="Online" checked>
-                        <label for="modalidade_online">Online</label>
-                        <input type="radio" id="modalidade_presencial" name="modalidade" value="Presencial">
-                        <label for="modalidade_presencial">Presencial</label>
-                    </div>
-                </div>
-                <div class="form-grupo" id="location-input-container" style="display: none;">
-                    <label for="localizacao">Localização (Cidade/Estado ou Endereço)</label>
-                    <input type="text" id="localizacao" name="localizacao">
-                </div>
-                <div class="form-grupo">
-                    <label>Tipo de Jogo</label>
-                    <div class="radio-group">
-                        <input type="radio" id="tipo_oneshot" name="tipo_jogo" value="One Shot" checked>
-                        <label for="tipo_oneshot">One Shot</label>
-                        <input type="radio" id="tipo_campanha" name="tipo_jogo" value="Campanha">
-                        <label for="tipo_campanha">Campanha</label>
-                    </div>
-                </div>
-                <div class="form-grupo">
-                    <label for="nivel">Nível dos Personagens</label>
-                    <input type="text" id="nivel" name="nivel" placeholder="Ex: Iniciante, Nível 5, Tier 2" required>
-                </div>
-                <div class="form-grupo">
-                    <label for="vagas">Número de Vagas</label>
-                    <input type="number" id="vagas" name="vagas" min="1" required>
-                </div>
-                 <div class="form-grupo">
-                    <label for="alerta_gatilho">Alerta de Gatilho</label>
-                    <input type="text" id="alerta_gatilho" name="alerta_gatilho" placeholder="Ex: Violência, temas sensíveis..." required>
-                </div>
-                <div class="form-grupo">
-                    <label for="descricao">Descrição</label>
-                    <textarea id="descricao" name="descricao" rows="5"></textarea>
-                </div>
-                <button type="submit" class="btn-primario">Publicar Aventura</button>
-            </form>
-        </aside>
+            </div>
+            <button type="submit" class="btn-primario">Cadastrar</button>
+        </form>
+
+        <p class="form-explanation">Ao se cadastrar, você cria uma conta para publicar e se inscrever em aventuras, além de interagir com a comunidade. Seus dados são usados apenas para o funcionamento do site.</p>
+
+        <div id="error-message"></div>
+        <div id="success-message"></div>
     </div>
 
-    <div id="toast-container"></div>
+    <footer class="site-footer">
+        <p>© 2025 Dados & Calangos | <a href="politica-de-privacidade.html">Política de Privacidade</a></p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
