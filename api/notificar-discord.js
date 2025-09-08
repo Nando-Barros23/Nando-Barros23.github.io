@@ -29,7 +29,7 @@ export default async function handler(request, response) {
     };
     
     const discordPayload = {
-      content: "📢 Uma nova aventura foi chamada no mural!", 
+      content: "📢 Uma nova aventura foi chamada no mural! @everyone", 
       embeds: [embed],
       components: [
         {
