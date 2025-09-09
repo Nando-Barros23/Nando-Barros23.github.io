@@ -25,9 +25,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (adventureData) {
             displayAdventureDetails(adventureData);
-            await renderActionButtons();
+            
+            const { data: subscription } = await supabaseClient
+                .from('inscricoes')
+                .select('status')
+                .eq('user_id', currentUser.id)
+                .eq('aventura_id', adventureId)
+                .single();
+
+            await renderActionButtons(subscription);
             await renderComments();
             renderCommentForm();
+            await renderSchedulingPanel(subscription);
         }
     }
 
@@ -51,8 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-
-    async function renderActionButtons() {
+    async function renderActionButtons(subscription) {
         const titleContainer = document.getElementById('title-container');
         const playerActionArea = document.getElementById('action-buttons-area');
         if (!playerActionArea || !titleContainer) return;
@@ -60,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         playerActionArea.innerHTML = '';
         const existingMasterActions = titleContainer.querySelector('.master-actions');
         if (existingMasterActions) existingMasterActions.remove();
-        
         
         if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
             const masterActionsWrapper = document.createElement('div');
@@ -72,42 +79,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             titleContainer.appendChild(masterActionsWrapper);
         } 
-        
         else if (currentUser && adventureData) {
-         
-            const { data: subscription } = await supabaseClient
-                .from('inscricoes')
-                .select('id, status') 
-                .eq('user_id', currentUser.id)
-                .eq('aventura_id', adventureId)
-                .single();
-
             if (subscription) {
-                
                 switch (subscription.status) {
-                    case 'aprovado':
-                        playerActionArea.innerHTML = `
-                            <p style="color: green; font-weight: bold;">✅ Você foi aprovado para esta aventura!</p>
-                            <button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Sair da Mesa</button>
-                        `;
-                        break;
-                    case 'pendente':
-                        playerActionArea.innerHTML = `
-                            <p style="font-weight: bold;">⏳ Sua candidatura está pendente de aprovação.</p>
-                            <button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>
-                        `;
-                        break;
-                    case 'recusado':
-                        playerActionArea.innerHTML = `<p style="color: red; font-weight: bold;">❌ A sua candidatura não foi aceite pelo mestre.</p>`;
-                        break;
-                    default:
-                         playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`;
+                    case 'aprovado': playerActionArea.innerHTML = `<p style="color: green; font-weight: bold;">✅ Você foi aprovado para esta aventura!</p><button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Sair da Mesa</button>`; break;
+                    case 'pendente': playerActionArea.innerHTML = `<p style="font-weight: bold;">⏳ Sua candidatura está pendente de aprovação.</p><button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`; break;
+                    case 'recusado': playerActionArea.innerHTML = `<p style="color: red; font-weight: bold;">❌ A sua candidatura não foi aceite pelo mestre.</p>`; break;
+                    default: playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`;
                 }
             } else {
-                
                 const { data: approvedSubs } = await supabaseClient.from('inscricoes').select('id').eq('aventura_id', adventureId).eq('status', 'aprovado');
                 const approvedCount = approvedSubs ? approvedSubs.length : 0;
-
                 if (approvedCount >= adventureData.vagas) {
                     playerActionArea.innerHTML = `<button class="btn-primario btn-inscricao" disabled>Vagas Esgotadas</button>`;
                 } else {
@@ -116,7 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     }
-
     
     function displayAdventureDetails(data) {
         document.title = `${data.titulo} - Dados & Calangos`;
@@ -182,6 +163,96 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function renderSchedulingPanel(subscription) {
+        const panel = document.getElementById('scheduling-panel');
+        const content = document.getElementById('scheduling-content');
+        if (!panel || !content) return;
+
+        const isMaster = currentUser && currentUser.id === adventureData.user_id;
+        const isApprovedPlayer = subscription && subscription.status === 'aprovado';
+
+        if (!isMaster && !isApprovedPlayer) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        panel.style.display = 'block';
+        content.innerHTML = '<p>A carregar sessões...</p>';
+
+        const { data: sessoes, error: sessoesError } = await supabaseClient
+            .from('sessoes_propostas')
+            .select(`*, votos_sessoes ( user_id )`)
+            .eq('aventura_id', adventureData.id)
+            .order('data_hora_proposta', { ascending: true });
+
+        if (sessoesError) {
+            content.innerHTML = '<p style="color: red;">Erro ao carregar sessões.</p>';
+            return;
+        }
+        
+        let html = '';
+        if (isMaster) {
+            html += `
+                <form id="propose-session-form" class="form-grupo">
+                    <label for="session-datetime">Propor Nova Data e Hora</label>
+                    <input type="datetime-local" id="session-datetime" required style="margin-bottom: 0.5rem; width: auto;">
+                    <textarea id="session-notes" placeholder="Notas (opcional, ex: Sessão Zero)" rows="2" style="width:100%"></textarea>
+                    <button type="submit" class="btn-primario" style="width: auto; margin-top: 0.5rem;">Propor Data</button>
+                </form>
+                <hr style="margin: 2rem 0;">
+            `;
+        }
+        
+        if (sessoes.length === 0) {
+            html += '<p>O mestre ainda não propôs nenhuma data para a próxima sessão.</p>';
+        } else {
+            sessoes.forEach(sessao => {
+                const dataFormatada = new Date(sessao.data_hora_proposta).toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' });
+                const totalVotos = sessao.votos_sessoes.length;
+                const userHasVoted = sessao.votos_sessoes.some(voto => voto.user_id === currentUser.id);
+
+                html += `<div class="session-proposal" style="background: #fff; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">`;
+                html += `
+                    <div class="session-info">
+                        <strong>${dataFormatada}</strong>
+                        <p style="font-size: 0.9rem; margin: 0;">Status: ${sessao.status} | Votos: ${totalVotos}</p>
+                        ${sessao.notas_mestre ? `<p style="font-size: 0.9rem; color: #555; margin: 0;">Nota: ${sessao.notas_mestre}</p>` : ''}
+                    </div>
+                `;
+                if (isApprovedPlayer && sessao.status === 'votacao') {
+                    if (userHasVoted) {
+                        html += `<button class="btn-secundario session-vote-btn" data-sessao-id="${sessao.id}" data-action="remove">❌ Remover Voto</button>`;
+                    } else {
+                        html += `<button class="btn-primario session-vote-btn" data-sessao-id="${sessao.id}" data-action="add">✅ Votar</button>`;
+                    }
+                }
+                html += '</div>';
+            });
+        }
+        content.innerHTML = html; 
+    }
+
+    async function handleProposeSession() {
+        const datetimeInput = document.getElementById('session-datetime');
+        const notesInput = document.getElementById('session-notes');
+        if (!datetimeInput.value) return alert('Por favor, escolha uma data e hora.');
+
+        await supabaseClient.from('sessoes_propostas').insert({ aventura_id: adventureId, data_hora_proposta: datetimeInput.value, notas_mestre: notesInput.value });
+        
+        const { data: sub } = await supabaseClient.from('inscricoes').select('status').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
+        await renderSchedulingPanel(sub);
+    }
+
+    async function handleSessionVote(sessaoId, action) {
+        if (action === 'add') {
+            await supabaseClient.from('votos_sessoes').insert({ sessao_proposta_id: sessaoId, user_id: currentUser.id });
+        } else if (action === 'remove') {
+            await supabaseClient.from('votos_sessoes').delete().match({ sessao_proposta_id: sessaoId, user_id: currentUser.id });
+        }
+        const { data: sub } = await supabaseClient.from('inscricoes').select('status').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
+        await renderSchedulingPanel(sub);
+    }
+    
     async function handleSubscription() {
         const { data: existingSubscription } = await supabaseClient.from('inscricoes').select('id').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
         if (existingSubscription) {
@@ -191,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await supabaseClient.from('inscricoes').insert({ user_id: currentUser.id, aventura_id: adventureId });
             showToast('Candidatura enviada com sucesso!', 'success');
         }
-        await renderActionButtons();
+        await initializePage();
     }
     
     async function handleNewComment(e) {
@@ -240,6 +311,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     mainContainer.addEventListener('click', (e) => {
         const button = e.target.closest('button');
         if (!button) return;
+        
+        if (button.matches('.session-vote-btn')) {
+            const sessaoId = button.dataset.sessaoId;
+            const action = button.dataset.action;
+            handleSessionVote(sessaoId, action);
+            return;
+        }
+
         if (button.matches('.comment-delete-btn')) handleDeleteComment(button);
         if (button.matches('#subscribe-btn')) handleSubscription();
         if (button.matches('#archive-adventure-btn')) handleArchiveAdventure();
@@ -248,7 +327,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     mainContainer.addEventListener('submit', (e) => {
         if (e.target.matches('#comment-form')) {
+            e.preventDefault();
             handleNewComment(e);
+        }
+        if (e.target.matches('#propose-session-form')) {
+            e.preventDefault();
+            handleProposeSession();
         }
     });
 
