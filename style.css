@@ -10,6 +10,10 @@
     --fonte-titulo: 'MedievalSharp', cursive;
     --fonte-label: 'Cinzel', serif;
     --fonte-corpo: 'Roboto', sans-serif;
+    --cor-sucesso: #28a745;
+    --cor-perigo: #dc3545;
+    --cor-info: #17a2b8;
+    --cor-secundaria: #6c757d;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: var(--cor-texto-principal); line-height: 1.6; }
@@ -85,9 +89,9 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 .avatar-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cor-primaria); margin-bottom: 1rem; }
 #message-area { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 1rem; border-radius: 8px; display: none; z-index: 1000; }
 .my-adventure-item { background-color: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 4px; margin-bottom: 1rem; }
-.my-adventure-header { padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: var(--fonte-label); font-weight: bold; }
+.my-adventure-header { padding: 1rem; cursor: default; display: flex; justify-content: space-between; align-items: center; font-family: var(--fonte-label); font-weight: bold; }
 .my-adventure-header:hover { background-color: #e9e9e9; }
-.my-adventure-header i { transition: transform 0.2s ease; }
+.my-adventure-header i { transition: transform 0.2s ease; cursor: pointer; }
 .subscribers-list { padding: 0 1rem 1rem 1rem; border-top: 1px solid var(--cor-borda); display: none; }
 .subscriber-item { display: flex; align-items: center; gap: 10px; padding: 0.5rem 0; font-family: var(--fonte-corpo); }
 .subscriber-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
@@ -100,22 +104,73 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 #adventure-description blockquote { border-left: 4px solid var(--cor-borda); padding-left: 1rem; margin: 1rem 0; color: var(--cor-texto-secundario); font-style: italic; }
 .btn-icon-archive { background-color: #7a7a7a; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; flex-shrink: 0; }
 .btn-icon-archive:hover { background-color: #636363; }
+.site-footer { background-color: #fff; border-top: 2px solid var(--cor-primaria); padding: 1.5rem 2rem; margin-top: 3rem; text-align: center; font-size: 0.9rem; color: var(--cor-texto-secundario); }
+.site-footer a { color: var(--cor-primaria); text-decoration: none; font-weight: bold; }
+.site-footer a:hover { text-decoration: underline; }
 
-/* --- ESTILOS DO RODAPÉ ADICIONADOS --- */
-.site-footer {
-    background-color: #fff;
-    border-top: 2px solid var(--cor-primaria);
-    padding: 1.5rem 2rem;
-    margin-top: 3rem;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--cor-texto-secundario);
+/* --- NOVOS ESTILOS PARA O PAINEL DO MESTRE --- */
+.adventure-title-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-grow: 1;
 }
-.site-footer a {
-    color: var(--cor-primaria);
-    text-decoration: none;
-    font-weight: bold;
+
+.status-tag {
+    font-size: 0.8rem;
+    font-weight: normal;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    color: #fff;
 }
-.site-footer a:hover {
-    text-decoration: underline;
+
+.status-tag.active { background-color: var(--cor-info); }
+.status-tag.in-progress { background-color: #007bff; }
+.status-tag.finished { background-color: var(--cor-sucesso); }
+.status-tag.archived { background-color: var(--cor-secundaria); }
+
+.adventure-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
+
+.btn-adventure-action {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-corpo);
+    transition: all 0.2s;
+    color: #fff;
+}
+
+.btn-adventure-action.finalize { background-color: var(--cor-sucesso); }
+.btn-adventure-action.finalize:hover { background-color: #218838; }
+
+.btn-adventure-action.unarchive { background-color: var(--cor-info); }
+.btn-adventure-action.unarchive:hover { background-color: #138496; }
+
+.btn-adventure-action.delete-permanent { background-color: var(--cor-perigo); }
+.btn-adventure-action.delete-permanent:hover { background-color: #c82333; }
+
+.subscriber-section {
+    margin-top: 1rem;
+}
+
+.applicant-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+.btn-applicant-action {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+.btn-applicant-action.approve { background-color: var(--cor-sucesso); }
+.btn-applicant-action.reject { background-color: var(--cor-perigo); }

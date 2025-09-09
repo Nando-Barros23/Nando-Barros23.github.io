@@ -73,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderApplicantList(pending, document.getElementById(`pending-list-${adventureId}`));
         renderApplicantList(approved, document.getElementById(`approved-list-${adventureId}`));
     }
-
     
     function renderApplicantList(list, container) {
         if (list.length === 0) {
@@ -115,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             container.appendChild(applicantEl);
         });
     }
-
     
     async function handleApplicationAction(inscricaoId, action, headerElement) {
         let newStatus = action;
@@ -129,29 +127,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error) {
             alert('Erro ao processar a ação: ' + error.message);
         } else {
-
             const adventureId = headerElement.dataset.adventureId;
             await toggleSubscribers(adventureId, headerElement); 
             await toggleSubscribers(adventureId, headerElement); 
         }
     }
 
-    myAdventuresList.addEventListener('click', (e) => {
-        const header = e.target.closest('.my-adventure-header');
-        const actionButton = e.target.closest('.btn-applicant-action');
-
-        if (actionButton) {
-            const inscricaoId = actionButton.dataset.inscricaoId;
-            const action = actionButton.dataset.action;
-            const adventureHeader = actionButton.closest('.my-adventure-item').querySelector('.my-adventure-header');
-            handleApplicationAction(inscricaoId, action, adventureHeader);
-        } else if (header) {
-            const adventureId = header.dataset.adventureId;
-            toggleSubscribers(adventureId, header);
-        }
-    });
     
+    async function handleAdventureStatusChange(adventureId, newStatus) {
+        const { error } = await supabaseClient
+            .from('aventuras')
+            .update({ status: newStatus })
+            .eq('id', adventureId);
+        if (error) {
+            alert('Erro ao atualizar o status da aventura: ' + error.message);
+        } else {
+            loadMyAdventures(currentUser); 
+        }
+    }
 
+    async function handlePermanentDelete(adventureId) {
+        const confirmed = confirm('TEM A CERTEZA?\n\nEsta ação vai apagar permanentemente a aventura e todos os seus dados (inscrições, comentários, etc.). Isto é irreversível.');
+        if (!confirmed) return;
+
+        const { error } = await supabaseClient
+            .from('aventuras')
+            .delete()
+            .eq('id', adventureId);
+        if (error) {
+            alert('Erro ao apagar a aventura: ' + error.message);
+        } else {
+            alert('Aventura apagada com sucesso.');
+            loadMyAdventures(currentUser); 
+        }
+    }
+
+    
     async function loadMyAdventures(user) {
         const { data: adventures, error } = await supabaseClient
             .from('aventuras')
@@ -170,13 +181,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         adventures.forEach(adventure => {
             const item = document.createElement('div');
             item.className = 'my-adventure-item';
-            const statusTag = adventure.status === 'arquivada' 
-                ? '<span style="font-size: 0.8rem; color: #888; margin-left: 10px; font-weight: normal;">[Arquivada]</span>' 
-                : '';
+            
+            let statusTag = '';
+            let actionButtonsHTML = '';
+
+            const statusInfo = {
+                ativa: { text: '[Ativa]', class: 'active' },
+                em_andamento: { text: '[Em Andamento]', class: 'in-progress' },
+                finalizada: { text: '[Finalizada]', class: 'finished' },
+                arquivada: { text: '[Arquivada]', class: 'archived' }
+            };
+            
+            if (adventure.status && statusInfo[adventure.status]) {
+                statusTag = `<span class="status-tag ${statusInfo[adventure.status].class}">${statusInfo[adventure.status].text}</span>`;
+            }
+
+            switch (adventure.status) {
+                case 'em_andamento':
+                    actionButtonsHTML = `<button class="btn-adventure-action finalize" data-adventure-id="${adventure.id}">Finalizar</button>`;
+                    break;
+                case 'finalizada':
+                    actionButtonsHTML = `<button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}">Apagar de Vez</button>`;
+                    break;
+                case 'arquivada':
+                    actionButtonsHTML = `
+                        <button class="btn-adventure-action unarchive" data-adventure-id="${adventure.id}">Desarquivar</button>
+                        <button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}">Apagar de Vez</button>
+                    `;
+                    break;
+            }
+
             item.innerHTML = `
                 <div class="my-adventure-header" data-adventure-id="${adventure.id}">
-                    <span>${adventure.titulo} ${statusTag}</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <div class="adventure-title-status">
+                        <span>${adventure.titulo}</span>
+                        ${statusTag}
+                    </div>
+                    <div class="adventure-actions">
+                        ${actionButtonsHTML}
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
                 </div>
                 <div class="subscribers-list" id="subscribers-${adventure.id}" style="display: none;"></div>
             `;
@@ -283,9 +327,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderMasterApplicationForm(user) {
-        masterApplicationContent.innerHTML = `...`; 
-    
+        // Lógica do formulário de candidatura a mestre...
     }
+
+    
+    myAdventuresList.addEventListener('click', (e) => {
+        const header = e.target.closest('.my-adventure-header');
+        const actionButton = e.target.closest('.btn-applicant-action, .btn-adventure-action');
+        const chevron = e.target.closest('.fa-chevron-down');
+
+        if (actionButton) {
+            e.stopPropagation(); 
+            const adventureId = actionButton.dataset.adventureId;
+
+           
+            if (actionButton.classList.contains('btn-adventure-action')) {
+                if (actionButton.classList.contains('finalize')) {
+                    handleAdventureStatusChange(adventureId, 'finalizada');
+                } else if (actionButton.classList.contains('unarchive')) {
+                    handleAdventureStatusChange(adventureId, 'ativa');
+                } else if (actionButton.classList.contains('delete-permanent')) {
+                    handlePermanentDelete(adventureId);
+                }
+                return;
+            }
+            
+            if (actionButton.classList.contains('btn-applicant-action')) {
+                const inscricaoId = actionButton.dataset.inscricaoId;
+                const action = actionButton.dataset.action;
+                const adventureHeader = actionButton.closest('.my-adventure-item').querySelector('.my-adventure-header');
+                handleApplicationAction(inscricaoId, action, adventureHeader);
+                return;
+            }
+        }
+        
+        if (header && chevron) {
+            const adventureId = header.dataset.adventureId;
+            toggleSubscribers(adventureId, header);
+        }
+    });
 
     myAdventuresList.addEventListener('submit', (e) => {
         if (e.target.matches('.subscriber-search-form')) {
