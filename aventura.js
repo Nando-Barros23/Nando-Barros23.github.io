@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data: subscription } = await supabaseClient
                 .from('inscricoes')
                 .select('status')
-                .eq('user_id', currentUser.id)
+                .eq('user_id', currentUser?.id) // Adicionado '?' para segurança se não houver user
                 .eq('aventura_id', adventureId)
                 .single();
 
@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // --- FUNÇÃO renderActionButtons ATUALIZADA ---
     async function renderActionButtons(subscription) {
         const titleContainer = document.getElementById('title-container');
         const playerActionArea = document.getElementById('action-buttons-area');
@@ -69,6 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const existingMasterActions = titleContainer.querySelector('.master-actions');
         if (existingMasterActions) existingMasterActions.remove();
         
+        // Lógica para o Mestre
         if (currentUser && adventureData && currentUser.id === adventureData.user_id) {
             const masterActionsWrapper = document.createElement('div');
             masterActionsWrapper.className = 'master-actions';
@@ -78,7 +80,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <button id="delete-adventure-btn" class="btn-icon-delete" title="Deletar Aventura Permanentemente"><i class="fas fa-trash-alt"></i></button>
             `;
             titleContainer.appendChild(masterActionsWrapper);
+
+            // --- ADICIONADO: Botão para mudar o status da aventura ---
+            if (adventureData.status === 'ativa') {
+                playerActionArea.innerHTML = `<button id="start-scheduling-btn" class="btn-primario">Encerrar Inscrições e Agendar</button>`;
+            } else if (adventureData.status === 'em_andamento') {
+                playerActionArea.innerHTML = `<p style="font-weight: bold; color: green;">Esta aventura está em andamento.</p>`;
+            }
+
         } 
+        // Lógica para o Jogador
         else if (currentUser && adventureData) {
             if (subscription) {
                 switch (subscription.status) {
@@ -88,12 +99,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     default: playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`;
                 }
             } else {
-                const { data: approvedSubs } = await supabaseClient.from('inscricoes').select('id').eq('aventura_id', adventureId).eq('status', 'aprovado');
-                const approvedCount = approvedSubs ? approvedSubs.length : 0;
-                if (approvedCount >= adventureData.vagas) {
-                    playerActionArea.innerHTML = `<button class="btn-primario btn-inscricao" disabled>Vagas Esgotadas</button>`;
+                // --- ALTERADO: O botão "Quero Participar" só aparece se a aventura estiver 'ativa' ---
+                if (adventureData.status === 'ativa') {
+                    const { data: approvedSubs } = await supabaseClient.from('inscricoes').select('id').eq('aventura_id', adventureId).eq('status', 'aprovado');
+                    const approvedCount = approvedSubs ? approvedSubs.length : 0;
+                    if (approvedCount >= adventureData.vagas) {
+                        playerActionArea.innerHTML = `<button class="btn-primario btn-inscricao" disabled>Vagas Esgotadas</button>`;
+                    } else {
+                        playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+                    }
                 } else {
-                    playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao">Quero Participar!</button>`;
+                    playerActionArea.innerHTML = `<p style="font-weight: bold;">As inscrições para esta aventura estão encerradas.</p>`;
                 }
             }
         }
@@ -163,6 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // --- FUNÇÃO DO PAINEL DE AGENDAMENTO ATUALIZADA ---
     async function renderSchedulingPanel(subscription) {
         const panel = document.getElementById('scheduling-panel');
         const content = document.getElementById('scheduling-content');
@@ -171,7 +188,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isMaster = currentUser && currentUser.id === adventureData.user_id;
         const isApprovedPlayer = subscription && subscription.status === 'aprovado';
 
-        if (!isMaster && !isApprovedPlayer) {
+        // --- ALTERADO: Painel só aparece se a aventura estiver 'em_andamento'
+        if (adventureData.status !== 'em_andamento' || (!isMaster && !isApprovedPlayer)) {
             panel.style.display = 'none';
             return;
         }
@@ -236,9 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const datetimeInput = document.getElementById('session-datetime');
         const notesInput = document.getElementById('session-notes');
         if (!datetimeInput.value) return alert('Por favor, escolha uma data e hora.');
-
         await supabaseClient.from('sessoes_propostas').insert({ aventura_id: adventureId, data_hora_proposta: datetimeInput.value, notas_mestre: notesInput.value });
-        
         const { data: sub } = await supabaseClient.from('inscricoes').select('status').eq('user_id', currentUser.id).eq('aventura_id', adventureId).single();
         await renderSchedulingPanel(sub);
     }
@@ -296,6 +312,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    // --- NOVA FUNÇÃO ADICIONADA ---
+    async function handleStartScheduling() {
+        const confirmed = await showCustomConfirm('Tem a certeza de que quer encerrar as inscrições e iniciar o agendamento? Novos jogadores não poderão mais se candidatar.');
+        if (confirmed) {
+            const { error } = await supabaseClient
+                .from('aventuras')
+                .update({ status: 'em_andamento' })
+                .eq('id', adventureId);
+
+            if (error) {
+                showToast('Erro ao iniciar o agendamento.', 'error');
+            } else {
+                showToast('Inscrições encerradas! O painel de agendamento está agora visível para os jogadores aprovados.');
+                // Recarrega a página para mostrar o novo estado
+                location.reload();
+            }
+        }
+    }
+
     async function handleDeleteAdventure() {
         const confirmed = await showCustomConfirm('DELETAR PERMANENTEMENTE?\n\nEsta ação é irreversível e apagará todos os dados da aventura. Para apenas a esconder do mural, use a opção "Arquivar".');
         if (confirmed) {
@@ -308,10 +343,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showToast(message, type = 'success') { const toastContainer = document.getElementById('toast-container'); if (!toastContainer) return; const toast = document.createElement('div'); toast.className = `toast ${type}`; toast.textContent = message; toastContainer.appendChild(toast); setTimeout(() => { toast.classList.add('show'); }, 10); setTimeout(() => { toast.classList.remove('show'); toast.addEventListener('transitionend', () => toast.remove()); }, 3000); }
     function showCustomConfirm(message) { return new Promise((resolve) => { const overlay = document.getElementById('custom-confirm-overlay'); const messageEl = document.getElementById('confirm-message'); const btnYes = document.getElementById('confirm-btn-yes'); const btnNo = document.getElementById('confirm-btn-no'); messageEl.textContent = message; overlay.classList.remove('hidden'); const close = (value) => { overlay.classList.add('hidden'); btnYes.onclick = null; btnNo.onclick = null; resolve(value); }; btnYes.onclick = () => close(true); btnNo.onclick = () => close(false); }); }
 
+    // --- EVENT LISTENER DE CLICK ATUALIZADO ---
     mainContainer.addEventListener('click', (e) => {
         const button = e.target.closest('button');
         if (!button) return;
         
+        // Adicionada a nova ação
+        if (button.matches('#start-scheduling-btn')) {
+            handleStartScheduling();
+            return;
+        }
+
         if (button.matches('.session-vote-btn')) {
             const sessaoId = button.dataset.sessaoId;
             const action = button.dataset.action;
