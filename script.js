@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modalidade: formData.get('modalidade'),
                 localizacao: formData.get('modalidade') === 'Presencial' ? formData.get('localizacao') : null,
                 vagas: parseInt(formData.get('vagas')),
-                descricao: easyMDE.value(),
+                descricao: DOMPurify.sanitize(easyMDE.value()), 
                 alerta_gatilho: formData.get('alerta_gatilho'),
                 tipo_jogo: formData.get('tipo_jogo'),
                 nivel: formData.get('nivel'),

@@ -129,12 +129,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const descriptionElement = document.getElementById('adventure-description');
         if (data.descricao && window.marked) {
-            descriptionElement.innerHTML = marked.parse(data.descricao);
+            descriptionElement.innerHTML = DOMPurify.sanitize(marked.parse(data.descricao));
         } else {
             descriptionElement.textContent = data.descricao || 'Nenhuma descrição fornecida.';
         }
     }
-    
+
     async function renderComments() {
         const commentsList = document.getElementById('comments-list');
         if (!commentsList) return;
@@ -150,6 +150,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const commentEl = document.createElement('div');
             commentEl.className = 'comment';
             const canDelete = currentUser && (currentUser.id === comment.user_id || (adventureData && currentUser.id === adventureData.user_id));
+
+            const sanitizedContent = DOMPurify.sanitize(comment.content);
+
             commentEl.innerHTML = `
                 <div class="comment-avatar"><img src="${comment.profiles?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'}" alt="Avatar"></div>
                 <div class="comment-body">
@@ -157,9 +160,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span>${comment.profiles?.username || 'Usuário'}</span>
                         ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}" title="Deletar Comentário"><i class="fas fa-trash-alt"></i></button>` : ''}
                     </div>
-                    <p>${comment.content}</p>
+                    <p>${sanitizedContent}</p>
                 </div>`;
-            commentsList.appendChild(commentEl);
+        commentsList.appendChild(commentEl);
         });
     }
 
