@@ -52,34 +52,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     }
 
-    function renderAdventures(adventures) {
-        if (!adventuresGrid) return;
-        adventuresGrid.innerHTML = '';
-        if (adventures.length === 0) {
-            adventuresGrid.innerHTML = searchBar && searchBar.value
-                ? '<p>Nenhuma aventura encontrada com este termo.</p>'
-                : '<p>Ainda não há nenhuma aventura publicada. Seja o primeiro!</p>';
-        }
-        adventures.forEach(adventure => {
-            const cardLink = document.createElement('a');
-            cardLink.href = `aventura.html?id=${adventure.id}`;
-            cardLink.classList.add('adventure-card-link');
-            const card = document.createElement('div');
-            card.classList.add('adventure-card');
-            const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
-            card.innerHTML = `
-                <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image">
-                <div class="adventure-card-content">
-                    <h4>${adventure.titulo}</h4>
-                    <p><strong>Mestre:</strong> ${adventure.nome_mestre}</p>
-                    <p><strong>Sistema:</strong> ${adventure.sistema_rpg}</p>
-                    <p><strong>Alerta de Gatilho ⚠️:</strong> ${adventure.alerta_gatilho}</p>
-                </div>
-            `;
-            cardLink.appendChild(card);
-            adventuresGrid.appendChild(cardLink);
-        });
+function renderAdventures(adventures) {
+    if (!adventuresGrid) return;
+    adventuresGrid.innerHTML = '';
+    if (adventures.length === 0) {
+        adventuresGrid.innerHTML = searchBar && searchBar.value
+            ? '<p>Nenhuma aventura encontrada com este termo.</p>'
+            : '<p>Ainda não há nenhuma aventura publicada. Seja o primeiro!</p>';
     }
+    adventures.forEach(adventure => {
+        const cardLink = document.createElement('a');
+        cardLink.href = `aventura.html?id=${adventure.id}`;
+        cardLink.classList.add('adventure-card-link');
+        const card = document.createElement('div');
+        card.classList.add('adventure-card');
+        const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
+        
+        card.innerHTML = `
+            <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image" loading="lazy">
+            <div class="adventure-card-content">
+                <h4>${adventure.titulo}</h4>
+                <div class="card-details">
+                    <div class="card-detail-line">
+                        <i class="fas fa-user-edit"></i>
+                        <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
+                    </div>
+                    <div class="card-detail-line">
+                        <i class="fas fa-book-skull"></i>
+                        <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
+                    </div>
+                     <div class="card-detail-line">
+                        <i class="fas fa-users"></i>
+                        <span><strong>Vagas:</strong> ${adventure.vagas}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        cardLink.appendChild(card);
+        adventuresGrid.appendChild(cardLink);
+    });
+}
 
     async function updateUI(user) {
         if (user) {

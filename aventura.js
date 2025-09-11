@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.title = `${data.titulo} - Dados & Calangos`;
         document.getElementById('adventure-title').textContent = data.titulo;
         document.getElementById('adventure-image').src = data.image_url || 'https://i.imgur.com/Q3j5eH0.png';
+        document.getElementById('adventure-image').loading = 'lazy';
         document.getElementById('master-name').textContent = data.nome_mestre;
         document.getElementById('system-name').textContent = data.sistema_rpg;
         document.getElementById('modality').textContent = data.modalidade || 'Não especificado';
@@ -154,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sanitizedContent = DOMPurify.sanitize(comment.content);
 
             commentEl.innerHTML = `
-                <div class="comment-avatar"><img src="${comment.profiles?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'}" alt="Avatar"></div>
+                <div class="comment-avatar"><img src="${comment.profiles?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'}" alt="Avatar" loading="lazy"></div>
                 <div class="comment-body">
                     <div class="comment-header">
                         <span>${comment.profiles?.username || 'Usuário'}</span>
@@ -162,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <p>${sanitizedContent}</p>
                 </div>`;
-        commentsList.appendChild(commentEl);
+            commentsList.appendChild(commentEl);
         });
     }
 
