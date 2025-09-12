@@ -28,6 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    function validatePassword(password, confirmPassword) {
+        if (password.length < 8) {
+            return 'A senha deve ter pelo menos 8 caracteres.';
+        }
+        if (!/\d/.test(password)) {
+            return 'A senha precisa conter pelo menos um número.';
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            return 'A senha precisa conter pelo menos um caractere especial.';
+        }
+        if (password !== confirmPassword) {
+            return 'As senhas não conferem.';
+        }
+        return null; // Retorna null se a senha for válida
+    }
+
     googleLoginButton.addEventListener('click', async () => {
         const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
         if (error) showMessage(errorMessageDiv, `Erro no login com Google: ${error.message}`);
@@ -69,6 +85,25 @@ document.addEventListener('DOMContentLoaded', () => {
             registerForm.reset();
         }
     });
+
+const passwordInput = document.getElementById('register-password');
+const confirmPasswordInput = document.getElementById('confirm-password');
+
+function checkPasswords() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    if (password || confirmPassword) { // Só mostra erro se um dos campos estiver preenchido
+        const passwordError = validatePassword(password, confirmPassword);
+        if (passwordError) {
+            showMessage(errorMessageDiv, passwordError);
+        } else {
+            errorMessageDiv.style.display = 'none'; // Esconde a mensagem de erro se tudo estiver correto
+        }
+    }
+}
+
+passwordInput.addEventListener('input', checkPasswords);
+confirmPasswordInput.addEventListener('input', checkPasswords);
 
     supabaseClient.auth.onAuthStateChange((event, session) => {
         if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
