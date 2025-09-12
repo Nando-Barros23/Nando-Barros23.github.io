@@ -88,14 +88,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (sub.status === 'pendente') {
                 buttons = `
                     <div class="applicant-actions">
-                        <button class="btn-applicant-action approve" data-inscricao-id="${sub.id}" data-action="aprovado">Aprovar</button>
-                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="recusado">Recusar</button>
+                        <button class="btn-applicant-action approve" data-inscricao-id="${sub.id}" data-action="aprovado" aria-label="Aprovar ${profile.username || 'candidato'}">Aprovar</button>
+                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="recusado" aria-label="Recusar ${profile.username || 'candidato'}">Recusar</button>
                     </div>
                 `;
             } else if (sub.status === 'aprovado') {
                 buttons = `
                     <div class="applicant-actions">
-                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="removido">Remover</button>
+                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="removido" aria-label="Remover jogador ${profile.username || 'aprovado'}">Remover</button>
                     </div>
                 `;
             }

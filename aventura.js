@@ -69,9 +69,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const masterActionsWrapper = document.createElement('div');
             masterActionsWrapper.className = 'master-actions';
             masterActionsWrapper.innerHTML = `
-                <a href="editar-aventura.html?id=${adventureData.id}" class="btn-icon-edit" title="Editar Aventura"><i class="fas fa-pencil-alt"></i></a>
-                <button id="archive-adventure-btn" class="btn-icon-archive" title="Arquivar Aventura"><i class="fas fa-archive"></i></button>
-                <button id="delete-adventure-btn" class="btn-icon-delete" title="Deletar Aventura Permanentemente"><i class="fas fa-trash-alt"></i></button>
+                <a href="editar-aventura.html?id=${adventureData.id}" class="btn-icon-edit" title="Editar Aventura" aria-label="Editar Aventura"><i class="fas fa-pencil-alt"></i></a>
+                <button id="archive-adventure-btn" class="btn-icon-archive" title="Arquivar Aventura" aria-label="Arquivar Aventura"><i class="fas fa-archive"></i></button>
+                <button id="delete-adventure-btn" class="btn-icon-delete" title="Deletar Aventura Permanentemente" aria-label="Deletar Aventura Permanentemente"><i class="fas fa-trash-alt"></i></button>
             `;
             titleContainer.appendChild(masterActionsWrapper);
 
@@ -134,6 +134,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             descriptionElement.textContent = data.descricao || 'Nenhuma descrição fornecida.';
         }
+        const pageUrl = window.location.href;
+        const descriptionSnippet = data.descricao ? data.descricao.substring(0, 155).trim() + '...' : 'Veja os detalhes desta aventura de RPG de mesa.';
+        const imageUrl = data.image_url || 'https://i.imgur.com/SzXWxJe.png';
+
+            document.getElementById('og-title').setAttribute('content', data.titulo);
+            document.getElementById('og-description').setAttribute('content', descriptionSnippet);
+            document.getElementById('og-image').setAttribute('content', imageUrl);
+            document.getElementById('og-url').setAttribute('content', pageUrl);
+            document.getElementById('twitter-title').setAttribute('content', data.titulo);
+            document.getElementById('twitter-description').setAttribute('content', descriptionSnippet);
+            document.getElementById('twitter-image').setAttribute('content', imageUrl);
+            document.getElementById('twitter-url').setAttribute('content', pageUrl);
     }
 
     async function renderComments() {
