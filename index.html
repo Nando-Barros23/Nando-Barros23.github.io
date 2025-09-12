@@ -29,8 +29,22 @@
     <div class="container">
         <main>
             <h2>Chamados de Aventura</h2>
-            <div class="search-container" style="margin-bottom: 2rem;">
-              <input type="search" id="search-bar" placeholder="Pesquisar por título, sistema ou mestre..." style="width: 100%; padding: 0.8rem; font-size: 1rem; border: 1px solid var(--cor-borda); border-radius: 4px;">
+            <div class="filters-container">
+                <input type="search" id="search-bar" placeholder="Pesquisar por título ou mestre...">
+                <select id="filter-system">
+                    <option value="">Todos os Sistemas</option>
+                    </select>
+                <select id="filter-modality">
+                    <option value="">Todas as Modalidades</option>
+                    <option value="Online">Online</option>
+                    <option value="Presencial">Presencial</option>
+                </select>
+                <select id="filter-type">
+                    <option value="">Todos os Tipos</option>
+                    <option value="One Shot">One Shot</option>
+                    <option value="Campanha">Campanha</option>
+                </select>
+                <button id="clear-filters-btn" class="btn-secundario">Limpar Filtros</button>
             </div>
             
             <div id="adventures-grid">

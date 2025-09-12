@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userArea = document.getElementById('user-area');
     const publishSection = document.querySelector('.painel-lateral');
     const searchBar = document.getElementById('search-bar');
+    const systemFilter = document.getElementById('filter-system');
+    const modalityFilter = document.getElementById('filter-modality');
+    const typeFilter = document.getElementById('filter-type');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
     let currentUser = null;
     let allAdventures = [];
 
@@ -28,7 +32,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } else {
             allAdventures = adventuresResponse.data;
-            renderAdventures(allAdventures);
+            populateSystemFilter(allAdventures);
+            applyFilters();
         }
     }
 
@@ -52,13 +57,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     }
 
-function renderAdventures(adventures) {
+// --- ADICIONE ESTAS DUAS NOVAS FUNÇÕES ---
+function populateSystemFilter(adventures) {
+    const systems = [...new Set(adventures.map(adv => adv.sistema_rpg))];
+    systems.sort();
+    systemFilter.innerHTML = '<option value="">Todos os Sistemas</option>';
+    systems.forEach(system => {
+        const option = document.createElement('option');
+        option.value = system;
+        option.textContent = system;
+        systemFilter.appendChild(option);
+    });
+}
+
+function applyFilters() {
+    const searchTerm = searchBar.value.toLowerCase();
+    const selectedSystem = systemFilter.value;
+    const selectedModality = modalityFilter.value;
+    const selectedType = typeFilter.value;
+
+    const filteredAdventures = allAdventures.filter(adventure => {
+        const matchesSearch = searchTerm === '' || 
+                              adventure.titulo.toLowerCase().includes(searchTerm) || 
+                              adventure.nome_mestre.toLowerCase().includes(searchTerm);
+
+        const matchesSystem = selectedSystem === '' || adventure.sistema_rpg === selectedSystem;
+        const matchesModality = selectedModality === '' || adventure.modalidade === selectedModality;
+        const matchesType = selectedType === '' || adventure.tipo_jogo === selectedType;
+
+        return matchesSearch && matchesSystem && matchesModality && matchesType;
+    });
+
+    renderAdventures(filteredAdventures);
+}
+
+    function renderAdventures(adventures) {
     if (!adventuresGrid) return;
     adventuresGrid.innerHTML = '';
     if (adventures.length === 0) {
-        adventuresGrid.innerHTML = searchBar && searchBar.value
-            ? '<p>Nenhuma aventura encontrada com este termo.</p>'
-            : '<p>Ainda não há nenhuma aventura publicada. Seja o primeiro!</p>';
+        adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados.</p>';
     }
     adventures.forEach(adventure => {
         const cardLink = document.createElement('a');
@@ -116,17 +153,18 @@ function renderAdventures(adventures) {
         }
     }
     
-    if (searchBar) {
-        searchBar.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredAdventures = allAdventures.filter(adventure => 
-                adventure.titulo.toLowerCase().includes(searchTerm) ||
-                adventure.sistema_rpg.toLowerCase().includes(searchTerm) ||
-                adventure.nome_mestre.toLowerCase().includes(searchTerm)
-            );
-            renderAdventures(filteredAdventures);
-        });
-    }
+            searchBar.addEventListener('input', applyFilters);
+            systemFilter.addEventListener('change', applyFilters);
+            modalityFilter.addEventListener('change', applyFilters);
+            typeFilter.addEventListener('change', applyFilters);
+
+            clearFiltersBtn.addEventListener('click', () => {
+                searchBar.value = '';
+                systemFilter.value = '';
+                modalityFilter.value = '';
+                typeFilter.value = '';
+                applyFilters();
+            });
 
     if (adventureForm) {
         const onlineRadio = document.getElementById('modalidade_online');

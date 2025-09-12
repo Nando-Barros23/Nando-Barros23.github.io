@@ -174,3 +174,31 @@ h2, h3 { font-family: var(--fonte-titulo); color: var(--cor-primaria); margin-bo
 }
 .btn-applicant-action.approve { background-color: var(--cor-sucesso); }
 .btn-applicant-action.reject { background-color: var(--cor-perigo); }
+
+.filters-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: var(--cor-fundo-card);
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+}
+
+.filters-container input,
+.filters-container select,
+.filters-container button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: 4px;
+    background-color: #fff;
+    font-family: var(--fonte-corpo);
+}
+
+.filters-container button {
+    font-family: var(--fonte-corpo);
+    font-size: 0.9rem;
+}
