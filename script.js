@@ -119,8 +119,7 @@ function renderAdventures(adventures) {
                         <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
                     </div>
                      <div class="card-detail-line">
-                        <i class="fas fa-users"></i>
-                        <span><strong>Vagas:</strong> ${adventure.vagas}</span>
+                        <i class="fas fa-user"></i> <span><strong>Vagas:</strong> ${adventure.vagas}</span>
                     </div>
                 </div>
             </div>
@@ -171,6 +170,19 @@ function renderAdventures(adventures) {
         const presencialRadio = document.getElementById('modalidade_presencial');
         const locationContainer = document.getElementById('location-input-container');
         const locationInput = document.getElementById('localizacao');
+        const adventureImageInput = document.getElementById('adventure-image');
+        const fileUploadLabel = document.querySelector('.file-upload-label');
+        const originalLabelText = fileUploadLabel.innerHTML; // Guarda o texto original do botão
+
+        adventureImageInput.addEventListener('change', () => {
+            if (adventureImageInput.files.length > 0) {
+        // Se um ficheiro for selecionado, mostra o nome dele
+                fileUploadLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${adventureImageInput.files[0].name}`;
+            } else {
+        // Se a seleção for cancelada, volta ao texto original
+                fileUploadLabel.innerHTML = originalLabelText;
+            }
+        });
 
         const easyMDE = new EasyMDE({
             element: document.getElementById('descricao'),
