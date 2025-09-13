@@ -96,37 +96,39 @@ function renderAdventures(adventures) {
     adventuresGrid.innerHTML = '';
     if (adventures.length === 0) {
         adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados.</p>';
-    }
-    adventures.forEach(adventure => {
-        const cardLink = document.createElement('a');
-        cardLink.href = `aventura.html?id=${adventure.id}`;
-        cardLink.classList.add('adventure-card-link');
-        const card = document.createElement('div');
-        card.classList.add('adventure-card');
-        const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
+    } else {
+        adventures.forEach(adventure => {
+            const cardLink = document.createElement('a');
+            cardLink.href = `aventura.html?id=${adventure.id}`;
+            cardLink.classList.add('adventure-card-link');
+            const card = document.createElement('div');
+            card.classList.add('adventure-card');
+            const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
         
-        card.innerHTML = `
-            <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image" loading="lazy">
-            <div class="adventure-card-content">
-                <h4>${adventure.titulo}</h4>
-                <div class="card-details">
-                    <div class="card-detail-line">
-                        <i class="fas fa-user-edit"></i>
-                        <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
-                    </div>
-                    <div class="card-detail-line">
-                        <i class="fas fa-book-skull"></i>
-                        <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
-                    </div>
-                     <div class="card-detail-line">
-                        <i class="fas fa-user"></i> <span><strong>Vagas:</strong> ${adventure.vagas}</span>
+             card.innerHTML = `
+                <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image" loading="lazy">
+                <div class="adventure-card-content">
+                    <h4>${adventure.titulo}</h4>
+                    <div class="card-details">
+                        <div class="card-detail-line">
+                            <i class="fas fa-user-edit"></i>
+                            <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
+                        </div>
+                        <div class="card-detail-line">
+                            <i class="fas fa-book-skull"></i>
+                            <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
+                        </div>
+                         <div class="card-detail-line">
+                            <i class="fas fa-user"></i>
+                            <span><strong>Vagas:</strong> ${adventure.vagas}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        cardLink.appendChild(card);
-        adventuresGrid.appendChild(cardLink);
-    });
+            `;
+            cardLink.appendChild(card);
+            adventuresGrid.appendChild(cardLink);
+        });
+    }
 }
 
     async function updateUI(user) {
@@ -176,10 +178,8 @@ function renderAdventures(adventures) {
 
         adventureImageInput.addEventListener('change', () => {
             if (adventureImageInput.files.length > 0) {
-        // Se um ficheiro for selecionado, mostra o nome dele
                 fileUploadLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${adventureImageInput.files[0].name}`;
             } else {
-        // Se a seleção for cancelada, volta ao texto original
                 fileUploadLabel.innerHTML = originalLabelText;
             }
         });

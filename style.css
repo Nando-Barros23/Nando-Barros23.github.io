@@ -1,9 +1,9 @@
 :root {
-    /* --- FONTES ATUALIZADAS --- */
+    /*  FONTES */
     --fonte-titulo: 'Cinzel', serif;
     --fonte-corpo: 'EB Garamond', serif;
     
-    /* --- PALETA DE CORES (Mantida) --- */
+    /*  PALETA DE CORES  */
     --cor-fundo: #F7F7F7;
     --cor-fundo-card: #FFDBA7;
     --cor-primaria: #D06E41;
@@ -11,17 +11,16 @@
     --cor-texto-principal: #221A29;
     --cor-texto-secundario: #5c5561;
     --cor-borda: #DFE0DF;
-    --sombra: 0 4px 8px rgba(0, 0, 0, 0.08); /* Sombra mais suave */
+    --sombra: 0 4px 8px rgba(0, 0, 0, 0.08); 
     --cor-sucesso: #28a745;
     --cor-perigo: #dc3545;
     --cor-info: #17a2b8;
     --cor-secundaria: #6c757d;
 }
 
-/* --- APLICAÇÃO GERAL DAS FONTES --- */
 h1, h2, h3, h4, h5, h6, .btn-primario, .btn-secundario, .form-grupo label, .my-adventure-header span, .separator, .comment-author {
     font-family: var(--fonte-titulo);
-    font-weight: 700; /* Garante que os títulos fiquem em negrito */
+    font-weight: 700; 
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,14 +49,10 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .btn-primario:hover { background-color: #b85b30; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
 .btn-secundario { background-color: var(--cor-texto-secundario); color: #fff; }
 .btn-secundario:hover { background-color: #4a444f; }
-
-/* --- NOVOS ESTILOS PARA OS CARDS DE AVENTURA COM ÍCONES --- */
 .card-details { margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.6rem; }
 .card-detail-line { display: flex; align-items: center; gap: 0.8rem; color: var(--cor-texto-secundario); font-size: 0.9rem; }
 .card-detail-line i { width: 16px; text-align: center; color: var(--cor-primaria); }
 .card-detail-line strong { color: var(--cor-texto-principal); font-weight: 700; font-family: var(--fonte-corpo); }
-
-/* --- RESTO DO SEU CSS ORIGINAL --- */
 #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
 .toast { padding: 15px 20px; border-radius: 8px; color: #fff; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transform: translateX(100%); transition: all 0.4s ease; }
 .toast.show { opacity: 1; transform: translateX(0); }
