@@ -91,7 +91,7 @@ function applyFilters() {
     renderAdventures(filteredAdventures);
 }
 
-    function renderAdventures(adventures) {
+function renderAdventures(adventures) {
     if (!adventuresGrid) return;
     adventuresGrid.innerHTML = '';
     if (adventures.length === 0) {
