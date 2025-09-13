@@ -63,14 +63,16 @@
             </div>
         </main>
         <aside class="painel-lateral">
-            <h3>Publique sua Aventura</h3>
+            <h3 class="text-center">Publique sua Aventura</h3>
             <form id="adventure-form">
                 <div class="form-grupo">
                     <label for="titulo">Título da Aventura</label>
                     <input type="text" id="titulo" name="titulo" required>
                 </div>
                 <div class="form-grupo">
-                    <label for="adventure-image">Imagem da Aventura (Opcional)</label>
+                    <label for="adventure-image" class="file-upload-label btn-primario">
+                        <i class="fas fa-image"></i> Escolher Imagem
+                    </label>
                     <input type="file" id="adventure-image" name="adventure-image" accept="image/png, image/jpeg">
                 </div>
                 <div class="form-grupo">
