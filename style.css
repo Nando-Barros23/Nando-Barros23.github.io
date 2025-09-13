@@ -127,3 +127,23 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 #adventure-form input[type="file"] { display: none; }
 #adventure-form button[type="submit"] { width: 100%; }
 .card-details, .card-detail-line { list-style-type: none; padding-left: 0; }
+
+/* --- NOVOS ESTILOS PARA A PÁGINA DE PERFIL --- */
+.profile-page-container { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+@media (min-width: 992px) { .profile-page-container { grid-template-columns: 1fr 3fr; } }
+.profile-sidebar { align-self: start; }
+.profile-container { display: block; }
+.adventure-title-status { display: flex; align-items: center; gap: 0.5rem; flex-grow: 1; }
+.status-tag { font-family: var(--fonte-corpo); font-size: 0.8rem; font-weight: bold; padding: 0.2rem 0.6rem; border-radius: 4px; color: #fff; white-space: nowrap; }
+.status-tag.active { background-color: var(--cor-info); }
+.status-tag.in-progress { background-color: #007bff; }
+.status-tag.finished { background-color: var(--cor-sucesso); }
+.status-tag.archived { background-color: var(--cor-secundaria); }
+.adventure-actions { display: flex; align-items: center; gap: 0.5rem; }
+.btn-adventure-action { padding: 0.4rem 0.8rem; font-size: 0.8rem; border: none; border-radius: 4px; cursor: pointer; font-family: var(--fonte-titulo); transition: all 0.2s; color: #fff; white-space: nowrap; }
+.btn-adventure-action.finalize { background-color: var(--cor-sucesso); }
+.btn-adventure-action.finalize:hover { background-color: #218838; }
+.btn-adventure-action.unarchive { background-color: var(--cor-info); }
+.btn-adventure-action.unarchive:hover { background-color: #138496; }
+.btn-adventure-action.delete-permanent { background-color: var(--cor-perigo); }
+.btn-adventure-action.delete-permanent:hover { background-color: #c82333; }

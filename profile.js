@@ -180,10 +180,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             let actionButtonsHTML = '';
 
             const statusInfo = {
-                ativa: { text: '[Ativa]', class: 'active' },
-                em_andamento: { text: '[Em Andamento]', class: 'in-progress' },
-                finalizada: { text: '[Finalizada]', class: 'finished' },
-                arquivada: { text: '[Arquivada]', class: 'archived' }
+                ativa: { text: 'Ativa', class: 'active' },
+                em_andamento: { text: 'Em Andamento', class: 'in-progress' },
+                finalizada: { text: 'Finalizada', class: 'finished' },
+                arquivada: { text: 'Arquivada', class: 'archived' }
             };
             
             if (adventure.status && statusInfo[adventure.status]) {
