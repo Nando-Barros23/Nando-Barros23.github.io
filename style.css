@@ -115,58 +115,53 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .btn-applicant-action.approve { background-color: var(--cor-sucesso); }
 .btn-applicant-action.reject { background-color: var(--cor-perigo); }
 
-/* --- ESTILOS REFINADOS PARA OS FILTROS --- */
 .filters-container {
-    display: flex; /* Mudar para Flexbox para mais controlo */
-    flex-wrap: wrap; /* Permite que os itens quebrem a linha em ecrãs pequenos */
+    display: flex;
+    flex-direction: column; /* Organiza as linhas em coluna */
     gap: 1rem;
     margin-bottom: 2rem;
     padding: 1rem;
     background-color: var(--cor-fundo-card);
     border-radius: 8px;
     border: 1px solid var(--cor-borda);
-    align-items: center; /* Alinha todos os itens verticalmente */
+}
+.filter-row-main {
+    width: 100%;
 }
 
-/* A barra de pesquisa será o elemento principal e maior */
-.filters-container #search-bar {
-    flex: 2 1 300px; /* Permite que cresça mais que os outros (2) e tem uma base maior (300px) */
+.filter-row-secondary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Mantém a responsividade */
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Estilo unificado para todos os inputs e selects */
+.filters-container input,
+.filters-container select {
+    width: 100%;
     padding: 0.8rem;
     font-size: 1rem;
     border: 1px solid var(--cor-borda);
     border-radius: 4px;
-}
-
-/* Os filtros dropdown serão mais pequenos e polidos */
-.filters-container select {
-    flex: 1 1 150px; /* Crescem menos (1) e têm uma base menor (150px) */
-    padding: 0.8rem;
-    font-size: 0.9rem; /* Fonte um pouco menor */
-    border: 1px solid var(--cor-borda);
-    border-radius: 4px;
     background-color: #fff;
     font-family: var(--fonte-corpo);
-    -webkit-appearance: none; /* Remove o estilo padrão do navegador */
+}
+
+/* Personalização dos selects (dropdowns) */
+.filters-container select {
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%235c5561%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.9%205.4-12.9%200-5-1.9-9.2-5.5-12.7z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
     background-position: right .7em top 50%;
     background-size: .65em auto;
-    padding-right: 2.5rem; /* Espaço para a seta personalizada */
+    padding-right: 2.5rem;
 }
 
-/* O botão de limpar será mais subtil */
 .filters-container #clear-filters-btn {
-    flex-basis: auto; /* A largura será baseada no conteúdo */
-    width: auto;
     font-family: var(--fonte-corpo);
     font-size: 0.9rem;
-    padding: 0.8rem 1rem;
-    background-color: var(--cor-texto-secundario);
-    color: #fff;
-}
-
-.filters-container #clear-filters-btn:hover {
-    background-color: #4a444f;
+    padding: 0.8rem;
 }
