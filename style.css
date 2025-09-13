@@ -114,6 +114,7 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .btn-applicant-action { padding: 0.2rem 0.5rem; font-size: 0.8rem; border: none; border-radius: 4px; color: #fff; cursor: pointer; }
 .btn-applicant-action.approve { background-color: var(--cor-sucesso); }
 .btn-applicant-action.reject { background-color: var(--cor-perigo); }
+
 /* --- ESTILOS REFINADOS PARA OS FILTROS --- */
 .filters-container {
     display: flex; /* Mudar para Flexbox para mais controlo */
@@ -127,14 +128,18 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
     align-items: center; /* Alinha todos os itens verticalmente */
 }
 
-/* A barra de pesquisa será o elemento principal */
+/* A barra de pesquisa será o elemento principal e maior */
 .filters-container #search-bar {
-    flex: 2 1 300px; /* Permite que cresça mais que os outros */
+    flex: 2 1 300px; /* Permite que cresça mais que os outros (2) e tem uma base maior (300px) */
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: 4px;
 }
 
-/* Os filtros dropdown serão mais pequenos */
+/* Os filtros dropdown serão mais pequenos e polidos */
 .filters-container select {
-    flex: 1 1 150px; /* Crescem menos e têm uma base menor */
+    flex: 1 1 150px; /* Crescem menos (1) e têm uma base menor (150px) */
     padding: 0.8rem;
     font-size: 0.9rem; /* Fonte um pouco menor */
     border: 1px solid var(--cor-borda);
@@ -148,7 +153,7 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
     background-repeat: no-repeat;
     background-position: right .7em top 50%;
     background-size: .65em auto;
-    padding-right: 2.5rem;
+    padding-right: 2.5rem; /* Espaço para a seta personalizada */
 }
 
 /* O botão de limpar será mais subtil */
