@@ -195,12 +195,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     actionButtonsHTML = `<button class="btn-adventure-action finalize" data-adventure-id="${adventure.id}">Finalizar</button>`;
                     break;
                 case 'finalizada':
-                    actionButtonsHTML = `<button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}">Apagar de Vez</button>`;
+                    actionButtonsHTML = `<button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}" title="Apagar de Vez" aria-label="Apagar Permanentemente"><i class="fas fa-trash-alt"></i></button>`;
                     break;
                 case 'arquivada':
                     actionButtonsHTML = `
-                        <button class="btn-adventure-action unarchive" data-adventure-id="${adventure.id}">Desarquivar</button>
-                        <button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}">Apagar de Vez</button>
+                        <button class="btn-adventure-action unarchive" data-adventure-id="${adventure.id}" title="Desarquivar" aria-label="Desarquivar"><i class="fas fa-box-open"></i></button>
+                        <button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}" title="Apagar de Vez" aria-label="Apagar Permanentemente"><i class="fas fa-trash-alt"></i></button>
                     `;
                     break;
             }
