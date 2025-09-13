@@ -172,9 +172,10 @@ function renderAdventures(adventures) {
         const presencialRadio = document.getElementById('modalidade_presencial');
         const locationContainer = document.getElementById('location-input-container');
         const locationInput = document.getElementById('localizacao');
+
         const adventureImageInput = document.getElementById('adventure-image');
         const fileUploadLabel = document.querySelector('.file-upload-label');
-        const originalLabelText = fileUploadLabel.innerHTML; // Guarda o texto original do botão
+        const originalLabelText = fileUploadLabel.innerHTML;
 
         adventureImageInput.addEventListener('change', () => {
             if (adventureImageInput.files.length > 0) {
@@ -183,6 +184,7 @@ function renderAdventures(adventures) {
                 fileUploadLabel.innerHTML = originalLabelText;
             }
         });
+
 
         const easyMDE = new EasyMDE({
             element: document.getElementById('descricao'),
