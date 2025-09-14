@@ -67,11 +67,21 @@
 
         <div id="action-buttons-area" class="subscription-section"></div>
         <div class="comments-section">
-            <hr style="margin: 2rem 0;">
             <h3>Comentários</h3>
             <div id="comments-list"></div>
             <div id="comment-form-container"></div>
         </div>
+        <div class="delete-confirmation" id="delete-confirmation">
+        Tem certeza que deseja deletar este comentário?
+        <button class="btn-confirm">Sim</button>
+        <button class="btn-cancel">Cancelar</button>
+        </div>
+
+        <button class="delete-btn" onclick="mostrarConfirmacaoDelete('id-do-comentario')">
+        <img src="img/trash-red.png" alt="Excluir" class="trash-icon">
+        </button>
+
+
     </main>
     
     <div id="toast-container"></div>
