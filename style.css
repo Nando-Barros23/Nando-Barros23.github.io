@@ -117,7 +117,7 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .filters-container select { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%235c5561%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.9%205.4-12.9%200-5-1.9-9.2-5.5-12.7z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right .7em top 50%; background-size: .65em auto; padding-right: 2.5rem; }
 .filters-container #clear-filters-btn { font-family: var(--fonte-corpo); font-size: 0.9rem; padding: 0.8rem;}
 .text-center { text-align: center; }
-#adventure-image { display: none; }
+#adventure-image { display: block; width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
 .file-upload-label { display: inline-block; width: 100%; cursor: pointer; }
 .card-details { list-style-type: none; padding-left: 0; }
 .radio-group { display: flex; gap: 1rem; border: 1px solid var(--cor-borda); border-radius: 8px; padding: 0.5rem; background-color: var(--cor-fundo); }
@@ -127,8 +127,6 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 #adventure-form input[type="file"] { display: none; }
 #adventure-form button[type="submit"] { width: 100%; }
 .card-details, .card-detail-line { list-style-type: none; padding-left: 0; }
-
-/* --- NOVOS ESTILOS PARA A PÁGINA DE PERFIL --- */
 .profile-page-container { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
 @media (min-width: 992px) { .profile-page-container { grid-template-columns: 1fr 3fr; } }
 .profile-sidebar { align-self: start; }
@@ -149,3 +147,9 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .btn-adventure-action.delete-permanent:hover { background-color: #c82333; }
 .avatar-container { text-align: center; margin-bottom: 1.5rem; }
 .avatar-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--cor-borda); box-shadow: var(--sombra); }
+#comment-form-container { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; }
+#comment-form-container textarea { width: 100%; min-height: 80px; padding: 0.8rem; border: 1px solid var(--cor-borda); border-radius: 6px; font-family: var(--fonte-corpo); resize: vertical; }
+#comment-form-container button { align-self: flex-end; padding: 0.6rem 1.2rem; }
+.comments-section { background: #fff; border: 1px solid var(--cor-borda); border-radius: 8px; padding: 1.5rem; }
+.comment-author { font-weight: bold; color: var(--cor-primaria); }
+
