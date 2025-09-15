@@ -252,21 +252,35 @@ function renderAdventures(adventures) {
                 image_url: imageUrl
             };
             
-            const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
-            if (error) {
-                console.error('Erro ao inserir aventura:', error);
-                showToast('Ocorreu um erro ao publicar sua aventura.', 'error');
-            } else {
-                showToast('Aventura publicada com sucesso!', 'success');
-                adventureForm.reset();
-                easyMDE.value("");
-                locationContainer.style.display = 'none';
-                onlineRadio.checked = true;
-                initializeIndexPage();
+        const { data, error } = await supabaseClient.from('aventuras').insert([newAdventure]).select();
+
+        if (error) {
+            console.error('Erro ao inserir aventura:', error);
+            showToast('Ocorreu um erro ao publicar sua aventura.', 'error');
+        } else {
+            const novaAventura = data[0]; 
+
+            try {
+              const { data: funcData, error: funcError } = await supabaseClient.functions.invoke('notificar-discord', {
+                body: { aventura: novaAventura }
+              });
+
+              if (funcError) throw funcError;
+
+              console.log("Notificação para o Discord enviada com sucesso!", funcData);
+            } catch (funcError) {
+              console.error("Erro ao notificar o Discord:", funcError);
             }
-            formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
-        });
-    }
+
+            showToast('Aventura publicada com sucesso!', 'success');
+            adventureForm.reset();
+            easyMDE.value("");
+            locationContainer.style.display = 'none';
+            onlineRadio.checked = true;
+            initializeIndexPage(); 
+        }
+        formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
+    });
 
     initializeIndexPage();
 });
