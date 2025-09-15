@@ -1,4 +1,3 @@
-document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
     const adventuresGrid = document.getElementById('adventures-grid');
     const adventureForm = document.getElementById('adventure-form');
@@ -285,5 +284,6 @@ function renderAdventures(adventures) {
     renderAdventures();
 });
 
-initializeIndexPage();
+document.addEventListener('DOMContentLoaded', () => {
+    initializeIndexPage();
 });
