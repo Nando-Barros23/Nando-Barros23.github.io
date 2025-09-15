@@ -190,17 +190,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const item = document.createElement('div');
                 item.className = 'my-adventure-item';
 
-                let statusTag = '';
-                const statusInfo = {
-                    ativa: { text: 'Ativa', class: 'active' },
-                    em_andamento: { text: 'Em Andamento', class: 'in-progress' },
-                    finalizada: { text: 'Finalizada', class: 'finished' },
-                    arquivada: { text: 'Arquivada', class: 'archived' }
-                };
-                if (adventure.status && statusInfo[adventure.status]) {
-                    statusTag = `<span class="status-tag ${statusInfo[adventure.status].class}">${statusInfo[adventure.status].text}</span>`;
-                }
-
                 let actionButtonsHTML = '';
                 switch (adventure.status) {
                     case 'ativa': 
@@ -224,7 +213,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="my-adventure-header" data-adventure-id="${adventure.id}">
                         <div class="adventure-title-status">
                             <span>${adventure.titulo}</span>
-                            ${statusTag}
                         </div>
                         <div class="adventure-actions">
                             ${actionButtonsHTML}
