@@ -188,19 +188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             container.innerHTML = '<p>Você precisa estar <a href="login.html">logado</a> para comentar.</p>';
         }
     }
-    function mostrarConfirmacaoDelete(btn) {
-    const comment = btn.closest(".comment");
-    const box = comment.querySelector(".delete-confirmation");
-    box.style.display = "block";
-    }
-
-    document.addEventListener("click", function(e) {
-    if (e.target.classList.contains("btn-cancel")) {
-        e.target.closest(".delete-confirmation").style.display = "none";
-    }
-    });
-
-
     // --- FUNÇÃO DO PAINEL DE AGENDAMENTO ATUALIZADA ---
     async function renderSchedulingPanel(subscription) {
         const panel = document.getElementById('scheduling-panel');

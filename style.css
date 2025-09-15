@@ -154,6 +154,6 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .comment-author { font-weight: bold; color: var(--cor-primaria); }
 .comments-section h3 { margin-top: 0; margin-bottom: 1rem; }
 .delete-confirmation { display: none; margin-top: 1rem; padding: 1rem; border-radius: 6px; background: #ffecec;color: #a30000; }
-.delete-btn { background: none; border: none; cursor: pointer; padding: 0; color: var(--cor-perigo); font-size: 1.2rem; }
+.comment-delete-btn { background: none; border: none; cursor: pointer; padding: 0; color: var(--cor-perigo); font-size: 1.2rem; }
 .trash-icon { width: 20px; height: 20px; }
-.delete-btn:hover { color: #a30000; }
+.comment-delete-btn:hover { color: #a30000; }
