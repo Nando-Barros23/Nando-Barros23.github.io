@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const masterApplicationSection = document.getElementById('master-application-section');
     const myAdventuresSection = document.getElementById('my-adventures-section');
     const myAdventuresList = document.getElementById('my-adventures-list');
+    let myAllAdventures = [];
     let currentUser = null;
 
     
@@ -157,83 +158,99 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-        async function loadMyAdventures(user) {
-        const { data: adventures, error } = await supabaseClient
+        async function loadMyAdventures(user) { const { data: adventures, error } = await supabaseClient
             .from('aventuras')
             .select('id, titulo, status, vagas') 
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });
             
-        if (error) { console.error('Erro ao buscar aventuras do mestre:', error); return; }
-
-        myAdventuresList.innerHTML = '';
-        if (adventures.length === 0) {
-            myAdventuresList.innerHTML = '<p>Você ainda não publicou nenhuma aventura.</p>';
+            if (error) { 
+            console.error('Erro ao buscar aventuras do mestre:', error);
+            myAdventuresList.innerHTML = '<p>Erro ao carregar aventuras.</p>';
             return;
+            }
+
+            myAllAdventures = adventures; 
+            renderFilteredAdventures('em_andamento'); 
         }
 
-        const adventureIds = adventures.map(a => a.id);
-        const { data: allSubs } = await supabaseClient
-            .from('inscricoes')
-            .select('aventura_id, status')
-            .in('aventura_id', adventureIds);
+        function renderFilteredAdventures(statusFilter) {
+            myAdventuresList.innerHTML = ''; 
 
-        adventures.forEach(adventure => {
-            const subsForThisAdventure = allSubs.filter(s => s.aventura_id === adventure.id);
-            const approvedCount = subsForThisAdventure.filter(s => s.status === 'aprovado').length;
-            const pendingCount = subsForThisAdventure.filter(s => s.status === 'pendente').length;
-            
-            let countsHTML = '';
-            if (adventure.status === 'ativa' || adventure.status === 'em_andamento') {
-                countsHTML = `<span class="adventure-counts">(${approvedCount}/${adventure.vagas} Aprovados | ${pendingCount} Pendentes)</span>`;
+            const statusesToShow = (statusFilter === 'em_andamento') ? ['em_andamento', 'ativa'] : [statusFilter];
+
+            const filteredAdventures = myAllAdventures.filter(adv => statusesToShow.includes(adv.status));
+
+            if (filteredAdventures.length === 0) {
+                myAdventuresList.innerHTML = `<p style="padding: 1rem;">Nenhuma aventura encontrada na categoria "${statusFilter}".</p>`;
+                return;
             }
 
-            const item = document.createElement('div');
-            item.className = 'my-adventure-item';
-            
-            let statusTag = '';
-            const statusInfo = {
-                ativa: { text: 'Ativa', class: 'active' },
-                em_andamento: { text: 'Em Andamento', class: 'in-progress' },
-                finalizada: { text: 'Finalizada', class: 'finished' },
-                arquivada: { text: 'Arquivada', class: 'archived' }
-            };
-            if (adventure.status && statusInfo[adventure.status]) {
-                statusTag = `<span class="status-tag ${statusInfo[adventure.status].class}">${statusInfo[adventure.status].text}</span>`;
-            }
-            let actionButtonsHTML = '';
-            switch (adventure.status) {
-                case 'em_andamento':
-                    actionButtonsHTML = `<button class="btn-adventure-action finalize" data-adventure-id="${adventure.id}">Finalizar</button>`;
-                    break;
-                case 'finalizada':
-                    actionButtonsHTML = `<button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}" title="Apagar de Vez" aria-label="Apagar Permanentemente"><i class="fas fa-trash-alt"></i></button>`;
-                    break;
-                case 'arquivada':
-                    actionButtonsHTML = `
-                        <button class="btn-adventure-action unarchive" data-adventure-id="${adventure.id}" title="Desarquivar" aria-label="Desarquivar"><i class="fas fa-box-open"></i></button>
-                        <button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}" title="Apagar de Vez" aria-label="Apagar Permanentemente"><i class="fas fa-trash-alt"></i></button>
-                    `;
-                    break;
-            }
+            filteredAdventures.forEach(adventure => {
+                const item = document.createElement('div');
+                item.className = 'my-adventure-item';
 
-            item.innerHTML = `
-                <div class="my-adventure-header" data-adventure-id="${adventure.id}">
-                    <div class="adventure-title-status">
-                        <span>${adventure.titulo}</span>
-                        ${statusTag}
-                        ${countsHTML}
+                let statusTag = '';
+                const statusInfo = {
+                    ativa: { text: 'Ativa', class: 'active' },
+                    em_andamento: { text: 'Em Andamento', class: 'in-progress' },
+                    finalizada: { text: 'Finalizada', class: 'finished' },
+                    arquivada: { text: 'Arquivada', class: 'archived' }
+                };
+                if (adventure.status && statusInfo[adventure.status]) {
+                    statusTag = `<span class="status-tag ${statusInfo[adventure.status].class}">${statusInfo[adventure.status].text}</span>`;
+                }
+
+                let actionButtonsHTML = '';
+                switch (adventure.status) {
+                    case 'ativa': 
+                        actionButtonsHTML = `<button class="btn-adventure-action finalize" style="background-color: #ffc107; color: #212529;" data-adventure-id="${adventure.id}">Iniciar Sessão</button>`;
+                        break;
+                    case 'em_andamento':
+                        actionButtonsHTML = `<button class="btn-adventure-action finalize" data-adventure-id="${adventure.id}">Finalizar</button>`;
+                        break;
+                    case 'finalizada':
+                        actionButtonsHTML = `<button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}" title="Apagar de Vez"><i class="fas fa-trash-alt"></i></button>`;
+                        break;
+                    case 'arquivada':
+                        actionButtonsHTML = `
+                            <button class="btn-adventure-action unarchive" data-adventure-id="${adventure.id}" title="Desarquivar"><i class="fas fa-box-open"></i></button>
+                            <button class="btn-adventure-action delete-permanent" data-adventure-id="${adventure.id}" title="Apagar de Vez"><i class="fas fa-trash-alt"></i></button>
+                        `;
+                        break;
+                }
+
+                item.innerHTML = `
+                    <div class="my-adventure-header" data-adventure-id="${adventure.id}">
+                        <div class="adventure-title-status">
+                            <span>${adventure.titulo}</span>
+                            ${statusTag}
+                        </div>
+                        <div class="adventure-actions">
+                            ${actionButtonsHTML}
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
                     </div>
-                    <div class="adventure-actions">
-                        ${actionButtonsHTML}
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="subscribers-list" id="subscribers-${adventure.id}" style="display: none;"></div>
-            `;
-            myAdventuresList.appendChild(item);
-        });
-    }
+                    <div class="subscribers-list" id="subscribers-${adventure.id}" style="display: none;"></div>
+                `;
+                myAdventuresList.appendChild(item);
+            });
+        }
+
+        const adventureTabs = document.querySelector('.adventure-tabs');
+        if (adventureTabs) {
+            adventureTabs.addEventListener('click', (e) => {
+                e.preventDefault();
+                const clickedTab = e.target.closest('.tab-link');
+                if (!clickedTab) return;
+
+                adventureTabs.querySelectorAll('.tab-link').forEach(tab => tab.classList.remove('active'));
+                clickedTab.classList.add('active');
+
+                const status = clickedTab.dataset.status;
+                renderFilteredAdventures(status);
+            });
+        }
 
     async function initializeProfilePage() {
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();

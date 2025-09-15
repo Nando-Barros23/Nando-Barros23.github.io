@@ -180,3 +180,7 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 #action-buttons-area { text-align: left; margin: 2rem 0; display: flex;  align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .status-box { padding: 0.8rem 1.2rem; border-radius: 6px; font-family: var(--fonte-titulo); font-size: 1rem; display: flex; align-items: center; gap: 0.8rem; }
 .status-box.pending { background-color: #fff8e1;  color: #856404; border: 1px solid #ffecb3; }
+.adventure-tabs { display: flex; border-bottom: 2px solid var(--cor-borda); margin-bottom: 1.5rem; }
+.tab-link { font-family: var(--fonte-titulo); padding: 0.8rem 1.5rem; cursor: pointer; text-decoration: none; color: var(--cor-texto-secundario); border-bottom: 3px solid transparent; transition: all 0.2s ease; }
+.tab-link:hover { color: var(--cor-texto-principal); }
+.tab-link.active { color: var(--cor-primaria); border-bottom-color: var(--cor-primaria); }
