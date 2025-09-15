@@ -277,7 +277,7 @@ function renderAdventures(adventures) {
             easyMDE.value("");
             locationContainer.style.display = 'none';
             onlineRadio.checked = true;
-            initializeIndexPage(); 
+            renderAdventures(); 
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
