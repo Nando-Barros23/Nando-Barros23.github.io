@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="comment-avatar"><img src="${comment.profiles?.avatar_url || 'https://i.imgur.com/V4Rcl9o.png'}" alt="Avatar" loading="lazy"></div>
                 <div class="comment-body">
                     <div class="comment-header">
-                        <span>${comment.profiles?.username || 'Usuário'}</span>
+                        <span class="comment-author">${comment.profiles?.username || 'Usuário'}</span>
                         ${canDelete ? `<button class="comment-delete-btn" data-comment-id="${comment.id}" title="Deletar Comentário"><i class="fas fa-trash-alt"></i></button>` : ''}
                     </div>
                     <p>${sanitizedContent}</p>

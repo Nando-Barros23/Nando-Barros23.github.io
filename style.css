@@ -162,3 +162,4 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 #confirm-message { font-family: var(--fonte-titulo); font-size: 1.2rem; margin-bottom: 1.5rem; }
 .confirm-buttons { display: flex; justify-content: center; gap: 1rem; }
 .hidden { display: none !important; }
+.comment-body p { color: var(--cor-texto-secundario); margin: 0; }
