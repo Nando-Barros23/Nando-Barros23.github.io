@@ -83,17 +83,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
         } 
-        // Lógica para o Jogador
         else if (currentUser && adventureData) {
             if (subscription) {
                 switch (subscription.status) {
                     case 'aprovado': playerActionArea.innerHTML = `<p style="color: green; font-weight: bold;">✅ Você foi aprovado para esta aventura!</p><button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Sair da Mesa</button>`; break;
-                    case 'pendente': playerActionArea.innerHTML = `<p style="font-weight: bold;">⏳ Sua candidatura está pendente de aprovação.</p><button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`; break;
+                    
+                    case 'pendente':
+                        playerActionArea.innerHTML = `
+                            <div class="status-box pending">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>Sua candidatura está pendente de aprovação.</span>
+                            </div>
+                            <button id="subscribe-btn" class="btn-secundario">Cancelar Candidatura</button>
+                        `;
+                        break;                    
+                    
                     case 'recusado': playerActionArea.innerHTML = `<p style="color: red; font-weight: bold;">❌ A sua candidatura não foi aceite pelo mestre.</p>`; break;
                     default: playerActionArea.innerHTML = `<button id="subscribe-btn" class="btn-primario btn-inscricao inscrito">Cancelar Candidatura</button>`;
                 }
             } else {
-                // --- ALTERADO: O botão "Quero Participar" só aparece se a aventura estiver 'ativa' ---
+                
                 if (adventureData.status === 'ativa') {
                     const { data: approvedSubs } = await supabaseClient.from('inscricoes').select('id').eq('aventura_id', adventureId).eq('status', 'aprovado');
                     const approvedCount = approvedSubs ? approvedSubs.length : 0;
