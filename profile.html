@@ -35,11 +35,17 @@
     
         <div class="profile-page-container">
             <aside class="profile-sidebar">
+
+
                 <div class="avatar-container">
                     <img src="https://i.imgur.com/V4Rcl9o.png" alt="Avatar do Usuário" id="avatar-img" class="avatar-image" loading="lazy">
+                    <label for="avatar-upload" class="avatar-overlay">
+                        <i class="fas fa-camera"></i>
+                        <span>Alterar</span>
+                    </label>
                     <input type="file" id="avatar-upload" hidden accept="image/png, image/jpeg">
-                    <button id="btn-change-avatar" class="btn-primario" style="width:100%">Trocar Foto</button>
                 </div>
+
                 <hr style="margin: 1.5rem 0;">
                 <h3 id="username-display">Carregando...</h3>
                 <p id="email-display">Carregando...</p>

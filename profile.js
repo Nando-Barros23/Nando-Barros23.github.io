@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <button type="submit" class="btn-primario" style="padding: 0.5rem 1rem;">Buscar</button>
             </form>
             <div class="subscriber-items-container">
-                <p>Carregando candidatos...</p>
+                <div class="spinner-container"><div class="spinner"></div></div>
             </div>
         `;
         listDiv.style.display = 'block';
@@ -84,18 +84,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             applicantEl.className = 'subscriber-item';
             applicantEl.id = `inscricao-${sub.id}`;
 
+            // CÓDIGO NOVO
             let buttons = '';
             if (sub.status === 'pendente') {
                 buttons = `
                     <div class="applicant-actions">
-                        <button class="btn-applicant-action approve" data-inscricao-id="${sub.id}" data-action="aprovado" aria-label="Aprovar ${profile.username || 'candidato'}">Aprovar</button>
-                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="recusado" aria-label="Recusar ${profile.username || 'candidato'}">Recusar</button>
+                        <button class="btn-applicant-action approve" data-inscricao-id="${sub.id}" data-action="aprovado" title="Aprovar Candidato" aria-label="Aprovar ${profile.username || 'candidato'}"><i class="fas fa-check"></i></button>
+                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="recusado" title="Recusar Candidato" aria-label="Recusar ${profile.username || 'candidato'}"><i class="fas fa-times"></i></button>
                     </div>
                 `;
             } else if (sub.status === 'aprovado') {
                 buttons = `
                     <div class="applicant-actions">
-                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="removido" aria-label="Remover jogador ${profile.username || 'aprovado'}">Remover</button>
+                        <button class="btn-applicant-action reject" data-inscricao-id="${sub.id}" data-action="removido" title="Remover Jogador" aria-label="Remover jogador ${profile.username || 'aprovado'}"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
             }
@@ -156,11 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    
-    async function loadMyAdventures(user) {
+        async function loadMyAdventures(user) {
         const { data: adventures, error } = await supabaseClient
             .from('aventuras')
-            .select('id, titulo, status')
+            .select('id, titulo, status, vagas') 
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });
             
@@ -172,24 +172,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        const adventureIds = adventures.map(a => a.id);
+        const { data: allSubs } = await supabaseClient
+            .from('inscricoes')
+            .select('aventura_id, status')
+            .in('aventura_id', adventureIds);
+
         adventures.forEach(adventure => {
+            const subsForThisAdventure = allSubs.filter(s => s.aventura_id === adventure.id);
+            const approvedCount = subsForThisAdventure.filter(s => s.status === 'aprovado').length;
+            const pendingCount = subsForThisAdventure.filter(s => s.status === 'pendente').length;
+            
+            let countsHTML = '';
+            if (adventure.status === 'ativa' || adventure.status === 'em_andamento') {
+                countsHTML = `<span class="adventure-counts">(${approvedCount}/${adventure.vagas} Aprovados | ${pendingCount} Pendentes)</span>`;
+            }
+
             const item = document.createElement('div');
             item.className = 'my-adventure-item';
             
             let statusTag = '';
-            let actionButtonsHTML = '';
-
             const statusInfo = {
                 ativa: { text: 'Ativa', class: 'active' },
                 em_andamento: { text: 'Em Andamento', class: 'in-progress' },
                 finalizada: { text: 'Finalizada', class: 'finished' },
                 arquivada: { text: 'Arquivada', class: 'archived' }
             };
-            
             if (adventure.status && statusInfo[adventure.status]) {
                 statusTag = `<span class="status-tag ${statusInfo[adventure.status].class}">${statusInfo[adventure.status].text}</span>`;
             }
-
+            let actionButtonsHTML = '';
             switch (adventure.status) {
                 case 'em_andamento':
                     actionButtonsHTML = `<button class="btn-adventure-action finalize" data-adventure-id="${adventure.id}">Finalizar</button>`;
@@ -210,6 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="adventure-title-status">
                         <span>${adventure.titulo}</span>
                         ${statusTag}
+                        ${countsHTML}
                     </div>
                     <div class="adventure-actions">
                         ${actionButtonsHTML}
@@ -379,8 +392,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             usernameDisplay.textContent = newUsername;
         }
     });
-
-    btnChangeAvatar.addEventListener('click', () => { avatarUpload.click(); });
 
     avatarUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];

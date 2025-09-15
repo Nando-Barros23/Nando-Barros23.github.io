@@ -163,3 +163,17 @@ h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5r
 .confirm-buttons { display: flex; justify-content: center; gap: 1rem; }
 .hidden { display: none !important; }
 .comment-body p { color: var(--cor-texto-secundario); margin: 0; }
+.btn-applicant-action { border-radius: 50%; width: 32px; height: 32px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.2s ease; }
+.btn-applicant-action:hover { transform: scale(1.1); }
+.avatar-container { position: relative; cursor: pointer; margin-bottom: 1rem; }
+.avatar-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; opacity: 0; transition: opacity 0.3s ease; font-family: var(--fonte-titulo); }
+.avatar-container:hover .avatar-overlay { opacity: 1; }
+.avatar-overlay i { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.profile-sidebar hr { border: none; border-top: 1px solid var(--cor-borda); margin: 1.5rem 0; }
+#username-display { text-align: center; font-size: 1.5rem; margin-bottom: 0.25rem; word-break: break-word; }
+#email-display { text-align: center; color: var(--cor-texto-secundario); font-size: 0.9rem; word-break: break-all; margin-bottom: 0.5rem; }
+.profile-sidebar p { text-align: center; }
+.adventure-counts { font-family: var(--fonte-corpo); font-size: 0.8rem; color: var(--cor-texto-secundario); font-weight: normal; margin-left: 0.75rem; }
+.spinner-container { display: flex; justify-content: center; padding: 2rem; }
+.spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--cor-primaria); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
