@@ -282,5 +282,8 @@ function renderAdventures(adventures) {
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
-    initializeIndexPage();
+    renderAdventures();
+});
+
+initializeIndexPage();
 });
