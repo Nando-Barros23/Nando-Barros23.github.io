@@ -325,7 +325,7 @@ function applyFilters() {
         }
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
-
+}
     renderAdventures(allAdventures); 
 
 document.addEventListener('DOMContentLoaded', () => {
