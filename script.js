@@ -1,5 +1,6 @@
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. INICIALIZAÇÃO E VARIÁVEIS
-    const adventuresContainer = document.getElementById('adventures-container');    
+    const adventuresGrid = document.getElementById('adventures-grid');
     const adventureForm = document.getElementById('adventure-form');
     const userArea = document.getElementById('user-area');
     const publishSection = document.querySelector('.painel-lateral');
@@ -12,9 +13,9 @@
     let allAdventures = [];
 
     async function initializeIndexPage() {
-        if (adventuresContainer) {
-    adventuresContainer.innerHTML = '<p>Carregando aventuras...</p>';
-}
+        if (adventuresGrid) {
+            adventuresGrid.innerHTML = '<p>Carregando aventuras...</p>';
+        }
         
         const [sessionResponse, adventuresResponse] = await Promise.all([
             supabaseClient.auth.getSession(),
@@ -26,8 +27,8 @@
 
         if (adventuresResponse.error) {
             console.error('Erro ao buscar aventuras:', adventuresResponse.error);
-            if (adventuresContainer) {
-                adventuresContainer.innerHTML = '<p style="color: red;">Erro ao carregar as aventuras. Tente recarregar a página.</p>';
+            if (adventuresGrid) {
+                adventuresGrid.innerHTML = '<p style="color: red;">Erro ao carregar as aventuras. Tente recarregar a página.</p>';
             }
         } else {
             allAdventures = adventuresResponse.data;
@@ -90,44 +91,43 @@ function applyFilters() {
     renderAdventures(filteredAdventures);
 }
 
-function renderAdventures(adventuresToRender) {
-    const adventuresContainer = document.getElementById('adventures-container');
-    if (!adventuresContainer) {
-        console.error("Container de aventuras não encontrado!");
-        return;
-    }
-
-    adventuresContainer.innerHTML = ''; // Limpa o container antes de adicionar os novos cards
-
-    if (adventuresToRender && adventuresToRender.length > 0) {
-        adventuresToRender.forEach(adventure => {
+function renderAdventures(adventures) {
+    if (!adventuresGrid) return;
+    adventuresGrid.innerHTML = '';
+    if (adventures.length === 0) {
+        adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados.</p>';
+    } else {
+        adventures.forEach(adventure => {
+            const cardLink = document.createElement('a');
+            cardLink.href = `aventura.html?id=${adventure.id}`;
+            cardLink.classList.add('adventure-card-link');
             const card = document.createElement('div');
-            card.className = 'adventure-card';
-            card.innerHTML = `
-                <img src="${adventure.image_url || 'https://i.imgur.com/Q3j5eH0.png'}" alt="Imagem da Aventura" loading="lazy">
-                <div class="card-content">
-                    <h3>${adventure.titulo}</h3>
+            card.classList.add('adventure-card');
+            const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
+        
+             card.innerHTML = `
+                <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image" loading="lazy">
+                <div class="adventure-card-content">
+                    <h4>${adventure.titulo}</h4>
                     <div class="card-details">
                         <div class="card-detail-line">
                             <i class="fas fa-user-edit"></i>
                             <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
                         </div>
                         <div class="card-detail-line">
-                            <i class="fas fa-book"></i>
+                            <i class="fas fa-book-skull"></i>
                             <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
                         </div>
-                        <div class="card-detail-line">
-                            <i class="fas fa-users"></i>
+                         <div class="card-detail-line">
+                            <i class="fas fa-user"></i>
                             <span><strong>Vagas:</strong> ${adventure.vagas}</span>
                         </div>
                     </div>
-                    <a href="aventura.html?id=${adventure.id}" class="btn-primario" style="width: 100%;">Ver Detalhes</a>
                 </div>
             `;
-            adventuresContainer.appendChild(card);
+            cardLink.appendChild(card);
+            adventuresGrid.appendChild(cardLink);
         });
-    } else {
-        adventuresContainer.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados. Que tal criar a primeira?</p>';
     }
 }
 
@@ -252,37 +252,21 @@ function renderAdventures(adventuresToRender) {
                 image_url: imageUrl
             };
             
-        const { data, error } = await supabaseClient.from('aventuras').insert([newAdventure]).select();
-
-        if (error) {
-            console.error('Erro ao inserir aventura:', error);
-            showToast('Ocorreu um erro ao publicar sua aventura.', 'error');
-        } else {
-            const novaAventura = data[0]; 
-
-            try {
-              const { data: funcData, error: funcError } = await supabaseClient.functions.invoke('notificar-discord', {
-                body: { aventura: novaAventura }
-              });
-
-              if (funcError) throw funcError;
-
-              console.log("Notificação para o Discord enviada com sucesso!", funcData);
-            } catch (funcError) {
-              console.error("Erro ao notificar o Discord:", funcError);
+            const { error } = await supabaseClient.from('aventuras').insert([newAdventure]);
+            if (error) {
+                console.error('Erro ao inserir aventura:', error);
+                showToast('Ocorreu um erro ao publicar sua aventura.', 'error');
+            } else {
+                showToast('Aventura publicada com sucesso!', 'success');
+                adventureForm.reset();
+                easyMDE.value("");
+                locationContainer.style.display = 'none';
+                onlineRadio.checked = true;
+                initializeIndexPage();
             }
+            formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
+        });
+    }
 
-            showToast('Aventura publicada com sucesso!', 'success');
-            adventureForm.reset();
-            easyMDE.value("");
-            locationContainer.style.display = 'none';
-            onlineRadio.checked = true;
-            renderAdventures(allAdventures); 
-        }
-        formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
     initializeIndexPage();
 });
