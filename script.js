@@ -90,45 +90,90 @@ function applyFilters() {
     renderAdventures(filteredAdventures);
 }
 
-function renderAdventures(adventures) {
-    if (!adventuresGrid) return;
-    adventuresGrid.innerHTML = '';
-    if (adventures.length === 0) {
-        adventuresGrid.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados.</p>';
-    } else {
-        adventures.forEach(adventure => {
-            const cardLink = document.createElement('a');
-            cardLink.href = `aventura.html?id=${adventure.id}`;
-            cardLink.classList.add('adventure-card-link');
-            const card = document.createElement('div');
-            card.classList.add('adventure-card');
-            const placeholderImg = 'https://i.imgur.com/Q3j5eH0.png';
-        
-             card.innerHTML = `
-                <img src="${adventure.image_url || placeholderImg}" alt="Imagem da Aventura" class="adventure-card-image" loading="lazy">
-                <div class="adventure-card-content">
-                    <h4>${adventure.titulo}</h4>
-                    <div class="card-details">
-                        <div class="card-detail-line">
-                            <i class="fas fa-user-edit"></i>
-                            <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
+    // SUBSTITUA A FUNÇÃO INTEIRA PELA VERSÃO ABAIXO
+    async function renderAdventures() {
+        const adventuresContainer = document.getElementById('adventures-container');
+        if (!adventuresContainer) {
+            console.error("Container de aventuras não encontrado!");
+            return;
+        }e
+
+        adventuresContainer.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
+
+        try {
+            // --- ESTA PARTE ESTAVA FALTANDO ---
+            // 1. Constrói a consulta ao Supabase
+            let query = supabaseClient
+                .from('aventuras')
+                .select('*')
+                .eq('status', 'ativa')
+                .order('created_at', { ascending: false });
+
+            // 2. Aplica os filtros da página
+            const filterSystem = document.getElementById('filter-system').value;
+            const filterModality = document.getElementById('filter-modality').value;
+            const filterType = document.getElementById('filter-type').value;
+            const searchInput = document.getElementById('search-input').value.trim();
+
+            if (searchInput) {
+                query = query.ilike('titulo', `%${searchInput}%`);
+            }
+            if (filterSystem) {
+                query = query.eq('sistema_rpg', filterSystem);
+            }
+            if (filterModality) {
+                query = query.eq('modalidade', filterModality);
+            }
+            if (filterType) {
+                query = query.eq('tipo_jogo', filterType);
+            }
+
+            // 3. Executa a consulta
+            const { data: adventures, error } = await query;
+            // --- FIM DA PARTE QUE FALTAVA ---
+
+            if (error) {
+                throw error; // Joga o erro para o bloco catch
+            }
+
+            adventuresContainer.innerHTML = ''; // Limpa o spinner
+
+            if (adventures && adventures.length > 0) {
+                adventures.forEach(adventure => {
+                    const card = document.createElement('div');
+                    card.className = 'adventure-card';
+                    card.innerHTML = `
+                        <img src="${adventure.image_url || 'https://i.imgur.com/Q3j5eH0.png'}" alt="Imagem da Aventura" loading="lazy">
+                        <div class="card-content">
+                            <h3>${adventure.titulo}</h3>
+                            <div class="card-details">
+                                <div class="card-detail-line">
+                                    <i class="fas fa-user-edit"></i>
+                                    <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
+                                </div>
+                                <div class="card-detail-line">
+                                    <i class="fas fa-book"></i>
+                                    <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
+                                </div>
+                                <div class="card-detail-line">
+                                    <i class="fas fa-users"></i>
+                                    <span><strong>Vagas:</strong> ${adventure.vagas}</span>
+                                </div>
+                            </div>
+                            <a href="aventura.html?id=${adventure.id}" class="btn-primario" style="width: 100%;">Ver Detalhes</a>
                         </div>
-                        <div class="card-detail-line">
-                            <i class="fas fa-book-skull"></i>
-                            <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
-                        </div>
-                         <div class="card-detail-line">
-                            <i class="fas fa-user"></i>
-                            <span><strong>Vagas:</strong> ${adventure.vagas}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            cardLink.appendChild(card);
-            adventuresGrid.appendChild(cardLink);
-        });
+                    `;
+                    adventuresContainer.appendChild(card);
+                });
+            } else {
+                adventuresContainer.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados. Que tal criar a primeira?</p>';
+            }
+
+        } catch (error) {
+            console.error('Erro ao renderizar aventuras:', error);
+            adventuresContainer.innerHTML = '<p class="error-message">Ocorreu um erro ao carregar as aventuras. Tente novamente mais tarde.</p>';
+        }
     }
-}
 
     async function updateUI(user) {
         if (user) {
@@ -281,7 +326,7 @@ function renderAdventures(adventures) {
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 
-    renderAdventures(allAdventures);
+    renderAdventures(allAdventures); 
 });
 
 document.addEventListener('DOMContentLoaded', () => {
