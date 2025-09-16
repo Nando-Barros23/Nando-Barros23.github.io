@@ -327,7 +327,6 @@ function applyFilters() {
     });
 
     renderAdventures(allAdventures); 
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeIndexPage();
