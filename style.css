@@ -32,7 +32,7 @@ header h1 { font-size: 2.5rem; color: var(--cor-texto-principal); }
 .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
 @media (min-width: 992px) { .container { grid-template-columns: 3fr 1.5fr; } }
 h2, h3 { color: var(--cor-primaria); margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--cor-borda); }
-#adventures-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.adventures-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
 .adventure-card-link { text-decoration: none; color: inherit; display: block; }
 .adventure-card { background-color: var(--cor-fundo-card); border: 1px solid var(--cor-borda); border-radius: 8px; box-shadow: var(--sombra); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; overflow: hidden; }
 .adventure-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); }
