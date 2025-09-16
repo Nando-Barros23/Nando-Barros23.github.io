@@ -89,84 +89,47 @@ function applyFilters() {
 
     renderAdventures(filteredAdventures);
 }
-    async function renderAdventures(filteredAdventures) {
-        const adventuresContainer = document.getElementById('adventures-container');
-        if (!adventuresContainer) {
-            console.error("Container de aventuras não encontrado!");
-            return;
-        }
 
-        adventuresContainer.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
-
-        try {
-            let query = supabaseClient
-                .from('aventuras')
-                .select('*')
-                .eq('status', 'ativa')
-                .order('created_at', { ascending: false });
-
-            const filterSystem = document.getElementById('filter-system').value;
-            const filterModality = document.getElementById('filter-modality').value;
-            const filterType = document.getElementById('filter-type').value;
-            const searchInput = document.getElementById('search-input').value.trim();
-
-            if (searchInput) {
-                query = query.ilike('titulo', `%${searchInput}%`);
-            }
-            if (filterSystem) {
-                query = query.eq('sistema_rpg', filterSystem);
-            }
-            if (filterModality) {
-                query = query.eq('modalidade', filterModality);
-            }
-            if (filterType) {
-                query = query.eq('tipo_jogo', filterType);
-            }
-
-            const { data: adventures, error } = await query;
-
-            if (error) {
-                throw error; 
-            }
-
-            adventuresContainer.innerHTML = ''; 
-
-            if (adventures && adventures.length > 0) {
-                adventures.forEach(adventure => {
-                    const card = document.createElement('div');
-                    card.className = 'adventure-card';
-                    card.innerHTML = `
-                        <img src="${adventure.image_url || 'https://i.imgur.com/Q3j5eH0.png'}" alt="Imagem da Aventura" loading="lazy">
-                        <div class="card-content">
-                            <h3>${adventure.titulo}</h3>
-                            <div class="card-details">
-                                <div class="card-detail-line">
-                                    <i class="fas fa-user-edit"></i>
-                                    <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
-                                </div>
-                                <div class="card-detail-line">
-                                    <i class="fas fa-book"></i>
-                                    <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
-                                </div>
-                                <div class="card-detail-line">
-                                    <i class="fas fa-users"></i>
-                                    <span><strong>Vagas:</strong> ${adventure.vagas}</span>
-                                </div>
-                            </div>
-                            <a href="aventura.html?id=${adventure.id}" class="btn-primario" style="width: 100%;">Ver Detalhes</a>
-                        </div>
-                    `;
-                    adventuresContainer.appendChild(card);
-                });
-            } else {
-                adventuresContainer.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados. Que tal criar a primeira?</p>';
-            }
-
-        } catch (error) {
-            console.error('Erro ao renderizar aventuras:', error);
-            adventuresContainer.innerHTML = '<p class="error-message">Ocorreu um erro ao carregar as aventuras. Tente novamente mais tarde.</p>';
-        }
+function renderAdventures(adventuresToRender) {
+    const adventuresContainer = document.getElementById('adventures-container');
+    if (!adventuresContainer) {
+        console.error("Container de aventuras não encontrado!");
+        return;
     }
+
+    adventuresContainer.innerHTML = ''; // Limpa o container antes de adicionar os novos cards
+
+    if (adventuresToRender && adventuresToRender.length > 0) {
+        adventuresToRender.forEach(adventure => {
+            const card = document.createElement('div');
+            card.className = 'adventure-card';
+            card.innerHTML = `
+                <img src="${adventure.image_url || 'https://i.imgur.com/Q3j5eH0.png'}" alt="Imagem da Aventura" loading="lazy">
+                <div class="card-content">
+                    <h3>${adventure.titulo}</h3>
+                    <div class="card-details">
+                        <div class="card-detail-line">
+                            <i class="fas fa-user-edit"></i>
+                            <span><strong>Mestre:</strong> ${adventure.nome_mestre}</span>
+                        </div>
+                        <div class="card-detail-line">
+                            <i class="fas fa-book"></i>
+                            <span><strong>Sistema:</strong> ${adventure.sistema_rpg}</span>
+                        </div>
+                        <div class="card-detail-line">
+                            <i class="fas fa-users"></i>
+                            <span><strong>Vagas:</strong> ${adventure.vagas}</span>
+                        </div>
+                    </div>
+                    <a href="aventura.html?id=${adventure.id}" class="btn-primario" style="width: 100%;">Ver Detalhes</a>
+                </div>
+            `;
+            adventuresContainer.appendChild(card);
+        });
+    } else {
+        adventuresContainer.innerHTML = '<p>Nenhuma aventura encontrada com os filtros selecionados. Que tal criar a primeira?</p>';
+    }
+}
 
     async function updateUI(user) {
         if (user) {
@@ -319,7 +282,6 @@ function applyFilters() {
         formButton.disabled = false; formButton.textContent = 'Publicar Aventura';
     });
 }
-    renderAdventures(allAdventures); 
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeIndexPage();
