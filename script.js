@@ -1,5 +1,5 @@
     // 1. INICIALIZAÇÃO E VARIÁVEIS
-    const adventuresGrid = document.getElementById('adventures-grid');
+    const adventuresContainer = document.getElementById('adventures-container');    
     const adventureForm = document.getElementById('adventure-form');
     const userArea = document.getElementById('user-area');
     const publishSection = document.querySelector('.painel-lateral');
@@ -12,9 +12,9 @@
     let allAdventures = [];
 
     async function initializeIndexPage() {
-        if (adventuresGrid) {
-            adventuresGrid.innerHTML = '<p>Carregando aventuras...</p>';
-        }
+        if (adventuresContainer) {
+    adventuresContainer.innerHTML = '<p>Carregando aventuras...</p>';
+}
         
         const [sessionResponse, adventuresResponse] = await Promise.all([
             supabaseClient.auth.getSession(),
@@ -26,8 +26,8 @@
 
         if (adventuresResponse.error) {
             console.error('Erro ao buscar aventuras:', adventuresResponse.error);
-            if (adventuresGrid) {
-                adventuresGrid.innerHTML = '<p style="color: red;">Erro ao carregar as aventuras. Tente recarregar a página.</p>';
+            if (adventuresContainer) {
+                adventuresContainer.innerHTML = '<p style="color: red;">Erro ao carregar as aventuras. Tente recarregar a página.</p>';
             }
         } else {
             allAdventures = adventuresResponse.data;
