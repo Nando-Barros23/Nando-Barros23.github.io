@@ -89,27 +89,22 @@ function applyFilters() {
 
     renderAdventures(filteredAdventures);
 }
-
-    // SUBSTITUA A FUNÇÃO INTEIRA PELA VERSÃO ABAIXO
-    async function renderAdventures() {
+    async function renderAdventures(filteredAdventures) {
         const adventuresContainer = document.getElementById('adventures-container');
         if (!adventuresContainer) {
             console.error("Container de aventuras não encontrado!");
             return;
-        }e
+        }
 
         adventuresContainer.innerHTML = `<div class="spinner-container"><div class="spinner"></div></div>`;
 
         try {
-            // --- ESTA PARTE ESTAVA FALTANDO ---
-            // 1. Constrói a consulta ao Supabase
             let query = supabaseClient
                 .from('aventuras')
                 .select('*')
                 .eq('status', 'ativa')
                 .order('created_at', { ascending: false });
 
-            // 2. Aplica os filtros da página
             const filterSystem = document.getElementById('filter-system').value;
             const filterModality = document.getElementById('filter-modality').value;
             const filterType = document.getElementById('filter-type').value;
@@ -128,15 +123,13 @@ function applyFilters() {
                 query = query.eq('tipo_jogo', filterType);
             }
 
-            // 3. Executa a consulta
             const { data: adventures, error } = await query;
-            // --- FIM DA PARTE QUE FALTAVA ---
 
             if (error) {
-                throw error; // Joga o erro para o bloco catch
+                throw error; 
             }
 
-            adventuresContainer.innerHTML = ''; // Limpa o spinner
+            adventuresContainer.innerHTML = ''; 
 
             if (adventures && adventures.length > 0) {
                 adventures.forEach(adventure => {
