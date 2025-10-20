@@ -22,3 +22,4 @@ try {
   supabaseClient = supabase.createClient(fallbackUrl, fallbackKey);
   console.warn('⚠️ Usando configuração de fallback - apenas para desenvolvimento');
 }
+window.supabaseClient = supabaseClient;
