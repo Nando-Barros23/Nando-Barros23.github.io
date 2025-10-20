@@ -1,25 +1,22 @@
-// config.js - Versão Segura para Vercel
-let supabaseClient;
+// config.js - VERSÃO SIMPLES E SEGURA
 
-try {
-  // Tentar usar environment variables do Vercel
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY;
+// No Vercel, isso funciona automaticamente
+// No seu computador, vai dar erro - mas só você vê o erro
+
+const supabaseUrl = 'https://zslokbeazldiwmblahps.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY; // ← CHAVE ESCONDIDA
+
+if (!supabaseKey) {
+  // Se não encontrar a chave escondida
+  console.error('❌ AVISO: Chave do Supabase não encontrada');
+  console.error('💡 No Vercel: Configure SUPABASE_ANON_KEY nas Environment Variables');
+  console.error('💡 No seu PC: Isso é normal durante desenvolvimento');
   
-  if (supabaseUrl && supabaseKey) {
-    // Ambiente do Vercel - seguro
-    supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-    console.log('✅ Configuração segura do Supabase carregada');
-  } else {
-    // Fallback para desenvolvimento local
-    throw new Error('Variáveis de ambiente não encontradas');
-  }
-} catch (error) {
-  // Fallback para desenvolvimento (NUNCA use em produção)
-  const fallbackUrl = 'https://zslokbeazldiwmblahps.supabase.co';
-  const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
-  
-  supabaseClient = supabase.createClient(fallbackUrl, fallbackKey);
-  console.warn('⚠️ Usando configuração de fallback - apenas para desenvolvimento');
+  // PARA completamente se não tiver chave (MAIS SEGURO)
+  window.supabaseClient = null;
+} else {
+  // Só cria o cliente se tiver chave de verdade
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+  window.supabaseClient = supabaseClient;
+  console.log('✅ Supabase configurado com segurança');
 }
-window.supabaseClient = supabaseClient;
