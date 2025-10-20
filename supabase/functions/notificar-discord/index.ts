@@ -1,20 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
-// Pega a URL secreta do webhook que configuramos
+// Pega a URL secreta do webhook que vamos configurar na próxima fase
 const DISCORD_WEBHOOK_URL = Deno.env.get('DISCORD_WEBHOOK_URL')
 
 serve(async (req) => {
-  // Responde a checagens de CORS do navegador
+  // Responde a checagens de CORS do navegador (necessário para o invoke funcionar)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Pega os dados da aventura que o frontend enviou
+    // Pega os dados da aventura que o nosso site (script.js) enviou
     const { aventura } = await req.json()
 
-    // Monta a mensagem (embed) para o Discord
+    // Monta a mensagem bonita (embed) para o Discord
     const discordPayload = {
       embeds: [
         {
@@ -32,6 +32,7 @@ serve(async (req) => {
           footer: {
             text: `Clique no título para ver os detalhes da aventura.`
           },
+          // Garanta que o link abaixo seja o do seu site. Se você usa Vercel, pode trocar.
           url: `https://nando-barros23.github.io/aventura.html?id=${aventura.id}`
         }
       ]
@@ -44,13 +45,13 @@ serve(async (req) => {
       body: JSON.stringify(discordPayload),
     });
 
-    // Retorna uma resposta de sucesso para o frontend
+    // Retorna uma resposta de sucesso para o nosso site
     return new Response(JSON.stringify({ message: "Notificação enviada com sucesso!" }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
   } catch (error) {
-    // Retorna uma resposta de erro para o frontend
+    // Retorna uma resposta de erro para o nosso site
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
