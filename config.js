@@ -1,22 +1,5 @@
-// config.js - VERSÃO SIMPLES E SEGURA
+// keys
 
-// No Vercel, isso funciona automaticamente
-// No seu computador, vai dar erro - mas só você vê o erro
-
-const supabaseUrl = 'https://zslokbeazldiwmblahps.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY; // ← CHAVE ESCONDIDA
-
-if (!supabaseKey) {
-  // Se não encontrar a chave escondida
-  console.error('❌ AVISO: Chave do Supabase não encontrada');
-  console.error('💡 No Vercel: Configure SUPABASE_ANON_KEY nas Environment Variables');
-  console.error('💡 No seu PC: Isso é normal durante desenvolvimento');
-  
-  // PARA completamente se não tiver chave (MAIS SEGURO)
-  window.supabaseClient = null;
-} else {
-  // Só cria o cliente se tiver chave de verdade
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-  window.supabaseClient = supabaseClient;
-  console.log('✅ Supabase configurado com segurança');
-}
+const SUPABASE_URL = 'https://zslokbeazldiwmblahps.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzbG9rYmVhemxkaXdtYmxhaHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0NDA2NDcsImV4cCI6MjA3MDAxNjY0N30.UfTi-SBzIa9Wn_uEnQiW5PAiTECSVimnGGVJ1IFABDQ';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
